@@ -1,4 +1,6 @@
-# CamHD_motion_metadata
+# CamHD Motion Metadata
+
+>  __PLEASE NOTE:__ This metadata is generated automatically.   _Please_ use the Github issue tracker to flag data quality issues, and _please_ use the git commit to track file versions for data traceability.
 
 This repository stores supplementary metadata associated with the uncompressed video data from [CamHD](http://www.interactiveoceans.washington.edu/story/High_Definition_Video_Camera) stored at the [Ocean Observatories Initiative](http://oceanobservatories.org/) [raw data repository](https://rawdata.oceanobservatories.org/files/).
 
@@ -48,7 +50,8 @@ At present, this JSON is set from the the Lazycache movie metadata, including th
   ...
   "frame_stats": [
     {
-      "frame_number": 100
+      "frame_number": 100,
+      ....
     },
     {
       ...
@@ -60,3 +63,43 @@ At present, this JSON is set from the the Lazycache movie metadata, including th
 ```
 
 NOTE the array is written as the movie is processed and _may not be in order._
+
+
+## regions
+
+`regions` metadata describes continuous sections of video which have been determined to show the same kind of motion.  At the top level, the `regions` object is an array of objects, each of which describes a region:
+
+```
+    ...
+    "contents": {
+        "regions": "1.0"
+    },
+    "regions": [
+        {
+            "bounds": [
+                580,
+                1050
+            ],
+            "type": "static",
+            "stats": {
+                "scale_mean": 0.999919751891621,
+                "tx_mean": -0.007306357788220547,
+                "ty_mean": -0.0038538576792083563,
+                "size": 611
+            }
+        },
+        ...
+    },
+...
+}
+```
+
+Each region is described by `bounds` which give the beginning and end of the region in frames, a `type` label, and supplementary stats from the region extraction process.
+
+Currently, the types are:
+
+ * `static`:  camera is not moving or zooming
+ * `zoom_in` or `zoom_out`:  camera is zooming.  If the camera is determined to be zooming, the translation is ignored
+ * `N`,`NW`, `NE`, etc.:  camera is translating.  Directions are approximate with North being tilting upwards, South being tilting downward, East being panning rightward, etc.
+ * `short`:  Segment is too short to determine motion
+ * `unknown`:  Unable to determine motion
