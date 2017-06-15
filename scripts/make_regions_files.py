@@ -7,7 +7,9 @@ import argparse
 import os.path
 import subprocess
 
-REGION_ANALYSIS = "../camhd_motion_analysis/python/region_analysis.py"
+
+import camhd_motion_analysis as ma
+
 
 parser = argparse.ArgumentParser(description='Generate _optical_flow_region.json files from _optical_flow.json files')
 
@@ -39,16 +41,13 @@ for path in args.input:
 
         if os.path.isfile( outfile ) and args.force == False:
             logging.warning("Skipping %s or run with --force to overwrite" % outfile )
-        elif args.dryrun == False:
-            procout = subprocess.run( ["python3", REGION_ANALYSIS,
-                                                   "--output", outfile,
-                                                    infile ],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE,
-                                    encoding='utf8' )
+            continue
 
-            logging.info( "stdout: %s" % procout.stdout )
-            logging.info( "stderr: %s" % procout.stderr )
+        if args.dryrun == True:
+            continue
 
-            if os.path.isfile( outfile ) and args.gitadd:
-                subprocess.run( [ "git", "add", outfile ] )
+        with open(infile) as data_file:
+            ma.region_analysis( data_file, outfile=outfile )
+
+        if os.path.isfile( outfile ) and args.gitadd:
+            subprocess.run( [ "git", "add", outfile ] )
