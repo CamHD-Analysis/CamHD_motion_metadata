@@ -76,6 +76,8 @@ def migrate( jinput ):
 for path in args.input:
     for inpath in glob.iglob( path, recursive=True):
 
+        logging.info("Processing %s" % inpath)
+
         with open( inpath ) as infile:
             jinput = json.load( infile )
 
