@@ -1,129 +1,46 @@
 # CamHD Motion Metadata
 
->  __PLEASE NOTE:__ This metadata is generated automatically.   _Please_ use the Github issue tracker to flag data quality issues, and _please_ use the git commit to track file versions for data traceability.
+>  __PLEASE NOTE:__  The metadata files in this repo are generated automatically.   We're still developing our QA/QC processes!    _Please_ use the Github issue tracker to flag missing files, data quality issues, etc.
 
-This repository stores supplementary metadata associated with the uncompressed video data from [CamHD](http://www.interactiveoceans.washington.edu/story/High_Definition_Video_Camera) stored at the [Ocean Observatories Initiative](http://oceanobservatories.org/) [raw data repository](https://rawdata.oceanobservatories.org/files/).
+[CamHD](http://www.interactiveoceans.washington.edu/story/High_Definition_Video_Camera), an HD camera installed at 1500m water depth at [Axial Seamount](https://en.wikipedia.org/wiki/Axial_Seamount), generates ~13-minute HD videos of an active hydrothermal vent ecosystem, eight times a day.   These files are stored in the [Ocean Observatories Initiative](http://oceanobservatories.org/) [raw data repository](https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/).
 
-These metdata products are generated under the NSF OTIC-sponsored program [_Cloud-Capable Tools for CamHD Data Analysis_](https://camhd-analysis.github.io/public-www/).
+Under the NSF OTIC-sponsored program [_Cloud-Capable Tools for CamHD Data Analysis_](https://camhd-analysis.github.io/public-www/), we are investigating the use of video analytics / computer to generate ancillary metadata about each video: camera motion and position, and identification of sections (sequences of frames, time bounds) within each video when the camera is still, and looking and particular known "stations" on the vent.
+
+This repo is the primary distribution point for those metadata files.   The Git format lets us version and track files as they are created, flag data quality issues, etc.
+
+For additional information on this project, please see [The project blog](https://camhd-analysis.github.io/public-www/)
+
+## Using the data
 
 The directory structure within this repository mirrors that of the raw data
-archive.  As we focus on CamHD, all of the metadata files is under the
+archive.  Since we only analyze CamHD data, all of the metadata files is under the
 directory `RS03ASHS/PN03B/06-CAMHDA301/`.   Metadata files share a common root
 name with video files, followed by a suffix which describes the metadata
 (described in greater detail below).  All metadata is stored in JSON-encoded
 text files, and all files use the `.json` extension.   
 
-All files contain a JSON object at the top level, which contains at least these two keys:
+All JSON files contain some common fields described [here](docs/JsonCommon.md).  At present, there are two specific types of JSON file in the repo:
 
-`contents` is an object containing string identifiers and semantic version
-numbers of the data type(s) within the file.  So, for example
+ * `*_optical_flow.json` files contain the estimated camera motion for a subset of frames in in each video.  The format is described [here](docs/OpticalFlow.md).
 
-```
-{
-  "contents" : { "movie", : "1.0", "optical_flow": "1.0" }
-  ...
-}
-```
+ * The optical flow files are then processed to isolate sequences where the camera motion is consistent (e.g. tilting upward, zooming in, static).  These "regions" of consistent behavior are described in a `*_optical_flow_regions.json` file described [here](docs/OpticalFlowRegions.md).
 
-indicates the file contains "movie" data in the 1.0 file format and  "optical
-flow" data in the 1.0 file format.   Given the flexibility of JSON the
-file contents could be determined by guess-and-check, but we provide these
-hints to quickly detect either breaking changes to file format or
-unexpected file contents.
-
-Frame numbers are given in the Quicktime convention where the first frame in the movie is __1__,
-and the last is __(number of frames)___.
-
-## movie
-
-The `movie` content type adds a top-level object `movie`:
-
-```
-{
-  ...
-  "movie": {
-      "Duration": 839.338562011719,
-      "NumFrames": 25155,
-      "URL": "https://rawdata.oceanobservatories.org/files//RS03ASHS/PN03B/06-CAMHDA301/2016/01/01/CAMHDA301-20160101T000000Z.mov",
-      "cacheURL": "https://camhd-app-dev.appspot.com/v1/org/oceanobservatories/rawdata/files/RS03ASHS/PN03B/06-CAMHDA301/2016/01/01/CAMHDA301-20160101T000000Z.mov"
-  },
-  ...
-}
-```
-
-At present, this JSON is set from the the Lazycache movie metadata, including
-the duration in seconds, the number of frames, and the original
-raw data archive URL.   The `cacheURL` field gives the Lazycache URL used
-to retrieve the metadata (if applicable).
-
-## frame_stats
-
-``frame_stats`` data is produced by the _frame_stats_ tool in the
-[camhd_motion_analysis](https://github.com/CamHD-Analysis/camhd_motion_analysis)
-project.  It iterates over frames in the movie and runs a set of analyses
-on each frame.    The `frame_stats` object at the top level is an array
-of objects.   Each object contains the frame number at the top-level:
-
-```
-{
-  ...
-  "frame_stats": [
-    {
-      "frame_number": 100,
-      ....
-    },
-    {
-      "frame_number": 200,
-      ...
-    },
-    ...
-  ],
-  ...
-}
-```
-
-NOTE the array is written as the movie is processed and _may not be in order._  
-Also, the frames present depends on the algorithm(s) used to generate
-the frame stats.
+Right now, the JSON file formats are __unstable__.   The [file format](docs/JsonCommon.md) allows for semantic versioning of the file contents, and we describe format changes in the [Change Log](docs/ChangeLog.md).
 
 
-## regions
+## License / Citing the data
 
-`regions` metadata describes continuous sections of video which have been
-determined to show the same kind of motion.  At the top level, the `regions`
-object is an array of objects, each of which describes a region:
+[![CC-SA-4.0 License](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-sa/4.0/)
 
-```
-    ...
-    "contents": {
-        "regions": "1.0"
-    },
-    "regions": [
-        {
-            "bounds": [
-                580,
-                1050
-            ],
-            "type": "static",
-            "stats": {
-                "scale_mean": 0.999919751891621,
-                "tx_mean": -0.007306357788220547,
-                "ty_mean": -0.0038538576792083563,
-                "size": 611
-            }
-        },
-        ...
-    },
-...
-}
-```
+This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
 
-Each region is described by `bounds` which give the beginning and end of the region in frames, a `type` label, and supplementary stats from the region extraction process.
+Citations TBD.
 
-Currently, the types are:
 
- * `static`:  camera is not moving or zooming
- * `zoom_in` or `zoom_out`:  camera is zooming.  If the camera is determined to be zooming, the translation is ignored
- * `N`,`NW`, `NE`, etc.:  camera is translating.  Directions are approximate with North being tilting upwards, South being tilting downward, East being panning rightward, etc.
- * `short`:  Segment is too short to determine motion
- * `unknown`:  Unable to determine motion
+## How the files are generated.
+
+The metadata files are generated using software these github repos:
+
+  * [CamHD-Analysis/camhd_motion_analysis](https://github.com/CamHD-Analysis/camhd_motion_analysis) contains the C++ and Python files which perform the actual movie analysis.
+
+  * [CamHD-Analysis/camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy) contains scripts and documentation on running the 'camhd_motion_analysis' in parallel on a cluster formed with Docker swarm.

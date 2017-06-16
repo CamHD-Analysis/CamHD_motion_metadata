@@ -54,20 +54,19 @@ def migrate( jinput ):
     if "timing" in jinput:
         del jinput["timing"]
 
-    ## Rewrite optical flow block in frame stats
-    similarity_keys = ["center", "flowScale", "fromFrame", "toFrame", "imgScale", "valid", "similarity"]
-
     # Rename frame_stats to frameStats
     json_rename(jinput, "frame_stats", "frameStats")
 
     for f in jinput["frameStats"]:
 
         json_rename( f, "frame_number", "frameNumber")
-        json_rename( f, "similarity", "opticalFlow" )
 
-        ## Timing information is bogus when it exists
-        if "performance" in f:
-            del f["performance"]
+        if "similarity" in f:
+            json_rename( f, "similarity", "opticalFlow" )
+
+            ## Timing information is bogus in older files
+            if "performance" in f:
+                del f["performance"]
 
 
     return jinput
