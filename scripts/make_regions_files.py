@@ -13,7 +13,7 @@ import camhd_motion_analysis as ma
 
 parser = argparse.ArgumentParser(description='Generate _optical_flow_region.json files from _optical_flow.json files')
 
-parser.add_argument('input', metavar='N', nargs='*', default=['RS03ASHS/**/*_optical_flow.json'],
+parser.add_argument('input', metavar='N', nargs='*',
                     help='Files or paths to process')
 
 parser.add_argument('--dry-run', dest='dryrun', action='store_true', help='Dry run, don\'t actually process')
