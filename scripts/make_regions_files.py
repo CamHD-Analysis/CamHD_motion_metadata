@@ -46,8 +46,7 @@ for path in args.input:
         if args.dryrun == True:
             continue
 
-        with open(infile) as data_file:
-            ma.region_analysis( data_file, outfile=outfile )
+        ma.region_analysis( infile, outfile=outfile )
 
         if os.path.isfile( outfile ) and args.gitadd:
             subprocess.run( [ "git", "add", outfile ] )
