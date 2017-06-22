@@ -67,14 +67,9 @@ class Classifier:
 
         return self.img_cache[name]
 
-
     def preprocess_image( self, img ):
         return skimage.color.rgb2gray(skt.rescale(img, 0.25, mode='constant' ))
 
-
-    def sample_images( self, tag, count ):
-        ct = min( count, len( self.imgs[tag] ) )
-        return [self.image(p) for p in random.sample(self.imgs[tag], ct)]
 
 
     def classify( self, ref_img, test_count ):
@@ -83,27 +78,20 @@ class Classifier:
 
         return results
 
+    def sample_images( self, tag, count ):
+        ct = min( count, len( self.imgs[tag] ) )
+        return [self.image(p) for p in random.sample(self.imgs[tag], ct)]
+
     def compare_images( self, ref_img, tag, count ):
         ## Choose an arbitrary image for now
-        logging.info("Class %s has %d samples, sampling %d times" % (tag, len(self.imgs[tag]), count) )
+        #logging.info("Class %s has %d samples, sampling %d times" % (tag, len(self.imgs[tag]), count) )
 
         scores = []
 
         for test_img in self.sample_images( tag, count ):
 
-    ##        logging.info("Comparing to class %s test image %s" % (tag, test_img_path) )
-
-            #shifts,error,phasediff = skf.register_translation( test_img, ref_img )
-            # logging.info("Relative to class %s, RMS error = %f, shifts = %f,%f" % (c, error, shifts[0], shifts[1]))
-            #
-            # ## Heuristic test to invalidate large shifts
-            # if abs(shifts[0]) > 30 or abs(shifts[1]) > 30:
-            #     logging.info("Large shift, discarding")
-            #     continue
-
-            # Odds = 0 : never consider image rotated by 180
+            # Odds = 0 : don't consider image rotated by 180
             result = ird.translation(test_img, ref_img, odds=0)
-
             scores.append( float(result['success']) )
 
 
