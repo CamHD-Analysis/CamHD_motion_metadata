@@ -40,29 +40,13 @@ args = parser.parse_args()
 
 logging.basicConfig( level=args.log.upper() )
 
-
-
-classification = {}
+classifier = None
 if not args.noclassify:
     import pycamhd.lazycache as camhd
-
     qt = camhd.lazycache( args.lazycache )
 
-    if not path.exists("classification/images/"):
-        logging.fatal("Need classification/images/ to perform classification.  Run scripts/fetch_classification_images.py")
-        exit()
-
-    for c in os.listdir("classification/images/"):
-        if c[0] == '.':
-            continue
-
-        classification[c] = []
-
-        for img in glob.iglob( "classification/images/%s/*.png" % c ):
-            classification[c].append( path.abspath(img) )
-
-    logging.info("Loaded classifications classes: %s " % ', '.join( classification.keys() ) )
-
+    classifier = ra.Classifier()
+    classifier.load( "classification/images/" )
 
 for path in args.input:
     for infile in glob.iglob( path, recursive=True):
@@ -82,8 +66,8 @@ for path in args.input:
 
         jout = ra.region_analysis( jin )
 
-        if not args.noclassify:
-            jout = ra.classify_regions( jout, classification, lazycache = qt, first_n = args.first )
+        if classifier and not args.noclassify :
+            jout = ra.classify_regions( jout, classifier, lazycache = qt, first_n = args.first )
 
         ## Write results
         with open( outfile, 'w' ) as out:
