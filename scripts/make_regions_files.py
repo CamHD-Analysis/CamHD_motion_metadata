@@ -28,6 +28,9 @@ parser.add_argument('--no-classify', dest='noclassify', action='store_true', hel
 parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
                     help='Logging level')
 
+parser.add_argument('--first', metavar='first', nargs='?', type=int,
+                    help='')
+
 parser.add_argument('--git-add', dest='gitadd', action='store_true', help='Run "git add" on resulting file')
 
 parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
@@ -52,14 +55,13 @@ if not args.noclassify:
     for c in os.listdir("classification/images/"):
         if c[0] == '.':
             continue
-            
-        logging.info("Loading classification class %s" % c )
 
         classification[c] = []
 
         for img in glob.iglob( "classification/images/%s/*.png" % c ):
             classification[c].append( path.abspath(img) )
 
+    logging.info("Loaded classifications classes: %s " % ', '.join( classification.keys() ) )
 
 
 for path in args.input:
@@ -81,7 +83,7 @@ for path in args.input:
         jout = ra.region_analysis( jin )
 
         if not args.noclassify:
-            jout = ra.classify_regions( jout, classification, lazycache = qt )
+            jout = ra.classify_regions( jout, classification, lazycache = qt, first_n = args.first )
 
         ## Write results
         with open( outfile, 'w' ) as out:
