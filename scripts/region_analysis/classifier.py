@@ -37,6 +37,9 @@ class Classifier:
     def tags( self ):
         return self.imgs.keys()
 
+    def images( self ):
+        return self.imgs
+
     def load( self, img_path ):
         if not path.exists(img_path):
             logging.fatal("Need %s to perform classification.  Run scripts/fetch_classification_images.py" % img_path)
@@ -77,6 +80,10 @@ class Classifier:
         results = compute( *values, get=dask.threaded.get )
 
         return results
+
+    def sample_paths( self, tag, count ):
+        ct = min( count, len( self.imgs[tag] ) )
+        return [p for p in random.sample(self.imgs[tag], ct)]
 
     def sample_images( self, tag, count ):
         ct = min( count, len( self.imgs[tag] ) )
