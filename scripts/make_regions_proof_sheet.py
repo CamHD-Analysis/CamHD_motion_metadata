@@ -62,7 +62,7 @@ for pathin in args.input:
             html.write("<html><body>\n")
             html.write("<h2>%s</h2>\n\n" % name)
 
-            html.write("<table>\n<tr><th>Start Frame</th><th>End Frame</th><th>Classification</th><th>Sample Image</th><th>Reference image from class</th>")
+            html.write("<table>\n<tr><th>Start Frame</th><th>End Frame</th><th>Classification</th><th>Sample Image</th><th>Reference image from class</th>\n")
 
             for r in jin["regions"]:
 

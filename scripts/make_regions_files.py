@@ -7,6 +7,7 @@ import argparse
 import os.path as path
 import os
 import json
+import time
 
 import region_analysis as ra
 
@@ -52,6 +53,8 @@ for path in args.input:
     for infile in glob.iglob( path, recursive=True):
         outfile = os.path.splitext(infile)[0] + "_regions.json"
 
+        timing = {}
+
         logging.info("Processing %s, Saving results to %s" % (infile, outfile) )
 
         if os.path.isfile( outfile ) and args.force == False:
@@ -61,13 +64,25 @@ for path in args.input:
         if args.dryrun == True:
             continue
 
+        start_time = time.time()
+
         with open(infile) as data_file:
             jin = json.load( data_file )
 
+        ra_start = time.time()
         jout = ra.region_analysis( jin )
+        timing['regionAnalysis'] = time.time()-ra_start
 
         if classifier and not args.noclassify :
+            classifier_start = time.time()
             jout = ra.classify_regions( jout, classifier, lazycache = qt, first_n = args.first )
+            timing['classification'] = time.time()-classifier_start
+
+
+
+        timing['elapsedSeconds'] = time.time()-start_time
+
+        jout['performance'] = {'timing': timing }
 
         ## Write results
         with open( outfile, 'w' ) as out:
