@@ -37,8 +37,8 @@ logging.basicConfig( level=args.log.upper() )
 import pycamhd.lazycache as camhd
 qt = camhd.lazycache( args.lazycache )
 
-classifier = ra.Classifier()
-classifier.load( "classification/images/" )
+# classifier = ra.Classifier()
+# classifier.load( "classification/images/" )
 
 
 for pathin in args.input:
@@ -62,7 +62,8 @@ for pathin in args.input:
             html.write("<html><body>\n")
             html.write("<h2>%s</h2>\n\n" % name)
 
-            html.write("<table>\n<tr><th>Start Frame</th><th>End Frame</th><th>Classification</th><th>Sample Image</th><th>Reference image from class</th>\n")
+            html.write("<table>\n<tr><th>Start Frame</th><th>End Frame</th><th>Classification</th><th>Sample Image</th</tr>\n")
+            #><th>Reference image from class</th>\n")
 
             for r in jin["regions"]:
 
@@ -88,18 +89,18 @@ for pathin in args.input:
                 relapath = path.relpath( img_file, path.dirname(html_file) )
                 html.write("<td><img width=640 src=\"%s\"/></td>" % (relapath) )
 
-                html.write("<td>")
-                if "sceneTag" in r.keys() and len(r['sceneTag']) > 0:
-                    first = r['sceneTag'][0]
-                    if  first in classifier.tags():
-                        paths = classifier.sample_paths( first, 3 )
-
-                        relapaths = [ path.relpath(p, path.dirname(html_file) ) for p in paths]
-
-                        for r in relapaths:
-                            html.write("<img width=640 src=\"%s\"/>" % r)
-
-                html.write("</td>")
+                # html.write("<td>")
+                # if "sceneTag" in r.keys() and len(r['sceneTag']) > 0:
+                #     first = r['sceneTag'][0]
+                #     if  first in classifier.tags():
+                #         paths = classifier.sample_paths( first, 3 )
+                #
+                #         relapaths = [ path.relpath(p, path.dirname(html_file) ) for p in paths]
+                #
+                #         for r in relapaths:
+                #             html.write("<img width=640 src=\"%s\"/>" % r)
+                #
+                # html.write("</td>")
                 html.write("</tr>\n")
 
 

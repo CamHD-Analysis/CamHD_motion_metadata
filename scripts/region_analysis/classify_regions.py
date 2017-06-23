@@ -110,7 +110,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
                 else:
                     scene_tag_guesses[r.tag] = [r.score]
 
-        rjson['sceneTag'] = [scene_tag]
+        rjson['sceneTag'] = scene_tag
         rjson['sceneTagMeta'] = { 'topTenPct': scene_tag_guesses }
 
 
@@ -145,8 +145,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
             logging.info("Comparison to prevGood: %f" % prevResult['success'])
             if prevResult['success'] > threshold:
                 scenes[i] = scenes[prevGood]
-                regions[ri]['sceneTag'].remove("unknown")
-                regions[ri]['sceneTag'].append( scenes[prevGood] )
+                regions[ri]['sceneTag'] = scenes[prevGood]
                 regions[ri]['sceneTagMeta']['inferredBy'] = "similarity to previous neighbor"
                 logging.info("Inferred tag %s by comparison to previous good match" % scenes[i])
                 continue
@@ -155,8 +154,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
             logging.info("Comparison to nextGood: %f" % nextResult['success'])
             if nextResult['success'] > threshold:
                 scenes[i] = scenes[nextGood]
-                regions[ri]['sceneTag'].remove("unknown")
-                regions[ri]['sceneTag'].append( scenes[nextGood] )
+                regions[ri]['sceneTag']= scenes[nextGood]
                 regions[ri]['sceneTagMeta']['inferredBy'] = "similarity to next neighbor"
                 logging.info("Inferred type %s by comparison to next good match" % scenes[i])
                 continue
@@ -174,8 +172,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
                 if REFERENCE_SEQUENCE[k] == scenes[prevGood] and REFERENCE_SEQUENCE[k+delta] == scenes[nextGood]:
                     ## Well, this sucks
                     scenes[i] = REFERENCE_SEQUENCE[ k+(i-prevGood) ]
-                    regions[ri]['sceneTag'].remove("unknown")
-                    regions[ri]['sceneTag'].append( scenes[i] )
+                    regions[ri]['sceneTag']= scenes[i] 
                     regions[ri]['sceneTagMeta']['inferredBy'] = "sequence"
                     logging.info("Inferred type %s by sequence" % scenes[i])
                     break

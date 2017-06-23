@@ -23,35 +23,34 @@ import numpy as np
 from dask import compute, delayed
 import dask.threaded
 
-url_root = re.compile("CAMHDA301-[0-9T]*Z")
+root_name_pattern = re.compile("CAMHDA301-[0-9T]*Z")
 img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*Z)_(\d*)\.")
 
 
 class CompareResult:
 
-    def __init__(self, tag, score ):
+    def __init__(self, tag, score):
         self.tag = tag
         self.score = score
 
 
-
 class Classifier:
 
-    def __init__( self, images ):
+    def __init__(self, images):
         self.img_cache = {}
         self.imgs = images
 
-    def tags( self ):
+    def tags(self):
         return self.imgs.keys()
 
-    def images( self ):
+    def images(self):
         return self.imgs
 
 
-    def load( self, img_path ):
+    def load(self, img_path):
         if not path.exists(img_path):
-            logging.fatal("Need %s to perform classification.  Run scripts/fetch_classification_images.py" % img_path)
-            return
+            logging.critical("Need %s to perform classification.  Run scripts/fetch_classification_images.py" % img_path)
+            raise Exception("")
 
         for tag in os.listdir(img_path):
             if tag[0] == '.':
@@ -72,9 +71,9 @@ class Classifier:
         if name in self.img_cache.keys():
             return self.img_cache[name]
 
-        ## Else eagerload
-        test_img = skd.load( name )
-        self.img_cache[name] = self.preprocess_image( test_img )
+        # Else eagerload
+        test_img = skd.load(name)
+        self.img_cache[name] = self.preprocess_image( est_img)
 
         return self.img_cache[name]
 
@@ -131,18 +130,36 @@ class GroundTruthLibrary:
 
     def load_ground_truth( self, ground_truth_file, img_path = "classification/images/" ):
         with open( ground_truth_file ) as f:
-            self.gt_json = json.load( f )
+            gt_json = json.load( f )
 
         all_gt_images = glob.iglob( "%s/**/*.png" % img_path )
 
-        for gt_file in self.gt_json:
-            gt_root = url_root.search(gt_file)
+        for gt_file in gt_json:
+            gt_root = root_name_pattern.search(gt_file)
 
             if not gt_root:
                 continue
             gt_root = gt_root.group(0)
 
             gt_images = {}
+
+            # Load gt_images with all of the identified regions in the files
+            with open(gt_file) as gt:
+                gt = json.load(gt)
+                if 'regions' not in gt:
+                    raise Exception( "Couldn't find regions in ground truth file \"%s\"" % gt_file )
+                for r in gt['regions']:
+                    if r['type'] != 'static':
+                        continue
+
+                    if 'sceneTag' not in r:
+                        raise Exception( "Ground truth file \"%s\" contains static region without scene tag" % gt_file )
+
+                    if r['sceneTag'] == 'unknown':
+                        raise Exception( "Unclassified static segment in ground truth file \"%s\"" % gt_file )
+
+                    gt_images[r['sceneTag']] = []
+
 
             logging.info("Checking GT file %s for root %s" % (gt_file, gt_root))
 
@@ -157,14 +174,15 @@ class GroundTruthLibrary:
                 if img_root != gt_root:
                     continue
 
-                if tag not in gt_images:
-                    gt_images[tag] = []
-                gt_images[tag].append( path.abspath(img_file) )
+                gt_images[tag].append(path.abspath(img_file))
 
+            self.gt_library[gt_file] = gt_images
 
-            self.gt_library[ gt_file ] = gt_images
+        if len(self.gt_library) != len(gt_json):
+            raise Exception("Error loading ground truth library")
 
-        #print(self.gt_library)
+        print(self.gt_library)
+
     def aggregate_images( self, keys ):
         imgs = {}
         for key in keys:
@@ -181,10 +199,10 @@ class GroundTruthLibrary:
         ## Nothing for now
 
         for t,count in tags.items():
-            logging.info("I need to %d draw more %s" % count,t)
+            logging.info("I need to draw %d more %s" % (count,t) )
 
     def select( self, url ):
-        mov_root = url_root.search(url).group(0)
+        mov_root = root_name_pattern.search(url).group(0)
 
         ## For now, just select a random ground truth in the library...
         use_keys = random.sample( self.gt_library.keys(), 1 )
@@ -193,12 +211,14 @@ class GroundTruthLibrary:
 
         MIN_IMAGES = 5
         short_tags = {}
-        for tag,gtimgs in imgs.items():
+        for tag, gtimgs in imgs.items():
             logging.info("For tag \"%s\", have %d ground truth images" % (tag,len(gtimgs)) )
-            if len(gtimgs) < MIN_IMAGES:
-                short_tags[tag] = len(MIN_IMAGES - gtimgs)
 
-        ## If there aren't enough images, get some more
+            deficit = MIN_IMAGES - len(gtimgs)
+            if deficit > 0:
+                short_tags[tag] = deficit
+
+        # If there aren't enough images, get some more
         if len(short_tags) > 0:
             self.supplement_gt_images( use_keys, short_tags )
             imgs = self.aggregate_images( use_keys )
