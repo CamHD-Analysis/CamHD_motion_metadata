@@ -32,6 +32,8 @@ parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
 parser.add_argument('--first', metavar='first', nargs='?', type=int,
                     help='')
 
+parser.add_argument("--ground-truth", dest="groundtruth", default="classification/ground_truth.json")
+
 parser.add_argument('--git-add', dest='gitadd', action='store_true', help='Run "git add" on resulting file')
 
 parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
@@ -46,8 +48,9 @@ if not args.noclassify:
     import pycamhd.lazycache as camhd
     qt = camhd.lazycache( args.lazycache )
 
-    classifier = ra.Classifier()
-    classifier.load( "classification/images/" )
+    gt_library = ra.GroundTruthLibrary( )
+    gt_library.load_ground_truth( args.groundtruth )
+    #classifier.load( "classification/images/" )
 
 for path in args.input:
     for infile in glob.iglob( path, recursive=True):
@@ -73,8 +76,20 @@ for path in args.input:
         jout = ra.region_analysis( jin )
         timing['regionAnalysis'] = time.time()-ra_start
 
-        if classifier and not args.noclassify :
+        jout['performance'] = {'timing': timing }
+
+        ## Write results as a checkpoint
+        with open( outfile, 'w' ) as out:
+            json.dump( jout, out, indent = 4)
+
+        url = jout["movie"]["URL"]
+
+
+        if not args.noclassify:
             classifier_start = time.time()
+
+            classifier = gt_library.select( url )
+
             jout = ra.classify_regions( jout, classifier, lazycache = qt, first_n = args.first )
             timing['classification'] = time.time()-classifier_start
 
