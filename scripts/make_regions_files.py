@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import glob
 import logging
 import argparse
@@ -48,19 +47,19 @@ parser.add_argument('--lazycache-url', dest='lazycache',
 
 args = parser.parse_args()
 
-logging.basicConfig( level=args.log.upper() )
+logging.basicConfig(level=args.log.upper())
 
 classifier = None
 if not args.noclassify:
     import pycamhd.lazycache as camhd
-    qt = camhd.lazycache( args.lazycache )
+    qt = camhd.lazycache(args.lazycache)
 
-    gt_library = ra.GroundTruthLibrary( )
-    gt_library.load_ground_truth( args.groundtruth )
-    #classifier.load( "classification/images/" )
+    gt_library = ra.GroundTruthLibrary()
+    gt_library.load_ground_truth(args.groundtruth)
+    # classifier.load( "classification/images/" )
 
 for path in args.input:
-    for infile in glob.iglob( path, recursive=True):
+    for infile in glob.iglob(path, recursive=True):
         outfile = os.path.splitext(infile)[0] + "_regions.json"
 
         timing = {}
@@ -68,7 +67,7 @@ for path in args.input:
         logging.info("Processing %s, Saving results to %s" % (infile, outfile))
 
         if os.path.isfile(outfile):
-            if args.forceunclassified and not ra.is_classified(outfile) :
+            if args.forceunclassified and not ra.is_classified(outfile):
                 logging.info("%s exists but isn't classified" % outfile)
             elif args.force is True:
                 logging.info("%s exists, overwriting" % outfile)
@@ -76,13 +75,13 @@ for path in args.input:
                 logging.warning("%s exists, run with --force to overwrite" % outfile )
                 continue
 
-        if args.dryrun == True:
+        if args.dryrun:
             continue
 
         start_time = time.time()
 
         with open(infile) as data_file:
-            jin = json.load( data_file )
+            jin = json.load(data_file)
 
         ra_start = time.time()
         jout = ra.region_analysis(jin)
@@ -99,34 +98,32 @@ for path in args.input:
         git_rev = ra.git_revision(infile)
         jout['depends'] = {'opticalFlow': {infile: git_rev}}
 
-        ## Write results as a checkpoint
-        with open( outfile, 'w' ) as out:
-            json.dump( jout, out, indent = 4)
+        # Write results as a checkpoint
+        with open(outfile, 'w') as out:
+            json.dump(jout, out, indent=4)
 
         url = jout["movie"]["URL"]
-
 
         if not args.noclassify:
             classifier_start = time.time()
 
-            classifier = gt_library.select( url )
+            classifier = gt_library.select(url)
 
-            jout = ra.classify_regions( jout, classifier, lazycache = qt, first_n = args.first )
+            jout = ra.classify_regions(jout, classifier, lazycache=qt,
+                                       first_n=args.first)
             timing['classification'] = time.time()-classifier_start
 
             if 'version' not in jout:
                 jout['version'] = {}
             jout['version']['classifyRegions'] = ra.classify_regions_version
 
-
-
         timing['elapsedSeconds'] = time.time()-start_time
 
-        jout['performance'] = {'timing': timing }
+        jout['performance'] = {'timing': timing}
 
-        ## Write results
-        with open( outfile, 'w' ) as out:
-            json.dump( jout, out, indent = 4)
+        # Write results
+        with open(outfile, 'w') as out:
+            json.dump(jout, out, indent=4)
 
-        if os.path.isfile( outfile ) and args.gitadd:
-            subprocess.run( [ "git", "add", outfile ] )
+        if os.path.isfile(outfile) and args.gitadd:
+            subprocess.run(["git", "add", outfile])
