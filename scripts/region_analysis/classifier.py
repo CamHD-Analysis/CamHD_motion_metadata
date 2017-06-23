@@ -131,11 +131,11 @@ class GroundTruthLibrary:
 
     def load_ground_truth( self, ground_truth_file, img_path = "classification/images/" ):
         with open( ground_truth_file ) as f:
-            gt_json = json.load( f )
+            self.gt_json = json.load( f )
 
         all_gt_images = glob.iglob( "%s/**/*.png" % img_path )
 
-        for gt_file in gt_json:
+        for gt_file in self.gt_json:
             gt_root = url_root.search(gt_file)
 
             if not gt_root:
@@ -179,8 +179,9 @@ class GroundTruthLibrary:
 
     def supplement_gt_images( self, movs, tags ):
         ## Nothing for now
-        for t in tags:
-            logging.info("I need to draw more %s" % t)
+
+        for t,count in tags.items():
+            logging.info("I need to %d draw more %s" % count,t)
 
     def select( self, url ):
         mov_root = url_root.search(url).group(0)
@@ -191,11 +192,11 @@ class GroundTruthLibrary:
         imgs = self.aggregate_images( use_keys )
 
         MIN_IMAGES = 5
-        short_tags = []
+        short_tags = {}
         for tag,gtimgs in imgs.items():
             logging.info("For tag \"%s\", have %d ground truth images" % (tag,len(gtimgs)) )
             if len(gtimgs) < MIN_IMAGES:
-                short_tags.append(tag)
+                short_tags[tag] = len(MIN_IMAGES - gtimgs)
 
         ## If there aren't enough images, get some more
         if len(short_tags) > 0:

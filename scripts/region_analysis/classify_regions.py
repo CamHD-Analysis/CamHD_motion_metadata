@@ -8,6 +8,8 @@ import imreg_dft as ird
 
 from operator import attrgetter
 
+classify_regions_version = "1.1"
+
 ## Quick hack to have this hardcoded
 REFERENCE_SEQUENCE = [ "d2_p1_z0", "d2_p1_z1", "d2_p1_z0", "d2_p0_z0", "d2_p2_z0", "d2_p2_z1", "d2_p2_z0",
                         "d2_p0_z0", "d2_p3_z0", "d2_p3_z1", "d2_p3_z2", "d2_p3_z0", "d2_p0_z0",

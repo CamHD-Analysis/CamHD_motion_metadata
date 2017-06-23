@@ -6,6 +6,8 @@ import time
 from os import path
 import pandas as pd
 
+find_regions_version = "1.0"
+
 
 def clean_json( j ):
 
@@ -18,15 +20,16 @@ def clean_json( j ):
         frame_num_key = "frameNumber"
         optical_flow_key = "opticalFlow"
 
-    frame_num = [ f[frame_num_key] for f in stats]
-    similarities = [ f[optical_flow_key] for f in stats ]
+    frame_num = [f[frame_num_key] for f in stats]
+    similarities = [f[optical_flow_key] for f in stats]
 
     stats = pd.DataFrame(similarities, index=frame_num).sort_index()
 
     return stats
 
-def select_valid( stats ):
-    return stats[ stats.valid == True ]
+
+def select_valid(stats):
+    return stats[stats.valid == True ]
 
 def flatten_structure( valid ):
 

@@ -8,11 +8,9 @@ import os.path as path
 import os
 import json
 import time
+import subprocess
 
 import region_analysis as ra
-
-
-#import camhd_motion_analysis as ma
 
 
 parser = argparse.ArgumentParser(description='Generate _optical_flow_region.json files from _optical_flow.json files')
@@ -20,11 +18,13 @@ parser = argparse.ArgumentParser(description='Generate _optical_flow_region.json
 parser.add_argument('input', metavar='N', nargs='*',
                     help='Files or paths to process')
 
-parser.add_argument('--dry-run', dest='dryrun', action='store_true', help='Dry run, don\'t actually process')
+parser.add_argument('--dry-run', dest='dryrun', action='store_true',
+                    help='Dry run, don\'t actually process')
 
 parser.add_argument('--force', dest='force', action='store_true', help='')
 
-parser.add_argument('--no-classify', dest='noclassify', action='store_true', help="Don't attempt to classify static regions" )
+parser.add_argument('--no-classify', dest='noclassify', action='store_true',
+                    help="Don't attempt to classify static regions")
 
 parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
                     help='Logging level')
@@ -76,13 +76,25 @@ for path in args.input:
         jout = ra.region_analysis( jin )
         timing['regionAnalysis'] = time.time()-ra_start
 
+        if 'versions' not in jout:
+            jout['versions'] = {}
+        jout['versions']['findRegions'] = ra.find_regions_version
         jout['performance'] = {'timing': timing }
+
+        if 'depends' not in jout:
+            jout['depends'] = {}
+
+        git_rev = subprocess.check_output(["git", "log", "-n 1",
+                        "--pretty=format:%H",  "--", infile ],
+                        encoding='utf8' )
+        jout['depends'][infile] = git_rev
 
         ## Write results as a checkpoint
         with open( outfile, 'w' ) as out:
             json.dump( jout, out, indent = 4)
 
         url = jout["movie"]["URL"]
+
 
 
         if not args.noclassify:
@@ -92,6 +104,8 @@ for path in args.input:
 
             jout = ra.classify_regions( jout, classifier, lazycache = qt, first_n = args.first )
             timing['classification'] = time.time()-classifier_start
+
+            jout['version']['classifyRegions'] = ra.classify_regions_version
 
 
 
