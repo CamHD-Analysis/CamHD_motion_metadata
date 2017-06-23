@@ -21,6 +21,8 @@ parser.add_argument('input', metavar='inputfiles', nargs='+',
 
 parser.add_argument('--force', dest='force', action='store_true', help='Force re-download of images')
 
+parser.add_argument('--squash-runs', dest='squashruns', action='store_true', help='Squash runs of multiple identical tags')
+
 parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
                     help='Logging level')
 
@@ -82,13 +84,13 @@ for pathin in args.input:
 
                 sceneTag = r['sceneTag']
 
-
                 if sceneTag == 'unknown':
                     unknowns[url].append(r)
                     continue
 
                 # Squash runs...
-                if sceneTag == prevTag:
+                if sceneTag == prevTag and args.squashruns:
+                    images[idx-1][url].append(r)
                     continue
 
                 prevTag = sceneTag
@@ -97,9 +99,9 @@ for pathin in args.input:
 
                 if idx >= len(images):
                     tags.append(sceneTag)
-                    images.append( {url: r })
+                    images.append({url: [r]})
                 elif sceneTag == tags[idx]:
-                    images[idx][url] = r
+                    images[idx][url] = [r]
                 else:
                     logging.info("Tag doesn't match order... (%s != %s)" % (sceneTag, tags[idx]))
 
@@ -108,7 +110,7 @@ for pathin in args.input:
                     for i in range(idx, min(idx+MAX_JUMP,len(tags))):
                         logging.info("Checking %s against %s at %d" % (sceneTag, tags[i], i))
                         if sceneTag == tags[i]:
-                            images[i][url] = r
+                            images[i][url] = [r]
                             idx = i
                             success = True
                             break
@@ -117,7 +119,7 @@ for pathin in args.input:
                         logging.info("Couldn't find a match, insert...")
                         # Couldn't find match.   insert
                         tags.insert( idx, sceneTag )
-                        images.insert( idx, {url: r} )
+                        images.insert( idx, {url: [r]} )
                         #idx = idx-1 # Back up so we reconsider using this new entry
 
                 # On success
@@ -148,7 +150,12 @@ with open(html_file, 'w') as html:
                 html.write("<td></td>")
                 continue
 
-            region = images[row][url]
+            regions = images[row][url]
+
+            if len(regions) < 1:
+                continue
+
+            region = regions[0]
 
             sample_frame = region['startFrame'] + 0.5 * (region['endFrame'] - region['startFrame'])
 
@@ -166,7 +173,9 @@ with open(html_file, 'w') as html:
             relapath = path.relpath( img_file, path.dirname(html_file) )
             relathumb = path.relpath( thumb_file, path.dirname(html_file) )
 
-            html.write("<td><a href=\"%s\"><img src=\"%s\"/></a><br>%d -- %d</td>" % (relapath,relathumb,region['startFrame'],region['endFrame']) )
+            caption = ', '.join(["%d -- %d" % (r['startFrame'],r['endFrame']) for r in regions])
+
+            html.write("<td><a href=\"%s\"><img src=\"%s\"/></a><br>%s</td>" % (relapath,relathumb,caption) )
 
 
         html.write("</tr>")
@@ -182,9 +191,8 @@ with open(html_file, 'w') as html:
         html.write("<th>%s</th>" % path.basename(name))
     html.write("</tr>\n")
 
-
     html.write("<tr>")
-        html.write("<td>Unknown</td>" )
+    html.write("<td>Unknown</td>" )
 
     for url in urls:
         if url not in unknowns:
