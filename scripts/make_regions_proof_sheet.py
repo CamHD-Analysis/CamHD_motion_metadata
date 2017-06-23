@@ -26,6 +26,8 @@ parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
 
 parser.add_argument('--output', dest='outfile', nargs='?', default='_html/proof.html', help='Output .html file')
 
+parser.add_argument('--image-size', dest='imgsize', nargs='?', default='320x240')
+
 parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
                     help='URL to Lazycache repo server (only needed if classifying)')
 
@@ -36,6 +38,10 @@ logging.basicConfig( level=args.log.upper() )
 
 import pycamhd.lazycache as camhd
 qt = camhd.lazycache( args.lazycache )
+
+img_size = args.imgsize.split('x')
+img_size = ( int(img_size[0]), int(img_size[1]))
+print(img_size)
 
 # classifier = ra.Classifier()
 # classifier.load( "classification/images/" )
@@ -73,7 +79,6 @@ for pathin in args.input:
                 if idx >= len(images):
                     tags.append(sceneTag)
                     images.append( {url: r })
-                    idx += 1
                 elif sceneTag == tags[idx]:
                     images[idx][url] = r
                 else:
@@ -86,17 +91,10 @@ for pathin in args.input:
                             break
 
 
+                # On success
+                idx += 1
 
-
-
-        #
-        # mov = jin["movie"]
-        # url = mov['URL']
-        # name = path.splitext( path.basename( url ))[0]
-        #
-        # html_file = args.outdir + "%s.html" % name
-
-img_path  = path.dirname( args.outfile ) + "/images/"
+img_path  = path.dirname(args.outfile) + "/images/"
 os.makedirs(img_path, exist_ok=True)
 
 
@@ -124,15 +122,21 @@ with open(html_file, 'w') as html:
 
             sample_frame = region['startFrame'] + 0.5 * (region['endFrame'] - region['startFrame'])
 
-            img_file = img_path + "%s_%d.png" % (path.splitext(path.basename(url))[0], sample_frame)
-            if args.force or not path.exists( img_file ):
-                logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, name))
-                img = qt.get_frame( url, sample_frame, format='png' )
+            img_file = img_path + "%s_%d.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
+            thumb_file = img_path + "%s_%d_thumbnail.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
+
+            if args.force or not path.exists( img_file ) or not path.exists( thumb_file ):
+                logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, path.basename(url)))
+                img = qt.get_frame( url, sample_frame, format='jpg' )
                 img.save( img_file )
+                img.thumbnail( img_size )  # PIL.thumbnail preserves aspect ratio
+
+                img.save( thumb_file )
 
             relapath = path.relpath( img_file, path.dirname(html_file) )
+            relathumb = path.relpath( thumb_file, path.dirname(html_file) )
 
-            html.write("<td><img width=640 src=\"%s\"/><br>%d -- %d</td>" % (relapath,region['startFrame'],region['endFrame']) )
+            html.write("<td><a href=\"%s\"><img src=\"%s\"/></a><br>%d -- %d</td>" % (relapath,relathumb,region['startFrame'],region['endFrame']) )
 
 
         html.write("</tr>")
