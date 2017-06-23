@@ -68,14 +68,22 @@ for pathin in args.input:
 
                 sceneTag = r['sceneTag']
 
+                logging.info("%s (%d,%d): %s" % (url, r['startFrame'], r['endFrame'], sceneTag))
+
                 if idx >= len(images):
                     tags.append(sceneTag)
-                    images.append( { url: r })
+                    images.append( {url: r })
                     idx += 1
                 elif sceneTag == tags[idx]:
                     images[idx][url] = r
                 else:
                     logging.info("Tag doesn't match order...")
+
+                    for i in range(idx,len(tags)):
+                        if sceneTag == tags[i]:
+                            images[i][url] = r
+                            idx = i
+                            break
 
 
 
@@ -97,7 +105,7 @@ with open(html_file, 'w') as html:
     html.write("<html><body>\n")
     html.write("<h2>Proof sheet</h2>\n\n")
 
-    html.write("<table>\n<tr><th>Tag</th>")
+    html.write("<table>\n<tr><th>Scene Tag</th>")
     for name in urls:
         html.write("<th>%s</th>" % path.basename(name))
     html.write("</tr>\n")
