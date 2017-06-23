@@ -23,8 +23,8 @@ parser.add_argument('--dry-run', dest='dryrun', action='store_true',
 parser.add_argument('--force', dest='force', action='store_true', help='')
 
 parser.add_argument('--force-unclassified', dest='forceunclassified',
-                    action='store_true', help='')
-
+                    action='store_true',
+                    help="Force rebuild of file only if it hasn't been classified")
 
 parser.add_argument('--no-classify', dest='noclassify', action='store_true',
                     help="Don't attempt to classify static regions")
@@ -67,7 +67,10 @@ for path in args.input:
         logging.info("Processing %s, Saving results to %s" % (infile, outfile))
 
         if os.path.isfile(outfile):
-            if args.forceunclassified and not ra.is_classified(outfile):
+            if gt_library and outfile in gt_library.gt_library.keys():
+                logging.info("%s is a ground truth file, skipping..." % outfile)
+                continue
+            elif args.forceunclassified and not ra.is_classified(outfile):
                 logging.info("%s exists but isn't classified" % outfile)
             elif args.force is True:
                 logging.info("%s exists, overwriting" % outfile)
@@ -113,9 +116,9 @@ for path in args.input:
                                        first_n=args.first)
             timing['classification'] = time.time()-classifier_start
 
-            if 'version' not in jout:
-                jout['version'] = {}
-            jout['version']['classifyRegions'] = ra.classify_regions_version
+            if 'versions' not in jout:
+                jout['versions'] = {}
+            jout['versions']['classifyRegions'] = ra.classify_regions_version
 
         timing['elapsedSeconds'] = time.time()-start_time
 

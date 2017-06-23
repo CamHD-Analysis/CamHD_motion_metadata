@@ -22,6 +22,7 @@ import numpy as np
 
 from dask import compute, delayed
 import dask.threaded
+import dask.multiprocess
 
 
 class CompareResult:
@@ -45,22 +46,22 @@ class Classifier:
         return self.imgs
 
 
-    def load(self, img_path):
-        if not path.exists(img_path):
-            logging.critical("Need %s to perform classification.  Run scripts/fetch_classification_images.py" % img_path)
-            raise Exception("")
-
-        for tag in os.listdir(img_path):
-            if tag[0] == '.':
-                continue
-
-            if tag not in self.imgs:
-                self.imgs[tag] = []
-
-            for img in glob.iglob( "%s/%s/*.png" % (img_path,tag) ):
-                self.imgs[tag].append( path.abspath(img) )
-
-        logging.info("Loaded classifications tags: %s " % ', '.join( self.tags() ) )
+    # def load(self, img_path):
+    #     if not path.exists(img_path):
+    #         logging.critical("Need %s to perform classification.  Run scripts/fetch_classification_images.py" % img_path)
+    #         raise Exception("")
+    #
+    #     for tag in os.listdir(img_path):
+    #         if tag[0] == '.':
+    #             continue
+    #
+    #         if tag not in self.imgs:
+    #             self.imgs[tag] = []
+    #
+    #         for img in glob.iglob( "%s/%s/*.png" % (img_path,tag) ):
+    #             self.imgs[tag].append( path.abspath(img) )
+    #
+    #     logging.info("Loaded classifications tags: %s " % ', '.join( self.tags() ) )
 
 
 
@@ -80,7 +81,7 @@ class Classifier:
 
     def classify(self, ref_img, test_count):
         values = [delayed(self.compare_images)(ref_img, tag, count=test_count) for tag in self.tags() ]
-        results = compute(*values, get=dask.threaded.get)
+        results = compute(*values, get=dask.multiprocess.get)
 
         return results
 

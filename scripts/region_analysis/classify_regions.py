@@ -104,22 +104,24 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
             if ratio > min_test_ratio:
                 scene_tag = first.tag
 
-            # Combine results with a simple voting scheme
             votes[ scene_tag ] = votes[scene_tag]+1 if scene_tag in votes.keys() else 1
 
 
-        # This is terrible code, I'm sure there's a more Python-idiomatic way to do it
-        # Check votes
+        # This is terrible code, I'm sure there's a more Python-idiomatic
+        # way to do it Check votes
         scene_tag = "unkown"
-        scene_meta = { 'inferredBy': " "}
+        scene_meta = { 'inferredBy': ""}
 
-        votes_max = max( votes.values() )
+        votes_max = max(votes.values())
         if votes_max > 1:
             for t in votes.keys():
                 if votes[t] == votes_max:
+                    logging.info("Good match to %s" % t)
                     scene_tag = t
-                    scenes.append( t )
-                    scene_meta['inferredBy'] = "matchToGroundTruth"
+                    scenes.append(t)
+
+                    if t != 'unknown':
+                        scene_meta['inferredBy'] = "matchToGroundTruth"
 
         all_results = sorted( all_results, key=attrgetter('score') )
         first = all_results[-1]
@@ -142,7 +144,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
 
 
     ## Now attempt to clean any unknowns
-    print(scenes)
+    logging.info(scenes)
 
     for i in range(len(scenes)):
         if scenes[i] != 'unknown':
@@ -150,46 +152,52 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
 
         ri = region_idx[i]
 
-        print("Trying to re-evaluate region %d from %d to %d" % (i, regions[ri]['startFrame'], regions[ri]['endFrame']))
+        logging.info("Trying to re-evaluate region %d from %d to %d" % (i, regions[ri]['startFrame'], regions[ri]['endFrame']))
 
         prevGood = None
         nextGood = None
         for j in reversed(range( 0, i )):
             if scenes[j] != 'unknown':
                 prevGood = j
+                break
 
         for j in range( i+1, len(scenes) ):
             if scenes[j] != 'unknown':
                 nextGood = j
+                break
 
         logging.info("Prev good at %d, next good at %d" % (prevGood, nextGood))
 
-        ## Try to infer from similarity
+        # Try to infer from similarity
         threshold = 0.95
-        if prevGood != None:
+        if prevGood is not None:
             prevResult = ird.translation( images[prevGood], images[i], odds=0)
 
-            logging.info("Comparison to prevGood: %f" % prevResult['success'])
+            logging.info("Comparing to prevGood: %f" % prevResult['success'])
             if prevResult['success'] > threshold:
                 scenes[i] = scenes[prevGood]
                 regions[ri]['sceneTag'] = scenes[prevGood]
                 regions[ri]['sceneTagMeta']['inferredBy'] = "similarityToPrevNeighbor"
                 logging.info("Inferred tag %s by comparison to previous good match" % scenes[i])
                 continue
-        elif nextGood != None:
+            else:
+                logging.info("Unknown region %d not a good match for previous %d: %f" % (i,prevGood,prevResult['success']))
+        elif nextGood is not None:
             nextResult = ird.translation( images[nextGood], images[i], odds=0)
-            logging.info("Comparison to nextGood: %f" % nextResult['success'])
+            logging.info("Comparing to nextGood: %f" % nextResult['success'])
             if nextResult['success'] > threshold:
                 scenes[i] = scenes[nextGood]
-                regions[ri]['sceneTag']= scenes[nextGood]
+                regions[ri]['sceneTag'] = scenes[nextGood]
                 regions[ri]['sceneTagMeta']['inferredBy'] = "similarityToNextNeighbor"
                 logging.info("Inferred type %s by comparison to next good match" % scenes[i])
                 continue
+            else:
+                logging.info("Unknown region %d not a good match for previous %d: %f" % (i,nextGood,nextResult['success']))
 
 
-        ## Try to infer from sequence
-        ##TODO Skip the corner cases for now
-        if prevGood != None and nextGood != None:
+        # Try to infer from sequence
+        # TODO Skip the corner cases for now
+        if prevGood is not None and nextGood is not None:
             logging.info("Trying to infer by sequence")
             delta = nextGood - prevGood
 

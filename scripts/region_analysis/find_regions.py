@@ -9,7 +9,7 @@ import pandas as pd
 find_regions_version = "1.0"
 
 
-def clean_json( j ):
+def clean_json(j):
 
     if "frame_stats" in j:
         stats = j["frame_stats"]
