@@ -58,13 +58,14 @@ if not args.noclassify:
     gt_library.load_ground_truth(args.groundtruth)
     # classifier.load( "classification/images/" )
 
-for path in args.input:
-    for infile in glob.iglob(path, recursive=True):
+for inpath in args.input:
+    if path.isdir( inpath ):
+        inpath += "/*_optical_flow.json"
+
+    for infile in sorted(glob.iglob(inpath, recursive=True)):
         outfile = os.path.splitext(infile)[0] + "_regions.json"
 
         timing = {}
-
-        logging.info("Processing %s, Saving results to %s" % (infile, outfile))
 
         if os.path.isfile(outfile):
             if gt_library and outfile in gt_library.gt_library.keys():
@@ -77,6 +78,8 @@ for path in args.input:
             else:
                 logging.warning("%s exists, run with --force to overwrite" % outfile )
                 continue
+
+        logging.info("Processing %s, Saving results to %s" % (infile, outfile))
 
         if args.dryrun:
             continue

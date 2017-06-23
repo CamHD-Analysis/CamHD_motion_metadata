@@ -22,7 +22,7 @@ import numpy as np
 
 from dask import compute, delayed
 import dask.threaded
-import dask.multiprocessing
+#import dask.multiprocessing
 
 
 class CompareResult:
@@ -81,7 +81,7 @@ class Classifier:
 
     def classify(self, ref_img, test_count):
         values = [delayed(self.compare_images)(ref_img, tag, count=test_count) for tag in self.tags() ]
-        results = compute(*values, get=dask.multiprocessing.get)
+        results = compute(*values, get=dask.threaded.get)
 
         return results
 

@@ -46,7 +46,7 @@ def is_classified( file ):
     return True
 
 def classify_regions( regionsj, classifier, lazycache, first_n = None,
-                        ref_samples = (0.4,0.5,0.6), test_count = 5 ):
+                        ref_samples = (0.4,0.5,0.6), test_count = 3 ):
 
     mov = regionsj["movie"]["URL"]
     regions = regionsj["regions"]
@@ -166,7 +166,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
                 nextGood = j
                 break
 
-        logging.info("Prev good at %d, next good at %d" % (prevGood, nextGood))
+        #logging.info("Prev good at %d, next good at %d" % (prevGood, nextGood))
 
         # Try to infer from similarity
         threshold = 0.95
@@ -200,6 +200,9 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
         if prevGood is not None and nextGood is not None:
             logging.info("Trying to infer by sequence")
             delta = nextGood - prevGood
+
+            if delta > 3:
+                continue
 
             for k in range( 0, len(REFERENCE_SEQUENCE)-delta ):
                 logging.info("%s == %s   ; %s == %s" % (REFERENCE_SEQUENCE[k], scenes[prevGood],REFERENCE_SEQUENCE[k+delta],scenes[nextGood] ))

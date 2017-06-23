@@ -50,7 +50,12 @@ tags = []
 images = []
 urls = []
 
+unknowns = {}
+
 for pathin in args.input:
+    if path.isdir(pathin):
+        pathin += "*_regions.json"
+
     for infile in glob.iglob( pathin, recursive=True):
 
         with open(infile) as data_file:
@@ -63,16 +68,30 @@ for pathin in args.input:
             url = jin['movie']['URL']
             urls.append(url)
 
+            unknowns[url] = []
+
             idx = 0
+            prevTag = None
             for r in jin["regions"]:
                 if r['type'] != 'static':
                     continue
 
                 if 'sceneTag' not in r:
-                    logging.info("Hm, static regions aren't tagged")
+                    #logging.info("Hm, static region isnt tagged")
                     continue
 
                 sceneTag = r['sceneTag']
+
+
+                if sceneTag == 'unknown':
+                    unknowns[url].append(r)
+                    continue
+
+                # Squash runs...
+                if sceneTag == prevTag:
+                    continue
+
+                prevTag = sceneTag
 
                 logging.info("%s (%d,%d): %s" % (url, r['startFrame'], r['endFrame'], sceneTag))
 
@@ -82,14 +101,24 @@ for pathin in args.input:
                 elif sceneTag == tags[idx]:
                     images[idx][url] = r
                 else:
-                    logging.info("Tag doesn't match order...")
+                    logging.info("Tag doesn't match order... (%s != %s)" % (sceneTag, tags[idx]))
 
-                    for i in range(idx,len(tags)):
+                    MAX_JUMP = 5
+                    success = False
+                    for i in range(idx, min(idx+MAX_JUMP,len(tags))):
+                        logging.info("Checking %s against %s at %d" % (sceneTag, tags[i], i))
                         if sceneTag == tags[i]:
                             images[i][url] = r
                             idx = i
+                            success = True
                             break
 
+                    if not success:
+                        logging.info("Couldn't find a match, insert...")
+                        # Couldn't find match.   insert
+                        tags.insert( idx, sceneTag )
+                        images.insert( idx, {url: r} )
+                        #idx = idx-1 # Back up so we reconsider using this new entry
 
                 # On success
                 idx += 1
@@ -97,6 +126,7 @@ for pathin in args.input:
 img_path  = path.dirname(args.outfile) + "/images/"
 os.makedirs(img_path, exist_ok=True)
 
+urls = sorted(urls)
 
 html_file = args.outfile
 with open(html_file, 'w') as html:
@@ -140,6 +170,53 @@ with open(html_file, 'w') as html:
 
 
         html.write("</tr>")
+
+    # And unknowns (how's the DRY?)
+
+    html.write("</table><hr>\n")
+
+    html.write("<h2>Unidentified images</h2>")
+
+    html.write("<table>\n<tr><th>Scene Tag</th>")
+    for name in urls:
+        html.write("<th>%s</th>" % path.basename(name))
+    html.write("</tr>\n")
+
+
+    html.write("<tr>")
+        html.write("<td>Unknown</td>" )
+
+    for url in urls:
+        if url not in unknowns:
+            html.write("<td></td>")
+            continue
+
+        html.write("<td>")
+        for region in unknowns[url]:
+
+            sample_frame = region['startFrame'] + 0.5 * (region['endFrame'] - region['startFrame'])
+
+            img_file = img_path + "%s_%d.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
+            thumb_file = img_path + "%s_%d_thumbnail.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
+
+            if args.force or not path.exists( img_file ) or not path.exists( thumb_file ):
+                logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, path.basename(url)))
+                img = qt.get_frame( url, sample_frame, format='jpg' )
+                img.save( img_file )
+                img.thumbnail( img_size )  # PIL.thumbnail preserves aspect ratio
+
+                img.save( thumb_file )
+
+            relapath = path.relpath( img_file, path.dirname(html_file) )
+            relathumb = path.relpath( thumb_file, path.dirname(html_file) )
+
+            html.write("<a href=\"%s\"><img src=\"%s\"/></a><br>%d -- %d<br>" % (relapath,relathumb,region['startFrame'],region['endFrame']) )
+        html.write("</td>")
+
+
+    html.write("</tr>")
+
+
 
     # for r in jin["regions"]:
     #
