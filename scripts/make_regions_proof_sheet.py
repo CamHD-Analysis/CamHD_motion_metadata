@@ -89,7 +89,7 @@ for pathin in args.input:
                     continue
 
                 # Squash runs...
-                if sceneTag == prevTag and args.squashruns:
+                if sceneTag == prevTag and not args.squashruns:
                     images[idx-1][url].append(r)
                     continue
 
