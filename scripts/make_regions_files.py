@@ -23,6 +23,10 @@ parser.add_argument('--dry-run', dest='dryrun', action='store_true',
 
 parser.add_argument('--force', dest='force', action='store_true', help='')
 
+parser.add_argument('--force-unclassified', dest='forceunclassified',
+                    action='store_true', help='')
+
+
 parser.add_argument('--no-classify', dest='noclassify', action='store_true',
                     help="Don't attempt to classify static regions")
 
@@ -32,11 +36,14 @@ parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
 parser.add_argument('--first', metavar='first', nargs='?', type=int,
                     help='')
 
-parser.add_argument("--ground-truth", dest="groundtruth", default="classification/ground_truth.json")
+parser.add_argument("--ground-truth", dest="groundtruth",
+                    default="classification/ground_truth.json")
 
-parser.add_argument('--git-add', dest='gitadd', action='store_true', help='Run "git add" on resulting file')
+parser.add_argument('--git-add', dest='gitadd', action='store_true',
+                    help='Run "git add" on resulting file')
 
-parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
+parser.add_argument('--lazycache-url', dest='lazycache',
+                    default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
                     help='URL to Lazycache repo server (only needed if classifying)')
 
 args = parser.parse_args()
@@ -58,11 +65,16 @@ for path in args.input:
 
         timing = {}
 
-        logging.info("Processing %s, Saving results to %s" % (infile, outfile) )
+        logging.info("Processing %s, Saving results to %s" % (infile, outfile))
 
-        if os.path.isfile( outfile ) and args.force == False:
-            logging.warning("Skipping %s or run with --force to overwrite" % outfile )
-            continue
+        if os.path.isfile(outfile):
+            if args.forceunclassified and not ra.is_classified(outfile) :
+                logging.info("%s exists but isn't classified" % outfile)
+            elif args.force is True:
+                logging.info("%s exists, overwriting" % outfile)
+            else:
+                logging.warning("%s exists, run with --force to overwrite" % outfile )
+                continue
 
         if args.dryrun == True:
             continue
@@ -73,28 +85,25 @@ for path in args.input:
             jin = json.load( data_file )
 
         ra_start = time.time()
-        jout = ra.region_analysis( jin )
+        jout = ra.region_analysis(jin)
         timing['regionAnalysis'] = time.time()-ra_start
 
         if 'versions' not in jout:
             jout['versions'] = {}
         jout['versions']['findRegions'] = ra.find_regions_version
-        jout['performance'] = {'timing': timing }
+        jout['performance'] = {'timing': timing}
 
         if 'depends' not in jout:
             jout['depends'] = {}
 
-        git_rev = subprocess.check_output(["git", "log", "-n 1",
-                        "--pretty=format:%H",  "--", infile ],
-                        encoding='utf8' )
-        jout['depends'][infile] = git_rev
+        git_rev = ra.git_revision(infile)
+        jout['depends'] = {'opticalFlow': {infile: git_rev}}
 
         ## Write results as a checkpoint
         with open( outfile, 'w' ) as out:
             json.dump( jout, out, indent = 4)
 
         url = jout["movie"]["URL"]
-
 
 
         if not args.noclassify:
@@ -105,6 +114,8 @@ for path in args.input:
             jout = ra.classify_regions( jout, classifier, lazycache = qt, first_n = args.first )
             timing['classification'] = time.time()-classifier_start
 
+            if 'version' not in jout:
+                jout['version'] = {}
             jout['version']['classifyRegions'] = ra.classify_regions_version
 
 

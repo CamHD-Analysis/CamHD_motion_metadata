@@ -8,17 +8,42 @@ import imreg_dft as ird
 
 from operator import attrgetter
 
+from .git_utils import *
+
 classify_regions_version = "1.1"
 
-## Quick hack to have this hardcoded
-REFERENCE_SEQUENCE = [ "d2_p1_z0", "d2_p1_z1", "d2_p1_z0", "d2_p0_z0", "d2_p2_z0", "d2_p2_z1", "d2_p2_z0",
-                        "d2_p0_z0", "d2_p3_z0", "d2_p3_z1", "d2_p3_z2", "d2_p3_z0", "d2_p0_z0",
-                        "d2_p4_z0", "d2_p4_z1", "d2_p4_z2", "d2_p4_z0", "d2_p0_z0", "d2_p5_z0",
-                        "d2_p5_z1", "d2_p5_z2", "d2_p5_z0", "d2_p0_z0", "d2_p6_z0", "d2_p6_z1",
-                        "d2_p6_z2", "d2_p6_z0", "d2_p0_z0", "d2_p0_z1", "d2_p0_z2", "d2_p0_z0",
-                        "d2_p7_z0", "d2_p7_z1", "d2_p7_z0", "d2_p0_z0", "d2_p8_z0", "d2_p8_z1",
-                        "d2_p8_z0", "d2_p0_z0", "d2_p1_z0" ]
+# Quick hack to have this hardcoded
+REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
+                      "d2_p0_z0", "d2_p2_z0", "d2_p2_z1", "d2_p2_z0",
+                      "d2_p0_z0", "d2_p3_z0", "d2_p3_z1",
+                      "d2_p3_z2", "d2_p3_z0", "d2_p0_z0",
+                      "d2_p4_z0", "d2_p4_z1", "d2_p4_z2",
+                      "d2_p4_z0", "d2_p0_z0", "d2_p5_z0",
+                      "d2_p5_z1", "d2_p5_z2", "d2_p5_z0",
+                      "d2_p0_z0", "d2_p6_z0", "d2_p6_z1",
+                      "d2_p6_z2", "d2_p6_z0", "d2_p0_z0",
+                      "d2_p0_z1", "d2_p0_z2", "d2_p0_z0",
+                      "d2_p7_z0", "d2_p7_z1", "d2_p7_z0",
+                      "d2_p0_z0", "d2_p8_z0", "d2_p8_z1",
+                      "d2_p8_z0", "d2_p0_z0", "d2_p1_z0"]
 
+
+def is_classified( file ):
+    with open(file) as f:
+        j = json.load(f)
+
+    if "regions" not in j:
+        return False
+
+    for r in j["regions"]:
+        if r['type'] != 'static':
+            continue
+
+        if 'sceneTag' not in r:
+            return False
+
+
+    return True
 
 def classify_regions( regionsj, classifier, lazycache, first_n = None,
                         ref_samples = (0.4,0.5,0.6), test_count = 5 ):
@@ -65,7 +90,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
 
             all_results += results
 
-            ## Heuristic tests?
+            # Heuristic tests?
             min_test_ratio = 2
 
             scene_tag = 'unknown'
@@ -73,13 +98,13 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
             first = results[-1]
             second = results[-2]
 
-            ## Use simple ratio test
+            # Use simple ratio test
             ratio = first.score / second.score
             logging.info("1st/2nd best scores: %f, %f    : ratio = %f" % (first.score, second.score, ratio))
             if ratio > min_test_ratio:
                 scene_tag = first.tag
 
-            ## Combine results with a simple voting scheme
+            # Combine results with a simple voting scheme
             votes[ scene_tag ] = votes[scene_tag]+1 if scene_tag in votes.keys() else 1
 
 
@@ -94,7 +119,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
                 if votes[t] == votes_max:
                     scene_tag = t
                     scenes.append( t )
-                    scene_meta['inferredBy'] = "match to reference"
+                    scene_meta['inferredBy'] = "matchToGroundTruth"
 
         all_results = sorted( all_results, key=attrgetter('score') )
         first = all_results[-1]
@@ -110,8 +135,10 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
                 else:
                     scene_tag_guesses[r.tag] = [r.score]
 
+        scene_meta['topTenPct'] = scene_tag_guesses
+
         rjson['sceneTag'] = scene_tag
-        rjson['sceneTagMeta'] = { 'topTenPct': scene_tag_guesses }
+        rjson['sceneTagMeta'] = scene_meta
 
 
     ## Now attempt to clean any unknowns
@@ -146,7 +173,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
             if prevResult['success'] > threshold:
                 scenes[i] = scenes[prevGood]
                 regions[ri]['sceneTag'] = scenes[prevGood]
-                regions[ri]['sceneTagMeta']['inferredBy'] = "similarity to previous neighbor"
+                regions[ri]['sceneTagMeta']['inferredBy'] = "similarityToPrevNeighbor"
                 logging.info("Inferred tag %s by comparison to previous good match" % scenes[i])
                 continue
         elif nextGood != None:
@@ -155,7 +182,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
             if nextResult['success'] > threshold:
                 scenes[i] = scenes[nextGood]
                 regions[ri]['sceneTag']= scenes[nextGood]
-                regions[ri]['sceneTagMeta']['inferredBy'] = "similarity to next neighbor"
+                regions[ri]['sceneTagMeta']['inferredBy'] = "similarityToNextNeighbor"
                 logging.info("Inferred type %s by comparison to next good match" % scenes[i])
                 continue
 
@@ -172,7 +199,7 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
                 if REFERENCE_SEQUENCE[k] == scenes[prevGood] and REFERENCE_SEQUENCE[k+delta] == scenes[nextGood]:
                     ## Well, this sucks
                     scenes[i] = REFERENCE_SEQUENCE[ k+(i-prevGood) ]
-                    regions[ri]['sceneTag']= scenes[i] 
+                    regions[ri]['sceneTag']= scenes[i]
                     regions[ri]['sceneTagMeta']['inferredBy'] = "sequence"
                     logging.info("Inferred type %s by sequence" % scenes[i])
                     break
@@ -181,5 +208,10 @@ def classify_regions( regionsj, classifier, lazycache, first_n = None,
             logging.info("No classified regions before _and_ after, skipping inference from sequence")
 
 
+    gt_file_revs = {}
+    for gt_file in classifier.gt_files:
+        gt_file_revs[gt_file] = git_revision(gt_file)
+
+    regionsj['depends']['classifyRegions'] = {'groundTruth': gt_file_revs}
 
     return regionsj

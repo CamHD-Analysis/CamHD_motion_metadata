@@ -14,16 +14,15 @@ import json
 
 import pycamhd.lazycache as camhd
 
-
+from .classifier import *
 
 root_name_pattern = re.compile("CAMHDA301-[0-9T]*Z")
 img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*Z)_(\d*)\.")
 
 
-
 class GroundTruthLibrary:
 
-    def __init__( self, lazycache = camhd.lazycache() ):
+    def __init__(self, lazycache=camhd.lazycache()):
         self.img_cache = {}
         self.imgs = {}
 
@@ -89,9 +88,7 @@ class GroundTruthLibrary:
         if len(self.gt_library) != len(gt_json):
             raise Exception("Error loading ground truth library")
 
-        print(self.gt_library)
-
-    def aggregate_images( self, keys ):
+    def aggregate_images(self, keys):
         imgs = {}
         for key in keys:
             logging.info("Using %s as ground truth" % key)
@@ -188,10 +185,9 @@ class GroundTruthLibrary:
         if len(short_tags) > 0:
             self.supplement_gt_images(use_gts, short_tags)
             imgs = self.aggregate_images(use_gts)
-
-        short_tags = collect_short_tags(imgs)
+            short_tags = collect_short_tags(imgs)
 
         if len(short_tags) > 0:
             raise Exception("Couldn't produce enough ground truth images")
 
-        return Classifier(imgs)
+        return Classifier(imgs, use_gts)
