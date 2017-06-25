@@ -6,29 +6,40 @@
         "cacheURL": "http://lazycache_nocache:8080/v1/org/oceanobservatories/rawdata/files/RS03ASHS/PN03B/06-CAMHDA301/2016/02/22/CAMHDA301-20160222T150000Z.mov"
     },
     "contents": {
-        "regions": "1.0"
+        "regions": "1.1"
     },
     "regions": [
         {
-            "bounds": [
-                581,
-                731
-            ],
+            "startFrame": 581,
+            "endFrame": 731,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999024711560839,
                 "txMean": -0.027280711047598067,
                 "tyMean": 0.08100050591233549,
                 "size": 195
+            },
+            "sceneTag": "unknown",
+            "sceneTagMeta": {
+                "inferredBy": "",
+                "topTenPct": {
+                    "d2_p7_z0": [
+                        0.0389591357364776,
+                        0.03989688819145646
+                    ],
+                    "d2_p2_z1": [
+                        0.039820064436912224,
+                        0.0402914341993709,
+                        0.04142008097252755
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                741,
-                751
-            ],
+            "startFrame": 741,
+            "endFrame": 751,
             "type": "short",
-            "stat": {
+            "stats": {
                 "scaleMean": NaN,
                 "txMean": NaN,
                 "tyMean": NaN,
@@ -36,25 +47,37 @@
             }
         },
         {
-            "bounds": [
-                751,
-                1051
-            ],
+            "startFrame": 751,
+            "endFrame": 1051,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999833424365988,
                 "txMean": 0.008818668415705437,
                 "tyMean": 0.007824069939928213,
                 "size": 390
+            },
+            "sceneTag": "unknown",
+            "sceneTagMeta": {
+                "inferredBy": "",
+                "topTenPct": {
+                    "d2_p7_z0": [
+                        0.038056231584701165
+                    ],
+                    "d2_p6_z2": [
+                        0.03869805101094368
+                    ],
+                    "d2_p2_z1": [
+                        0.03952181014480996,
+                        0.04086930427171013
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                1061,
-                1251
-            ],
+            "startFrame": 1061,
+            "endFrame": 1251,
             "type": "unknown",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0285090349385464,
                 "txMean": 1.1746923873592359,
                 "tyMean": -1.4272388045048197,
@@ -62,25 +85,32 @@
             }
         },
         {
-            "bounds": [
-                1251,
-                1351
-            ],
+            "startFrame": 1251,
+            "endFrame": 1351,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9996557245036823,
                 "txMean": -0.0023779353702880947,
                 "tyMean": -0.027902723397975428,
                 "size": 130
+            },
+            "sceneTag": "d2_p1_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p1_z1": [
+                        0.11296585459517287,
+                        0.11491575179189445,
+                        0.11773080200543014
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                1361,
-                1711
-            ],
+            "startFrame": 1361,
+            "endFrame": 1711,
             "type": "N",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9702141849127774,
                 "txMean": -0.6493544445492212,
                 "tyMean": 20.193908199896526,
@@ -88,25 +118,31 @@
             }
         },
         {
-            "bounds": [
-                1711,
-                2151
-            ],
+            "startFrame": 1711,
+            "endFrame": 2151,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0000046687561797,
                 "txMean": 0.009935675817148432,
                 "tyMean": 0.21064686710824754,
                 "size": 572
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.23646273795057504,
+                        0.24935697085773847
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                2161,
-                2441
-            ],
+            "startFrame": 2161,
+            "endFrame": 2441,
             "type": "NW",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0181206383110295,
                 "txMean": 25.088854518653736,
                 "tyMean": 30.245757164342564,
@@ -114,25 +150,31 @@
             }
         },
         {
-            "bounds": [
-                2441,
-                2451
-            ],
+            "startFrame": 2441,
+            "endFrame": 2451,
             "type": "static",
             "stats": {
                 "scaleMean": 1.00851697291365,
                 "txMean": 1.18538748106878,
                 "tyMean": 1.8836196343161,
                 "size": 13
+            },
+            "sceneTag": "d2_p2_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p2_z0": [
+                        0.14006477829451733,
+                        0.14762717075486642
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                2461,
-                2471
-            ],
+            "startFrame": 2461,
+            "endFrame": 2471,
             "type": "E",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.02808496168281,
                 "txMean": -12.3462406201317,
                 "tyMean": -3.56194889885365,
@@ -140,25 +182,32 @@
             }
         },
         {
-            "bounds": [
-                2471,
-                2551
-            ],
+            "startFrame": 2471,
+            "endFrame": 2551,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9987964047659676,
                 "txMean": -1.705531359397047,
                 "tyMean": 0.513599337059264,
                 "size": 104
+            },
+            "sceneTag": "d2_p2_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p2_z0": [
+                        0.11771321185963797,
+                        0.12265625008455681,
+                        0.1280695245037824
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                2561,
-                2611
-            ],
+            "startFrame": 2561,
+            "endFrame": 2611,
             "type": "W",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9878393525037801,
                 "txMean": 13.665969353433065,
                 "tyMean": 4.256283357464431,
@@ -166,25 +215,32 @@
             }
         },
         {
-            "bounds": [
-                2611,
-                2731
-            ],
+            "startFrame": 2611,
+            "endFrame": 2731,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9987254541377181,
                 "txMean": 0.8321353884097439,
                 "tyMean": 0.2521214321132594,
                 "size": 156
+            },
+            "sceneTag": "d2_p2_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p2_z0": [
+                        0.22843180403619293,
+                        0.22859761589542507,
+                        0.22989597223282518
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                2741,
-                2901
-            ],
+            "startFrame": 2741,
+            "endFrame": 2901,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0664493088962088,
                 "txMean": -0.03748688586441418,
                 "tyMean": 3.063074219677688,
@@ -192,25 +248,32 @@
             }
         },
         {
-            "bounds": [
-                2901,
-                3781
-            ],
+            "startFrame": 2901,
+            "endFrame": 3781,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9997574210954832,
                 "txMean": 0.2042698259777316,
                 "tyMean": 0.06919653639208292,
                 "size": 1144
+            },
+            "sceneTag": "d2_p2_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p2_z1": [
+                        0.23787793148292657,
+                        0.25149867492328687,
+                        0.25567117088868296
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                3791,
-                3951
-            ],
+            "startFrame": 3791,
+            "endFrame": 3951,
             "type": "zoom_out",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9419401041093834,
                 "txMean": -7.247399355160349,
                 "tyMean": 0.8187001279181974,
@@ -218,25 +281,32 @@
             }
         },
         {
-            "bounds": [
-                3951,
-                4121
-            ],
+            "startFrame": 3951,
+            "endFrame": 4121,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9995936017089896,
                 "txMean": 0.2373970629501515,
                 "tyMean": 0.049069693823070526,
                 "size": 221
+            },
+            "sceneTag": "d2_p2_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p2_z0": [
+                        0.22262282124871902,
+                        0.2265633941234224,
+                        0.22700901692433595
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                4131,
-                4171
-            ],
+            "startFrame": 4131,
+            "endFrame": 4171,
             "type": "W",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9590157827331176,
                 "txMean": 21.5852821033433,
                 "tyMean": 2.0703062252949627,
@@ -244,25 +314,32 @@
             }
         },
         {
-            "bounds": [
-                4171,
-                4301
-            ],
+            "startFrame": 4171,
+            "endFrame": 4301,
             "type": "static",
             "stats": {
                 "scaleMean": 1.001484571224427,
                 "txMean": -1.05052451513033,
                 "tyMean": -0.36652577353179727,
                 "size": 169
+            },
+            "sceneTag": "d2_p2_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p2_z0": [
+                        0.22075687407651967,
+                        0.2211699793806103,
+                        0.22334954136588905
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                4311,
-                4591
-            ],
+            "startFrame": 4311,
+            "endFrame": 4591,
             "type": "SE",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9799659908975306,
                 "txMean": -22.77863008652355,
                 "tyMean": -33.89881656996261,
@@ -270,25 +347,32 @@
             }
         },
         {
-            "bounds": [
-                4591,
-                4851
-            ],
+            "startFrame": 4591,
+            "endFrame": 4851,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999451136698081,
                 "txMean": 2.207312739485194,
                 "tyMean": 0.4608612071165581,
                 "size": 338
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.21087311837819467,
+                        0.22568288209760187,
+                        0.22597925575378933
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                4861,
-                5101
-            ],
+            "startFrame": 4861,
+            "endFrame": 5101,
             "type": "N",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0036407224157096,
                 "txMean": 5.444576210413463,
                 "tyMean": 40.343357307549105,
@@ -296,25 +380,32 @@
             }
         },
         {
-            "bounds": [
-                5101,
-                5391
-            ],
+            "startFrame": 5101,
+            "endFrame": 5391,
             "type": "static",
             "stats": {
                 "scaleMean": 0.999994212424091,
                 "txMean": -0.3108725728477505,
                 "tyMean": 0.33170733605060243,
                 "size": 377
+            },
+            "sceneTag": "d2_p3_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p3_z0": [
+                        0.19386747552532216,
+                        0.20503979842457085,
+                        0.20924066720021994
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                5401,
-                5551
-            ],
+            "startFrame": 5401,
+            "endFrame": 5551,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0680011845472561,
                 "txMean": 2.7777049250763155,
                 "tyMean": 2.017456376944224,
@@ -322,25 +413,32 @@
             }
         },
         {
-            "bounds": [
-                5551,
-                5691
-            ],
+            "startFrame": 5551,
+            "endFrame": 5691,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0003351408785142,
                 "txMean": 0.03837928864618302,
                 "tyMean": -0.04574658896013517,
                 "size": 182
+            },
+            "sceneTag": "d2_p3_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p3_z1": [
+                        0.07765005993756109,
+                        0.07918440642745138,
+                        0.08174594879300466
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                5701,
-                5841
-            ],
+            "startFrame": 5701,
+            "endFrame": 5841,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.08561900378872,
                 "txMean": 1.3574300411297444,
                 "tyMean": -2.411186581630702,
@@ -348,25 +446,101 @@
             }
         },
         {
-            "bounds": [
-                5841,
-                6741
-            ],
+            "startFrame": 5841,
+            "endFrame": 6741,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999799193118467,
                 "txMean": -0.010665533788542531,
                 "tyMean": -0.00044487543706321706,
                 "size": 1170
+            },
+            "sceneTag": "d2_p3_z1",
+            "sceneTagMeta": {
+                "inferredBy": "similarityToPrevNeighbor",
+                "topTenPct": {
+                    "d2_p8_z0": [
+                        0.029942384706923463
+                    ],
+                    "d2_p4_z1": [
+                        0.030010144687348767,
+                        0.03060551417383564
+                    ],
+                    "d2_p6_z1": [
+                        0.03003326015390748
+                    ],
+                    "d2_p5_z2": [
+                        0.030098005540618183,
+                        0.030753150530933793
+                    ],
+                    "d2_p3_z0": [
+                        0.030180554342520895,
+                        0.0305106532534271,
+                        0.033267452968913994
+                    ],
+                    "d2_p1_z0": [
+                        0.03022592176055208
+                    ],
+                    "d2_p0_z2": [
+                        0.030346103917734363,
+                        0.0307657523024496
+                    ],
+                    "d2_p5_z0": [
+                        0.030381035816861263
+                    ],
+                    "d2_p0_z0": [
+                        0.030412009917765114,
+                        0.03072353364384905
+                    ],
+                    "d2_p3_z1": [
+                        0.03043913209000421
+                    ],
+                    "d2_p4_z0": [
+                        0.0304414508887179,
+                        0.031087691281747504
+                    ],
+                    "d2_p4_z2": [
+                        0.030535363934105882,
+                        0.031493929063610406
+                    ],
+                    "d2_p3_z2": [
+                        0.030602958268718502,
+                        0.03178356538381539
+                    ],
+                    "d2_p1_z1": [
+                        0.030645707235075554,
+                        0.030713188110729383
+                    ],
+                    "d2_p5_z1": [
+                        0.03065324726310108
+                    ],
+                    "d2_p6_z0": [
+                        0.03099369639402234,
+                        0.03155110046641468
+                    ],
+                    "d2_p8_z1": [
+                        0.0313915674947756
+                    ],
+                    "d2_p2_z1": [
+                        0.031513606986118596,
+                        0.032965252562909525
+                    ],
+                    "d2_p2_z0": [
+                        0.03184893657865105,
+                        0.03315267364326371
+                    ],
+                    "d2_p7_z0": [
+                        0.031899986336682846,
+                        0.03235274136238616
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                6751,
-                7041
-            ],
+            "startFrame": 6751,
+            "endFrame": 7041,
             "type": "zoom_out",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9277022548244891,
                 "txMean": -2.0507937227038036,
                 "tyMean": -0.8549659698049187,
@@ -374,25 +548,32 @@
             }
         },
         {
-            "bounds": [
-                7041,
-                7101
-            ],
+            "startFrame": 7041,
+            "endFrame": 7101,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0009818545506444,
                 "txMean": -0.1846966996152342,
                 "tyMean": -0.8642932884706456,
                 "size": 78
+            },
+            "sceneTag": "d2_p3_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p3_z0": [
+                        0.20409519322749947,
+                        0.20622525246710097,
+                        0.2111307951847352
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                7111,
-                7351
-            ],
+            "startFrame": 7111,
+            "endFrame": 7351,
             "type": "S",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9945273207132023,
                 "txMean": -6.752871257277159,
                 "tyMean": -40.59273014606574,
@@ -400,25 +581,30 @@
             }
         },
         {
-            "bounds": [
-                7351,
-                7691
-            ],
+            "startFrame": 7351,
+            "endFrame": 7691,
             "type": "static",
             "stats": {
                 "scaleMean": 1.000000075366021,
                 "txMean": 1.3465204161263888,
                 "tyMean": -0.4338233062223392,
                 "size": 442
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.24064951490288844
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                7701,
-                7961
-            ],
+            "startFrame": 7701,
+            "endFrame": 7961,
             "type": "N",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0070500715323474,
                 "txMean": -9.560963082886614,
                 "tyMean": 34.505953445961666,
@@ -426,25 +612,32 @@
             }
         },
         {
-            "bounds": [
-                7961,
-                8271
-            ],
+            "startFrame": 7961,
+            "endFrame": 8271,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9997153939481148,
                 "txMean": 0.032219553639592335,
                 "tyMean": 0.45585096559495236,
                 "size": 403
+            },
+            "sceneTag": "d2_p4_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p4_z0": [
+                        0.2785797841283317,
+                        0.2947507905839037,
+                        0.29823621111145243
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                8281,
-                8441
-            ],
+            "startFrame": 8281,
+            "endFrame": 8441,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0553017014876476,
                 "txMean": -8.321157280098799,
                 "tyMean": 1.8663219537677884,
@@ -452,25 +645,32 @@
             }
         },
         {
-            "bounds": [
-                8441,
-                8571
-            ],
+            "startFrame": 8441,
+            "endFrame": 8571,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999368028124009,
                 "txMean": -0.09125494402715587,
                 "tyMean": 0.01418978070444467,
                 "size": 169
+            },
+            "sceneTag": "d2_p4_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p4_z1": [
+                        0.09643205131890555,
+                        0.09850548162375923,
+                        0.10055099656884746
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                8581,
-                8721
-            ],
+            "startFrame": 8581,
+            "endFrame": 8721,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0835303202409858,
                 "txMean": 0.08160686449850131,
                 "tyMean": -2.1215567704577585,
@@ -478,25 +678,32 @@
             }
         },
         {
-            "bounds": [
-                8721,
-                9621
-            ],
+            "startFrame": 8721,
+            "endFrame": 9621,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999971107472246,
                 "txMean": -0.0019237542423824927,
                 "tyMean": 0.015427592148597909,
                 "size": 1170
+            },
+            "sceneTag": "d2_p4_z2",
+            "sceneTagMeta": {
+                "inferredBy": "sequence",
+                "topTenPct": {
+                    "d2_p4_z2": [
+                        0.05223449347485634,
+                        0.053536217591808384,
+                        0.053726558241268874
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                9631,
-                9931
-            ],
+            "startFrame": 9631,
+            "endFrame": 9931,
             "type": "zoom_out",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9350250905387497,
                 "txMean": 4.28558740900963,
                 "tyMean": -1.4587482329718775,
@@ -504,25 +711,32 @@
             }
         },
         {
-            "bounds": [
-                9931,
-                9991
-            ],
+            "startFrame": 9931,
+            "endFrame": 9991,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0000505671434101,
                 "txMean": 0.060294112414247446,
                 "tyMean": -0.03439084852838679,
                 "size": 78
+            },
+            "sceneTag": "d2_p4_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p4_z0": [
+                        0.27464753150148935,
+                        0.2771264208769992,
+                        0.279312137361476
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                10001,
-                10251
-            ],
+            "startFrame": 10001,
+            "endFrame": 10251,
             "type": "S",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9923364881900345,
                 "txMean": 8.113977206006156,
                 "tyMean": -42.50886444361617,
@@ -530,25 +744,31 @@
             }
         },
         {
-            "bounds": [
-                10251,
-                10581
-            ],
+            "startFrame": 10251,
+            "endFrame": 10581,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999260696003134,
                 "txMean": -0.861065249447154,
                 "tyMean": -0.45906332908162906,
                 "size": 429
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.21907192350073026,
+                        0.24100121744023717
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                10591,
-                10771
-            ],
+            "startFrame": 10591,
+            "endFrame": 10771,
             "type": "NE",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0095252307217564,
                 "txMean": -21.115896196019648,
                 "tyMean": 31.763291136079438,
@@ -556,25 +776,32 @@
             }
         },
         {
-            "bounds": [
-                10771,
-                11081
-            ],
+            "startFrame": 10771,
+            "endFrame": 11081,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9994908107245399,
                 "txMean": 0.1168501256794218,
                 "tyMean": 0.8113346741810568,
                 "size": 403
+            },
+            "sceneTag": "d2_p5_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p5_z0": [
+                        0.2217903251194957,
+                        0.2304426192447342,
+                        0.24605253801450708
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                11091,
-                11241
-            ],
+            "startFrame": 11091,
+            "endFrame": 11241,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0610433220633608,
                 "txMean": -8.293556983517425,
                 "tyMean": -1.2139579722025524,
@@ -582,25 +809,32 @@
             }
         },
         {
-            "bounds": [
-                11241,
-                11361
-            ],
+            "startFrame": 11241,
+            "endFrame": 11361,
             "type": "static",
             "stats": {
                 "scaleMean": 1.00000182213963,
                 "txMean": -0.037101103085362956,
                 "tyMean": 0.005141333781154966,
                 "size": 156
+            },
+            "sceneTag": "d2_p5_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p5_z1": [
+                        0.07129329286388268,
+                        0.07321389656636779,
+                        0.07446498176999518
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                11371,
-                11531
-            ],
+            "startFrame": 11371,
+            "endFrame": 11531,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0782576420066248,
                 "txMean": 0.24133156708974243,
                 "tyMean": -2.335415263264651,
@@ -608,25 +842,36 @@
             }
         },
         {
-            "bounds": [
-                11531,
-                11701
-            ],
+            "startFrame": 11531,
+            "endFrame": 11701,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0001195273426216,
                 "txMean": -0.003495087616580924,
                 "tyMean": 0.05798898554073042,
                 "size": 221
+            },
+            "sceneTag": "unknown",
+            "sceneTagMeta": {
+                "inferredBy": "",
+                "topTenPct": {
+                    "d2_p5_z2": [
+                        0.03932536842682096,
+                        0.04073629225964318
+                    ],
+                    "d2_p2_z1": [
+                        0.04135380584447403,
+                        0.04316477318097386,
+                        0.04350778387592735
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                11711,
-                11721
-            ],
+            "startFrame": 11711,
+            "endFrame": 11721,
             "type": "short",
-            "stat": {
+            "stats": {
                 "scaleMean": NaN,
                 "txMean": NaN,
                 "tyMean": NaN,
@@ -634,25 +879,38 @@
             }
         },
         {
-            "bounds": [
-                11721,
-                12431
-            ],
+            "startFrame": 11721,
+            "endFrame": 12431,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999864410976147,
                 "txMean": -0.0009925303201839871,
                 "tyMean": -0.009391400568040314,
                 "size": 923
+            },
+            "sceneTag": "unknown",
+            "sceneTagMeta": {
+                "inferredBy": "",
+                "topTenPct": {
+                    "d2_p3_z2": [
+                        0.03631716950609062,
+                        0.03669063680428192
+                    ],
+                    "d2_p2_z1": [
+                        0.03759693440840557,
+                        0.0398560895624502
+                    ],
+                    "d2_p5_z2": [
+                        0.039799534406123355
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                12441,
-                12731
-            ],
+            "startFrame": 12441,
+            "endFrame": 12731,
             "type": "zoom_out",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.931789492068525,
                 "txMean": 3.922134841862204,
                 "tyMean": 1.0144035385760921,
@@ -660,25 +918,32 @@
             }
         },
         {
-            "bounds": [
-                12731,
-                12791
-            ],
+            "startFrame": 12731,
+            "endFrame": 12791,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0005234278730528,
                 "txMean": 0.4679959969405482,
                 "tyMean": -0.11538425688805982,
                 "size": 78
+            },
+            "sceneTag": "d2_p5_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p5_z0": [
+                        0.23625792131717002,
+                        0.23781364565519106,
+                        0.2457902195873518
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                12801,
-                13011
-            ],
+            "startFrame": 12801,
+            "endFrame": 13011,
             "type": "SW",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9915358039709437,
                 "txMean": 18.36294059501748,
                 "tyMean": -32.05519302495259,
@@ -686,25 +951,32 @@
             }
         },
         {
-            "bounds": [
-                13011,
-                13311
-            ],
+            "startFrame": 13011,
+            "endFrame": 13311,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999665123375244,
                 "txMean": -1.4842822600485184,
                 "tyMean": 0.48488688394893864,
                 "size": 390
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.1935679941111399,
+                        0.1987991716054248,
+                        0.21253709757016934
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                13321,
-                13441
-            ],
+            "startFrame": 13321,
+            "endFrame": 13441,
             "type": "SW",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0041658556598685,
                 "txMean": 34.93822757632512,
                 "tyMean": -12.721896763406265,
@@ -712,25 +984,31 @@
             }
         },
         {
-            "bounds": [
-                13441,
-                13811
-            ],
+            "startFrame": 13441,
+            "endFrame": 13811,
             "type": "static",
             "stats": {
                 "scaleMean": 0.999995726138882,
                 "txMean": 0.27336989391718863,
                 "tyMean": 0.5763804594101205,
                 "size": 481
+            },
+            "sceneTag": "d2_p6_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p6_z0": [
+                        0.29388952597369616,
+                        0.31652522737089833
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                13821,
-                13971
-            ],
+            "startFrame": 13821,
+            "endFrame": 13971,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.071025874429193,
                 "txMean": 3.018426734511535,
                 "tyMean": -1.2208961729208565,
@@ -738,25 +1016,32 @@
             }
         },
         {
-            "bounds": [
-                13971,
-                14111
-            ],
+            "startFrame": 13971,
+            "endFrame": 14111,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0000026340104184,
                 "txMean": -0.02064168822838222,
                 "tyMean": 0.003677960131177318,
                 "size": 182
+            },
+            "sceneTag": "d2_p6_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p6_z1": [
+                        0.3052227899125935,
+                        0.30784389596816986,
+                        0.30817697741409633
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                14121,
-                14261
-            ],
+            "startFrame": 14121,
+            "endFrame": 14261,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.084315583111658,
                 "txMean": 1.0906152326810086,
                 "tyMean": -2.2193781976109195,
@@ -764,25 +1049,32 @@
             }
         },
         {
-            "bounds": [
-                14261,
-                15161
-            ],
+            "startFrame": 14261,
+            "endFrame": 15161,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0000150447711382,
                 "txMean": -0.013178740605140583,
                 "tyMean": -0.006169016544882088,
                 "size": 1170
+            },
+            "sceneTag": "d2_p6_z2",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p6_z2": [
+                        0.19323497242946588,
+                        0.1970006109864787,
+                        0.21265291497078978
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                15171,
-                15461
-            ],
+            "startFrame": 15171,
+            "endFrame": 15461,
             "type": "zoom_out",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9260751450975158,
                 "txMean": -1.989858588458341,
                 "tyMean": 0.9091807502487878,
@@ -790,25 +1082,32 @@
             }
         },
         {
-            "bounds": [
-                15461,
-                15521
-            ],
+            "startFrame": 15461,
+            "endFrame": 15521,
             "type": "static",
             "stats": {
                 "scaleMean": 1.000162197443838,
                 "txMean": -0.27220335310417826,
                 "tyMean": -0.039714384787275625,
                 "size": 78
+            },
+            "sceneTag": "d2_p6_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p6_z0": [
+                        0.32190412005946084,
+                        0.3266765736664674,
+                        0.32682784367742707
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                15531,
-                15651
-            ],
+            "startFrame": 15531,
+            "endFrame": 15651,
             "type": "NE",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9961925409350175,
                 "txMean": -35.58707170159611,
                 "tyMean": 13.212456240817824,
@@ -816,25 +1115,30 @@
             }
         },
         {
-            "bounds": [
-                15651,
-                16151
-            ],
+            "startFrame": 15651,
+            "endFrame": 16151,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999953180262234,
                 "txMean": -0.21723750750071008,
                 "tyMean": -0.3984238395634366,
                 "size": 650
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.2288497522694278
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                16161,
-                16321
-            ],
+            "startFrame": 16161,
+            "endFrame": 16321,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.06791069039988,
                 "txMean": 1.3838345072250662,
                 "tyMean": -1.6289132589105761,
@@ -842,25 +1146,32 @@
             }
         },
         {
-            "bounds": [
-                16321,
-                16461
-            ],
+            "startFrame": 16321,
+            "endFrame": 16461,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999665001213401,
                 "txMean": 0.01438922289518933,
                 "tyMean": 0.0002705771285530634,
                 "size": 182
+            },
+            "sceneTag": "d2_p0_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z1": [
+                        0.07153165390824291,
+                        0.0734591478197729,
+                        0.07767047213908242
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                16471,
-                16611
-            ],
+            "startFrame": 16471,
+            "endFrame": 16611,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0835577092712108,
                 "txMean": 1.960903403990314,
                 "tyMean": -2.3607016431323937,
@@ -868,25 +1179,31 @@
             }
         },
         {
-            "bounds": [
-                16611,
-                17511
-            ],
+            "startFrame": 16611,
+            "endFrame": 17511,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999789913569933,
                 "txMean": 0.027792526502224617,
                 "tyMean": 0.02964033894335577,
                 "size": 1170
+            },
+            "sceneTag": "d2_p0_z2",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z2": [
+                        0.07358970778951607,
+                        0.07814054740571175
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                17521,
-                17811
-            ],
+            "startFrame": 17521,
+            "endFrame": 17811,
             "type": "zoom_out",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9259334870222768,
                 "txMean": -1.4970918931436699,
                 "tyMean": 1.0443384598316356,
@@ -894,25 +1211,31 @@
             }
         },
         {
-            "bounds": [
-                17811,
-                18201
-            ],
+            "startFrame": 17811,
+            "endFrame": 18201,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999758659985087,
                 "txMean": -0.009442121082515931,
                 "tyMean": 0.46834453172268997,
                 "size": 507
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.1920081734045026,
+                        0.21297448934048271
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                18211,
-                18551
-            ],
+            "startFrame": 18211,
+            "endFrame": 18551,
             "type": "S",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0010261011884405,
                 "txMean": -0.06337615166557539,
                 "tyMean": -50.777072285505014,
@@ -920,25 +1243,32 @@
             }
         },
         {
-            "bounds": [
-                18551,
-                18731
-            ],
+            "startFrame": 18551,
+            "endFrame": 18731,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0000033676328812,
                 "txMean": -0.012375944673381805,
                 "tyMean": 0.15909298553694023,
                 "size": 234
+            },
+            "sceneTag": "d2_p7_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p7_z0": [
+                        0.20498203986836697,
+                        0.20935989812962932,
+                        0.21859054263817587
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                18741,
-                18751
-            ],
+            "startFrame": 18741,
+            "endFrame": 18751,
             "type": "NE",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.970214235275394,
                 "txMean": -17.020223397569,
                 "tyMean": 29.4834011320866,
@@ -946,25 +1276,32 @@
             }
         },
         {
-            "bounds": [
-                18751,
-                19041
-            ],
+            "startFrame": 18751,
+            "endFrame": 19041,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999945021523985,
                 "txMean": -0.0010898494744968072,
                 "tyMean": -0.009964420977156033,
                 "size": 377
+            },
+            "sceneTag": "d2_p7_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p7_z0": [
+                        0.24689189688313595,
+                        0.2508929241979759,
+                        0.2523986825901396
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                19051,
-                19241
-            ],
+            "startFrame": 19051,
+            "endFrame": 19241,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0732480342367507,
                 "txMean": 1.1857758915572048,
                 "tyMean": -2.084518602430531,
@@ -972,25 +1309,32 @@
             }
         },
         {
-            "bounds": [
-                19241,
-                19421
-            ],
+            "startFrame": 19241,
+            "endFrame": 19421,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0000079802552078,
                 "txMean": 0.006653988724370879,
                 "tyMean": 0.0005206516201966108,
                 "size": 234
+            },
+            "sceneTag": "d2_p7_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p7_z1": [
+                        0.10602433809837764,
+                        0.10893004936193228,
+                        0.11003354380427938
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                19431,
-                19441
-            ],
+            "startFrame": 19431,
+            "endFrame": 19441,
             "type": "short",
-            "stat": {
+            "stats": {
                 "scaleMean": NaN,
                 "txMean": NaN,
                 "tyMean": NaN,
@@ -998,25 +1342,32 @@
             }
         },
         {
-            "bounds": [
-                19441,
-                20131
-            ],
+            "startFrame": 19441,
+            "endFrame": 20131,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999985855131535,
                 "txMean": -0.0005391168244950219,
                 "tyMean": -0.0021575144883778105,
                 "size": 897
+            },
+            "sceneTag": "d2_p7_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p7_z1": [
+                        0.10696883282336601,
+                        0.10710411950523473,
+                        0.10736252591914008
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                20141,
-                20331
-            ],
+            "startFrame": 20141,
+            "endFrame": 20331,
             "type": "zoom_out",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9296700301382205,
                 "txMean": -1.4111505962036381,
                 "tyMean": 1.0870172420915525,
@@ -1024,25 +1375,32 @@
             }
         },
         {
-            "bounds": [
-                20331,
-                20491
-            ],
+            "startFrame": 20331,
+            "endFrame": 20491,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999968046804995,
                 "txMean": -0.013151742658698149,
                 "tyMean": 0.001631676656792624,
                 "size": 208
+            },
+            "sceneTag": "d2_p7_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p7_z0": [
+                        0.25288755364095516,
+                        0.2529903148399754,
+                        0.25653042690922323
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                20501,
-                20841
-            ],
+            "startFrame": 20501,
+            "endFrame": 20841,
             "type": "N",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9961958515740894,
                 "txMean": -0.3692156158938097,
                 "tyMean": 47.28069991664496,
@@ -1050,25 +1408,31 @@
             }
         },
         {
-            "bounds": [
-                20841,
-                21161
-            ],
+            "startFrame": 20841,
+            "endFrame": 21161,
             "type": "static",
             "stats": {
                 "scaleMean": 1.000004094554916,
                 "txMean": 0.010581262652672866,
                 "tyMean": 0.3729971044357365,
                 "size": 416
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.24190846865340787,
+                        0.25895617838648793
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                21171,
-                21341
-            ],
+            "startFrame": 21171,
+            "endFrame": 21341,
             "type": "SE",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.0012703719081018,
                 "txMean": -41.13325135917008,
                 "tyMean": -34.650063637058864,
@@ -1076,25 +1440,30 @@
             }
         },
         {
-            "bounds": [
-                21341,
-                21691
-            ],
+            "startFrame": 21341,
+            "endFrame": 21691,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0000115760120758,
                 "txMean": -0.08866099503503376,
                 "tyMean": -0.005858247185100224,
                 "size": 455
+            },
+            "sceneTag": "d2_p8_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p8_z0": [
+                        0.27120219164322573
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                21701,
-                21821
-            ],
+            "startFrame": 21701,
+            "endFrame": 21821,
             "type": "zoom_in",
-            "stat": {
+            "stats": {
                 "scaleMean": 1.064012853778064,
                 "txMean": 0.6482934495671834,
                 "tyMean": -1.0307857330866017,
@@ -1102,25 +1471,32 @@
             }
         },
         {
-            "bounds": [
-                21821,
-                22711
-            ],
+            "startFrame": 21821,
+            "endFrame": 22711,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0000401837146253,
                 "txMean": -0.001225195661944102,
                 "tyMean": -0.005068179357655483,
                 "size": 1157
+            },
+            "sceneTag": "d2_p8_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p8_z1": [
+                        0.10078605821077137,
+                        0.10178231180893205,
+                        0.10410690672694384
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                22721,
-                22841
-            ],
+            "startFrame": 22721,
+            "endFrame": 22841,
             "type": "zoom_out",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9385134776128755,
                 "txMean": -0.7605420329343852,
                 "tyMean": 0.4264976474831034,
@@ -1128,25 +1504,32 @@
             }
         },
         {
-            "bounds": [
-                22841,
-                23221
-            ],
+            "startFrame": 22841,
+            "endFrame": 23221,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999945143757271,
                 "txMean": -0.0024537179230401233,
                 "tyMean": -0.002945840021528382,
                 "size": 494
+            },
+            "sceneTag": "d2_p8_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p8_z0": [
+                        0.23416438453187594,
+                        0.23616897037110385,
+                        0.23821863792864187
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                23231,
-                23411
-            ],
+            "startFrame": 23231,
+            "endFrame": 23411,
             "type": "NW",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.997211324703129,
                 "txMean": 40.74697505960017,
                 "tyMean": 33.86124084642543,
@@ -1154,25 +1537,30 @@
             }
         },
         {
-            "bounds": [
-                23411,
-                23781
-            ],
+            "startFrame": 23411,
+            "endFrame": 23781,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999977046714603,
                 "txMean": 0.3033306817948274,
                 "tyMean": 0.15230419320396377,
                 "size": 481
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": [
+                        0.2366062402388359
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                23791,
-                23961
-            ],
+            "startFrame": 23791,
+            "endFrame": 23961,
             "type": "S",
-            "stat": {
+            "stats": {
                 "scaleMean": 0.9992391766125602,
                 "txMean": 0.017816142192080234,
                 "tyMean": -40.80829015478833,
@@ -1180,25 +1568,32 @@
             }
         },
         {
-            "bounds": [
-                23961,
-                24021
-            ],
+            "startFrame": 23961,
+            "endFrame": 24021,
             "type": "static",
             "stats": {
                 "scaleMean": 1.0001957874073868,
                 "txMean": -0.007540297048680907,
                 "tyMean": -6.64241909126737,
                 "size": 78
+            },
+            "sceneTag": "d2_p1_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p1_z0": [
+                        0.24538574111330527,
+                        0.2514920792127109,
+                        0.25836798364994723
+                    ]
+                }
             }
         },
         {
-            "bounds": [
-                24031,
-                24041
-            ],
+            "startFrame": 24031,
+            "endFrame": 24041,
             "type": "short",
-            "stat": {
+            "stats": {
                 "scaleMean": NaN,
                 "txMean": NaN,
                 "tyMean": NaN,
@@ -1206,17 +1601,47 @@
             }
         },
         {
-            "bounds": [
-                24041,
-                24271
-            ],
+            "startFrame": 24041,
+            "endFrame": 24271,
             "type": "static",
             "stats": {
                 "scaleMean": 0.9999327207856357,
                 "txMean": -0.006311752304860171,
                 "tyMean": 1.9076806853222241,
                 "size": 299
+            },
+            "sceneTag": "d2_p1_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p1_z0": [
+                        0.27585692347348156,
+                        0.27679526113945685,
+                        0.28416359429918514
+                    ]
+                }
             }
         }
-    ]
+    ],
+    "versions": {
+        "findRegions": "1.0",
+        "classifyRegions": "1.1"
+    },
+    "performance": {
+        "timing": {
+            "regionAnalysis": 0.6078133583068848,
+            "classification": 371.3508298397064,
+            "elapsedSeconds": 372.20202374458313
+        }
+    },
+    "depends": {
+        "opticalFlow": {
+            "RS03ASHS/PN03B/06-CAMHDA301/2016/02/22/CAMHDA301-20160222T150000Z_optical_flow.json": "8be7e9be1e3867a03c40951a3f98921a31045f84"
+        },
+        "classifyRegions": {
+            "groundTruth": {
+                "RS03ASHS/PN03B/06-CAMHDA301/2016/03/01/CAMHDA301-20160301T030000Z_optical_flow_regions.json": "6ff19139f6051d5b26842c9f2ff524056aa7b7a3"
+            }
+        }
+    }
 }
