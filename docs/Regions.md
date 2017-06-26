@@ -20,8 +20,8 @@
   </tr>
 
   <tr>
-    <td>d2_p0_z0</td>
-    <td>Zoom Out / Pan up (no break"></td>
+    <td>d2/p0/z0</td>
+    <td>Zoom Out / Pan up (no break?)</td>
     <td> <img src="region_thumbs/frame_00002013.jpg"></td>
   </tr>
 
@@ -75,7 +75,7 @@
 
   <tr>
     <td>d2_p3_z2</td>
-    <td>Zoom in (further"></td>
+    <td>Zoom in (further)</td>
     <td> <img src="region_thumbs/frame_00006191.jpg"></td>
   </tr>
 
@@ -105,7 +105,7 @@
 
   <tr>
     <td>d2_p4_z2</td>
-    <td>Zoom in (further"></td>
+    <td>Zoom in (further)</td>
     <td> <img src="region_thumbs/frame_00009071.jpg"></td>
   </tr>
 
@@ -141,7 +141,7 @@
 
   <tr>
     <td>d2_p5_z2</td>
-    <td>Zoom in (further"></td>
+    <td>Zoom in (further)</td>
     <td> <img src="region_thumbs/frame_00011881.jpg"></td>
   </tr>
 
@@ -171,7 +171,7 @@
 
   <tr>
     <td>d2_p6_z2</td>
-    <td>Zoom in (further"></td>
+    <td>Zoom in (further)</td>
     <td> <img src="region_thumbs/frame_00014571.jpg"></td>
   </tr>
 
@@ -195,7 +195,7 @@
 
   <tr>
     <td>d2_p0_z2</td>
-    <td>Zoom in (further"></td>
+    <td>Zoom in (further)</td>
     <td> <img src="region_thumbs/frame_00016961.jpg"></td>
   </tr>
 
