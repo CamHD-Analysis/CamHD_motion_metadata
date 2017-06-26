@@ -21,7 +21,7 @@
 
   <tr>
     <td>d2/p0/z0</td>
-    <td>Zoom Out / Pan up (no break"></td>
+    <td>Zoom Out / Pan up (no break?)</td>
     <td> <img src="region_thumbs/frame_00002013.jpg"></td>
   </tr>
 
