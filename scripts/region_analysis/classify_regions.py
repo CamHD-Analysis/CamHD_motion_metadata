@@ -2,6 +2,7 @@
 
 import logging
 import random
+import json
 
 import numpy as np
 import imreg_dft as ird
