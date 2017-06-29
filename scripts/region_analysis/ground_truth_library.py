@@ -15,6 +15,8 @@ import json
 import pycamhd.lazycache as camhd
 
 from .classifier import *
+from .region_file import *
+
 
 root_name_pattern = re.compile("CAMHDA301-[0-9T]*Z")
 img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*Z)_(\d*)\.")
@@ -26,14 +28,14 @@ class GroundTruthLibrary:
         self.img_cache = {}
         self.imgs = {}
 
-        self.gt_urls = {}
+        self.gt_movs = {}
         self.gt_regions = {}
         self.gt_library = {}
         self.lazycache = lazycache
 
     def load_ground_truth( self, ground_truth_file, img_path="classification/images/"):
         with open(ground_truth_file) as f:
-            gt_json = json.load( f )
+            gt_json = json.load(f)
 
         all_gt_images = glob.iglob( "%s/**/*.png" % img_path )
 
@@ -47,25 +49,27 @@ class GroundTruthLibrary:
             gt_images = {}
 
             # Load gt_images with all of the identified regions in the files
-            gt = RegionFile( gt_file )
+            regionfile = RegionFile.load(gt_file)
 
-            self.gt_regions[gt_file] = gt.regions
-            self.gt_urls[gt_file]    = gt.url
+            self.gt_regions[gt_file] = regionfile.regions
+            self.gt_movs[gt_file] = regionfile.mov
 
-            for r in gt.static_regions:
-                if 'sceneTag' not in r:
-                    raise Exception( "Ground truth file \"%s\" contains static region without scene tag" % gt_file )
+            for r in regionfile.static_regions:
+                if r.scene_tag is None:
+                    raise Exception("Ground truth file \"%s\" contains static "
+                                    "region without scene tag" % gt_file )
 
-                if r['sceneTag'] == 'unknown':
-                    raise Exception( "Unclassified static segment in ground truth file \"%s\"" % gt_file )
+                if r.scene_tag is 'unknown':
+                    raise Exception("Unclassified static segment in ground "
+                                    "truth file \"%s\"" % gt_file )
 
-                gt_images[r['sceneTag']] = []
+                gt_images[r.scene_tag] = []
 
 
             logging.info("Checking GT file %s for root %s" % (gt_file, gt_root))
 
             for img_file in all_gt_images:
-                img_match = img_pattern.search( img_file )
+                img_match = img_pattern.search(img_file)
                 if not img_match:
                     continue
                 tag = img_match.group(1)
@@ -96,8 +100,8 @@ class GroundTruthLibrary:
 
 
     def add_gt_image( self, gt, frame, tag ):
-        url = self.gt_urls[gt]
-        img = self.lazycache.get_frame( url, frame, format='png' )
+        mov = self.gt_movs[gt]
+        img = self.lazycache.get_frame(mov, frame, format='png' )
 
         bname = path.splitext( path.basename( url ))[0]
         outfile = "classification/images/%s/%s_%08d.png" % (tag, bname, frame)

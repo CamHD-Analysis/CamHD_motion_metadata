@@ -29,30 +29,11 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
                       "d2_p8_z0", "d2_p0_z0", "d2_p1_z0"]
 
 
-def is_classified( file ):
-    with open(file) as f:
-        j = json.load(f)
-
-    if "regions" not in j:
-        return False
-
-    for r in j["regions"]:
-        if r['type'] != 'static':
-            continue
-
-        if 'sceneTag' not in r:
-            return False
-
-
-    return True
-
-def classify_regions( regionsj, classifier, lazycache, first_n = None,
+def classify_regions( regions, classifier, lazycache, first_n = None,
                         ref_samples = (0.4,0.5,0.6), test_count = 3 ):
 
-    mov = regionsj["movie"]["URL"]
-    regions = regionsj["regions"]
+    mov = regions.mov
 
-    ## These
     scenes = []
     images = []
     region_idx = []

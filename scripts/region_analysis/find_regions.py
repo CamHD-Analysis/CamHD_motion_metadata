@@ -8,44 +8,7 @@ import pandas as pd
 
 find_regions_version = "1.0"
 
-
-def clean_json(j):
-
-    if "frame_stats" in j:
-        stats = j["frame_stats"]
-        frame_num_key = "frame_number"
-        optical_flow_key = "similarity"
-    else:
-        stats = j["frameStats"]
-        frame_num_key = "frameNumber"
-        optical_flow_key = "opticalFlow"
-
-    frame_num = [f[frame_num_key] for f in stats]
-    similarities = [f[optical_flow_key] for f in stats]
-
-    stats = pd.DataFrame(similarities, index=frame_num).sort_index()
-
-    return stats
-
-
-def select_valid(stats):
-    return stats[stats.valid == True ]
-
-def flatten_structure( valid ):
-
-    # Break the similarity structure out into columns
-    #similarity = pd.DataFrame.from_records( valid.similarity, valid.index )
-
-    ## Convert center columns to center_x, center_y
-    valid = pd.concat( [valid.center.apply( pd.Series ), valid.drop('center', axis=1)], axis=1) \
-                .rename( columns={ 0: 'center_x', 1: 'center_y '} )
-
-    valid = pd.concat( [valid.similarity.apply( pd.Series ), valid.drop('similarity', axis=1)], axis=1) \
-                .rename( columns={ 0: 'scale', 1: 'theta', 2: 'trans_x', 3: 'trans_y'} )
-
-    valid['trans'] = valid.trans_x**2 + valid.trans_y**2
-
-    return valid
+from .region_file import *
 
 
 def contiguous_region(series, delta = 10):
@@ -141,25 +104,14 @@ def analyze_bounds( series, bounds ):
     return out
 
 
+def find_regions(oflow):
 
+    stable = oflow.valid.loc[lambda df: df.trans < 100].loc[ lambda df: (df.scale-1).abs() < 0.01 ]
 
-def region_analysis( jin ):
-    stats = clean_json( jin )
-    valid = flatten_structure( select_valid( stats ))
-
-    stable = valid.loc[lambda df: df.trans < 100].loc[ lambda df: (df.scale-1).abs() < 0.01 ]
-
-
-    stable_regions = contiguous_region( stable )
-    classify = classify_regions( valid, stable_regions )
+    stable_regions = contiguous_region(stable)
+    classify = classify_regions(oflow.valid, stable_regions)
 
     classify.sort(key=lambda x: x["startFrame"])
 
-    #regions_filename = metadata_repo + path.splitext(data_filename)[0] + '_regions.json'
-
-    ## Write metainformation
-    json_out = { 'movie': jin['movie'],
-                 'contents': { 'regions': '1.1' },
-                'regions': classify }
-
-    return json_out
+    # Write metainformation
+    return RegionFile.from_optical_flow(oflow, regions=classify)
