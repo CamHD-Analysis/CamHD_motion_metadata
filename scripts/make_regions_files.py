@@ -59,7 +59,7 @@ if not args.noclassify:
     # classifier.load( "classification/images/" )
 
 for inpath in args.input:
-    if path.isdir( inpath ):
+    if path.isdir(inpath):
         inpath += "/*_optical_flow.json"
 
     for infile in sorted(glob.iglob(inpath, recursive=True)):
@@ -76,7 +76,7 @@ for inpath in args.input:
             elif args.force is True:
                 logging.info("%s exists, overwriting" % outfile)
             else:
-                logging.warning("%s exists, run with --force to overwrite" % outfile )
+                logging.warning("%s exists, run with --force to overwrite" % outfile)
                 continue
 
         logging.info("Processing %s, Saving results to %s" % (infile, outfile))
