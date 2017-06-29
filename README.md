@@ -44,3 +44,7 @@ The metadata files are generated using software these github repos:
   * [CamHD-Analysis/camhd_motion_analysis](https://github.com/CamHD-Analysis/camhd_motion_analysis) contains the C++ and Python files which perform the actual movie analysis.
 
   * [CamHD-Analysis/camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy) contains scripts and documentation on running the 'camhd_motion_analysis' in parallel on a cluster formed with Docker swarm.
+
+## Todos
+
+ [ ] Use photometric comparison to squash identical segments
