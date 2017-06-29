@@ -20,7 +20,7 @@
   </tr>
 
   <tr>
-    <td>d2/p0/z0</td>
+    <td>d2_p0_z0</td>
     <td>Zoom Out / Pan up (no break?)</td>
     <td> <img src="region_thumbs/frame_00002013.jpg"></td>
   </tr>
@@ -248,7 +248,7 @@
   </tr>
 
   <tr>
-  <td>d2_p0_z0</td>
+    <td>d2_p0_z0</td>
     <td>Pan up/left</td>
     <td> <img src="region_thumbs/frame_00023615.jpg"></td>
   </tr>
