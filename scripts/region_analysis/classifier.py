@@ -22,7 +22,7 @@ import numpy as np
 
 from dask import compute, delayed
 import dask.threaded
-#import dask.multiprocessing
+# import dask.multiprocessing
 
 
 class CompareResult:
@@ -44,26 +44,6 @@ class Classifier:
 
     def images(self):
         return self.imgs
-
-
-    # def load(self, img_path):
-    #     if not path.exists(img_path):
-    #         logging.critical("Need %s to perform classification.  Run scripts/fetch_classification_images.py" % img_path)
-    #         raise Exception("")
-    #
-    #     for tag in os.listdir(img_path):
-    #         if tag[0] == '.':
-    #             continue
-    #
-    #         if tag not in self.imgs:
-    #             self.imgs[tag] = []
-    #
-    #         for img in glob.iglob( "%s/%s/*.png" % (img_path,tag) ):
-    #             self.imgs[tag].append( path.abspath(img) )
-    #
-    #     logging.info("Loaded classifications tags: %s " % ', '.join( self.tags() ) )
-
-
 
     def image( self, name ):
 

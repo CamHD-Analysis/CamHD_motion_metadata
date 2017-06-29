@@ -31,8 +31,8 @@ class GroundTruthLibrary:
         self.gt_library = {}
         self.lazycache = lazycache
 
-    def load_ground_truth( self, ground_truth_file, img_path = "classification/images/" ):
-        with open( ground_truth_file ) as f:
+    def load_ground_truth( self, ground_truth_file, img_path="classification/images/"):
+        with open(ground_truth_file) as f:
             gt_json = json.load( f )
 
         all_gt_images = glob.iglob( "%s/**/*.png" % img_path )
@@ -47,25 +47,19 @@ class GroundTruthLibrary:
             gt_images = {}
 
             # Load gt_images with all of the identified regions in the files
-            with open(gt_file) as gt:
-                gt = json.load(gt)
-                if 'regions' not in gt:
-                    raise Exception( "Couldn't find regions in ground truth file \"%s\"" % gt_file )
+            gt = RegionFile( gt_file )
 
-                self.gt_regions[gt_file] = gt['regions']
-                self.gt_urls[gt_file]    = gt['movie']['URL']
+            self.gt_regions[gt_file] = gt.regions
+            self.gt_urls[gt_file]    = gt.url
 
-                for r in gt['regions']:
-                    if r['type'] != 'static':
-                        continue
+            for r in gt.static_regions:
+                if 'sceneTag' not in r:
+                    raise Exception( "Ground truth file \"%s\" contains static region without scene tag" % gt_file )
 
-                    if 'sceneTag' not in r:
-                        raise Exception( "Ground truth file \"%s\" contains static region without scene tag" % gt_file )
+                if r['sceneTag'] == 'unknown':
+                    raise Exception( "Unclassified static segment in ground truth file \"%s\"" % gt_file )
 
-                    if r['sceneTag'] == 'unknown':
-                        raise Exception( "Unclassified static segment in ground truth file \"%s\"" % gt_file )
-
-                    gt_images[r['sceneTag']] = []
+                gt_images[r['sceneTag']] = []
 
 
             logging.info("Checking GT file %s for root %s" % (gt_file, gt_root))

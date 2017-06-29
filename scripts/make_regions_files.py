@@ -81,9 +81,6 @@ for inpath in args.input:
 
         logging.info("Processing %s, Saving results to %s" % (infile, outfile))
 
-        if args.dryrun:
-            continue
-
         start_time = time.time()
 
         with open(infile) as data_file:
@@ -105,8 +102,9 @@ for inpath in args.input:
         jout['depends'] = {'opticalFlow': {infile: git_rev}}
 
         # Write results as a checkpoint
-        with open(outfile, 'w') as out:
-            json.dump(jout, out, indent=4)
+        if not args.dryrun:
+            with open(outfile, 'w') as out:
+                json.dump(jout, out, indent=4)
 
         url = jout["movie"]["URL"]
 
@@ -128,8 +126,9 @@ for inpath in args.input:
         jout['performance'] = {'timing': timing}
 
         # Write results
-        with open(outfile, 'w') as out:
-            json.dump(jout, out, indent=4)
+        if not args.dryrun:
+            with open(outfile, 'w') as out:
+                json.dump(jout, out, indent=4)
 
         if os.path.isfile(outfile) and args.gitadd:
             subprocess.run(["git", "add", outfile])

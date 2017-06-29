@@ -15,7 +15,7 @@ numbers of the data type(s) within the file.  So, for example
 }
 ```
 
-indicates the file contains "movie" data in the 1.0 file format and frameStats: a list of data about some or all of the frames in the video.   The frameStats data is version 1.1 of "opticalFlow data (described [here](OpticalFlow.md)).
+indicates the file contains "movie" data in the 1.0 file format and frameStats: a list of data about some or all of the frames in the video.   The frameStats data is version 1.1 of "opticalFlow data (described [here](OpticalFlowJson.md)).
 
 Frame numbers are given in the Quicktime convention where the first frame in the movie is __1__,
 and the last is __(number of frames)___.
