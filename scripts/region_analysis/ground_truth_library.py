@@ -16,7 +16,7 @@ import json
 
 import pycamhd.lazycache as camhd
 
-from .classifier import *
+from .image_comparer import *
 from .region_file import *
 
 
@@ -93,7 +93,7 @@ class GroundTruthLibrary:
             for img_path in cached_images:
                 img = GTImage(img_path)
 
-                if not img.valid or img.basename is not regions.basename:
+                if not img.valid or img.basename != regions.basename:
                     continue
 
                 imgs[img.tag].append(img.abspath)
@@ -196,4 +196,4 @@ class GroundTruthLibrary:
         if len(short_tags) > 0:
             raise Exception("Couldn't produce enough ground truth images")
 
-        return Classifier(imgs, use_gts)
+        return ImageComparer(imgs, use_gts)

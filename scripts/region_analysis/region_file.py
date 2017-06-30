@@ -9,21 +9,43 @@ class Region:
     def __init__(self, json):
         self.json = json
 
-        self.type = json["type"] if "type" in json else None
-        self.scene_tag = json["sceneTag"] if "sceneTag" in json else None
-
-        self.start_frame = json['startFrame']
-        self.end_frame = json['endFrame']
-
     @property
     def static(self):
         return self.type == "static"
 
-    def draw(self):
+    def draw(self, range=(0.1, 0.9)):
         ''' Should be better parameterized '''
+        return frame_at( random(range[0], range[1]))
 
-        return self.start_frame + random.uniform(0.1,0.9) * (self.end_frame-self.start_frame)
+    def frame_at(self, pct):
+        return round(self.start_frame + pct * (self.end_frame-self.start_frame))
 
+    @property
+    def scene_tag(self):
+        return self.json["sceneTag"] if "sceneTag" in self.json else None
+
+    @property
+    def unknown(self):
+        return self.scene_tag() == 'unknown'
+
+    @property
+    def type(self):
+        return self.json["type"] if "type" in self.json else None
+
+    @property
+    def start_frame(self):
+        return self.json['startFrame']
+
+    @property
+    def end_frame(self):
+        return self.json['endFrame']
+
+    def set_scene_tag(self, scene_tag, inferred_by=None):
+        self.json['sceneTag'] = scene_tag
+        if 'sceneTagMeta' not in self.json:
+            self.json['sceneTagMeta'] = {}
+        if inferred_by:
+            self.json['sceneTagMeta']['inferredBy'] = inferred_by
 
 
 class RegionFile:
@@ -73,3 +95,6 @@ class RegionFile:
             return [r for r in self.regions if r.static]
         else:
             return [r for r in self.regions if r.static and r.scene_tag == scene_tag]
+
+    def static_at( self, i ):
+        return self.static_regions()[i]

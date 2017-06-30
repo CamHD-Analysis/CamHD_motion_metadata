@@ -29,7 +29,7 @@ def contiguous_region(series, delta = 10):
     return static_regions
 
 
-def classify_regions( valid, static ):
+def analyze_regions( valid, static ):
 
     regions = []
     for r in static:
@@ -109,7 +109,7 @@ def find_regions(oflow):
     stable = oflow.valid.loc[lambda df: df.trans < 100].loc[ lambda df: (df.scale-1).abs() < 0.01 ]
 
     stable_regions = contiguous_region(stable)
-    classify = classify_regions(oflow.valid, stable_regions)
+    classify = analyze_regions(oflow.valid, stable_regions)
 
     classify.sort(key=lambda x: x["startFrame"])
 

@@ -6,6 +6,7 @@ import json
 from .timer import *
 from .optical_flow_file import *
 from .find_regions import *
+from .classify_regions import *
 
 
 class RegionFileMaker:
@@ -51,8 +52,8 @@ class RegionFileMaker:
 
                     classify_regions(regions,
                                      classifier,
-                                     lazycache=self.qt,
-                                     first_n=self.first)
+                                     self.lazycache,
+                                     first=self.first)
 
                 timing['classification'] = t.interval
 

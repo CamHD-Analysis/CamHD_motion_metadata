@@ -11,8 +11,6 @@ import skimage.transform as skt
 import skimage.color
 import skimage.io
 
-import imreg_dft as ird
-
 import logging
 
 import re
@@ -27,12 +25,12 @@ import dask.threaded
 
 class CompareResult:
 
-    def __init__(self, tag, score):
+    def __init__(self, tag, error):
         self.tag = tag
-        self.score = score
+        self.rms = error
 
 
-class Classifier:
+class ImageComparer:
 
     def __init__(self, images, gt_files=[]):
         self.img_cache = {}
@@ -45,7 +43,7 @@ class Classifier:
     def images(self):
         return self.imgs
 
-    def image( self, name ):
+    def image(self, name):
 
         if name in self.img_cache.keys():
             return self.img_cache[name]
@@ -77,20 +75,27 @@ class Classifier:
         ## Choose an arbitrary image for now
         #logging.info("Class %s has %d samples, sampling %d times" % (tag, len(self.imgs[tag]), count) )
 
-        scores = []
+        errors = []
 
         for test_img in self.sample_images( tag, count ):
 
+            # Deprecated imreg_dft-based method
             # Odds = 0 : don't consider image rotated by 180
-            result = ird.translation(test_img, ref_img, odds=0)
-            scores.append( float(result['success']) )
+            #result = ird.translation(test_img, ref_img, odds=0)
 
+            (shift,rms,phase) = skf.register_translation(test_img, ref_img)
 
-        ## Now manipulate samples
-        scores = sorted(scores)
+            #print(shift,rms)
 
-        ## Drop highest and lowest
-        if len(scores) > 3:
-            scores = scores[1:-1]
+            # TODO:  Reimplement shift-based
 
-        return CompareResult( tag, np.mean(scores) )
+            errors.append(rms)
+
+        # Now aggregate samples
+        errors = sorted(errors)
+
+        # Drop highest and lowest
+        if len(errors) > 3:
+            errors = errors[1:-1]
+
+        return CompareResult( tag, np.mean(errors) )
