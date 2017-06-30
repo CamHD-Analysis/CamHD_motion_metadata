@@ -1,6 +1,7 @@
 
 
 import json
+import random
 from os import path
 
 
@@ -11,9 +12,18 @@ class Region:
         self.type = json["type"] if "type" in json else None
         self.scene_tag = json["sceneTag"] if "sceneTag" in json else None
 
+        self.start_frame = json['startFrame']
+        self.end_frame = json['endFrame']
+
     @property
     def static(self):
         return self.type == "static"
+
+    def draw(self):
+        ''' Should be better parameterized '''
+
+        return self.start_frame + random.uniform(0.1,0.9) * (self.end_frame-self.start_frame)
+
 
 
 class RegionFile:
@@ -31,7 +41,7 @@ class RegionFile:
             json.dump(self.json, out, indent=4)
 
         def is_classified(self):
-            for r in self.static_regions:
+            for r in self.static_regions():
                 if r.sceneTag is None:
                     return False
 
@@ -58,6 +68,8 @@ class RegionFile:
                            'depends': {'opticalFlow': {oflow.path(): oflow.git_rev()}}
                            })
 
-    @property
-    def static_regions(self):
-        return [r for r in self.regions if r.static]
+    def static_regions(self, scene_tag=None):
+        if scene_tag is None:
+            return [r for r in self.regions if r.static]
+        else:
+            return [r for r in self.regions if r.static and r.scene_tag == scene_tag]

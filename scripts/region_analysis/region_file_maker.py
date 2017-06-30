@@ -47,7 +47,7 @@ class RegionFileMaker:
 
             if not self.noclassify:
                 with Timer() as t:
-                    classifier = self.gt_library.select(regions.mov)
+                    classifier = self.gt_library.select(regions)
 
                     classify_regions(regions,
                                      classifier,
