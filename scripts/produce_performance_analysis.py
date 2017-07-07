@@ -28,6 +28,7 @@ args = parser.parse_args()
 logging.basicConfig( level=args.log.upper() )
 
 data = []
+skipped = 0
 
 for pathin in args.input:
     if path.isdir(pathin):
@@ -45,6 +46,10 @@ for pathin in args.input:
         movie = r.json["movie"]
         performance = r.json["performance"]
 
+        if "timing" not in performance or "startTime" not in performance["timing"]:
+            skipped += 1
+            continue
+
         perFrame = [ f["durationSeconds"] for f in r.json['frameStats']]
 
         data.append( { "mov": r.mov,
@@ -58,7 +63,7 @@ for pathin in args.input:
                     })
 
 
-logging.info("Processed %d files" % len(data) )
+logging.info("Processed %d files, skipped %d files" % (len(data),skipped) )
 
 with open( args.outfile, 'w' ) as outfile:
     json.dump( data, outfile, indent=4 )
