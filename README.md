@@ -21,9 +21,9 @@ text files, and all files use the `.json` extension.
 
 All JSON files contain some common fields described [here](docs/JsonCommon.md).  At present, there are two kinds of data files in the repo:
 
- * `*_optical_flow.json` files contain the estimated camera motion for each video.  The format is described [here](docs/OpticalFlow.md).
+ * `*_optical_flow.json` files contain the estimated camera motion for a subset of frames in in each video.  The format is described [here](docs/OpticalFlowJson.md).
 
- * The optical flow files are then processed to find sequences where the camera motion is consistent (e.g. tilting upward, zooming in, not moving).  These "regions" of consistent behavior are described in a `*_optical_flow_regions.json` file described [here](docs/OpticalFlowRegions.md).
+ * The optical flow files are then processed to isolate sequences where the camera motion is consistent (e.g. tilting upward, zooming in, static).  These "regions" of consistent behavior are described in a `*_optical_flow_regions.json` file described [here](docs/OpticalFlowRegionsJson.md).
 
 Right now, the JSON file formats are __unstable__.   The [file format](docs/JsonCommon.md) allows for semantic versioning of the file contents, and we describe format changes in the [Change Log](docs/ChangeLog.md).
 
@@ -41,11 +41,18 @@ Citations TBD.
 
 The metadata files are generated using software these github repos:
 
-  * [CamHD-Analysis/camhd_motion_analysis](https://github.com/CamHD-Analysis/camhd_motion_analysis) contains the C++ and Python files which perform the optical flow analysis used to generate the `_optical_flow.json` files.
+  * [CamHD-Analysis/camhd_motion_analysis](https://github.com/CamHD-Analysis/camhd_motion_analysis) contains the C++ and Python files which perform the optical flow calculation.
 
   * [CamHD-Analysis/camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy) contains scripts and documentation on running the 'camhd_motion_analysis' in parallel on a cluster formed with Docker swarm.
 
-The region analysis code is included in this repository in the `scripts/` directory.
+As well as Python tools included in the `scripts/` directory of this repo:
+
+  * [make_regions_files.py](docs/MakeRegionsFile.md) takes the [optical flow](docs/OpticalFlowJson.md) files as input and:
+
+    1. Breaks the video into time frames with consistent camera behavior (camera static, zooming in, panning left, etc.).  
+    1. Uses a set of hand-labelled ground truth files to attempt to label each static section with its corresponding [region](docs/Regions.md).
+
+  See [docs/MakeRegionsFile.md](docs/MakeRegionsFile.md) for more detail.
 
 ## Todos
 
