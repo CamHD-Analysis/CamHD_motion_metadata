@@ -43,14 +43,10 @@ The metadata files are generated using software these github repos:
 
   * [CamHD-Analysis/camhd_motion_analysis](https://github.com/CamHD-Analysis/camhd_motion_analysis) contains the C++ and Python files which perform the optical flow analysis used to generate the `_optical_flow.json` files.
 
-<<<<<<< HEAD
   * [CamHD-Analysis/camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy) contains scripts and documentation on running the 'camhd_motion_analysis' in parallel on a cluster formed with Docker swarm.
+
+The region analysis code is included in this repository in the `scripts/` directory.
 
 ## Todos
 
  [ ] Use photometric comparison to squash identical segments
-=======
-  * [CamHD-Analysis/camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy) contains scripts and documentation on running the `camhd_motion_analysis` on a cluster formed with Docker swarm.
-  
-The region analysis code is included in this repository in the `scripts/` directory.
->>>>>>> 993ea388512d7b5fc6a938638565a87ec279c87c
