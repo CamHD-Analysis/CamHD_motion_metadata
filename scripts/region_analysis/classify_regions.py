@@ -5,7 +5,7 @@ import random
 import json
 
 import numpy as np
-import imreg_dft as ird
+#import imreg_dft as ird
 
 from operator import attrgetter
 

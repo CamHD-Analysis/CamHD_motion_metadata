@@ -11,8 +11,6 @@ from .git_utils import *
 
 def clean_json(j):
 
-    print(j.keys())
-
     if "frame_stats" in j:
         stats = j["frame_stats"]
         frame_num_key = "frame_number"
@@ -58,14 +56,15 @@ def flatten_structure(valid):
 
 class OpticalFlowFile:
 
-    def __init__(self, filename):
+    def __init__(self, filename, flatten = True):
         self.filename = filename
 
         with open(filename) as f:
             self.json = json.load(f)
 
-        stats = clean_json(self.json)
-        self.valid = flatten_structure(select_valid(stats))
+        if flatten:
+            stats = clean_json(self.json)
+            self.valid = flatten_structure(select_valid(stats))
 
         self.mov = self.json['movie']['URL']
         self.basename = path.splitext(path.basename(self.mov))[0]
