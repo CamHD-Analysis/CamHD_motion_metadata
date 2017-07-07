@@ -26,7 +26,7 @@ class Region:
 
     @property
     def unknown(self):
-        return self.scene_tag() == 'unknown'
+        return self.scene_tag == 'unknown'
 
     @property
     def type(self):
