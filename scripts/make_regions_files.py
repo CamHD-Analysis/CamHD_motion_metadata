@@ -59,13 +59,11 @@ if not args.noclassify:
     # classifier.load( "classification/images/" )
 
 for inpath in args.input:
-    if path.isdir( inpath ):
+    if path.isdir(inpath):
         inpath += "/*_optical_flow.json"
 
     for infile in sorted(glob.iglob(inpath, recursive=True)):
         outfile = os.path.splitext(infile)[0] + "_regions.json"
-
-        timing = {}
 
         if os.path.isfile(outfile):
             if gt_library and outfile in gt_library.gt_library.keys():
@@ -76,60 +74,12 @@ for inpath in args.input:
             elif args.force is True:
                 logging.info("%s exists, overwriting" % outfile)
             else:
-                logging.warning("%s exists, run with --force to overwrite" % outfile )
+                logging.warning("%s exists, run with --force to overwrite" % outfile)
                 continue
 
-        logging.info("Processing %s, Saving results to %s" % (infile, outfile))
-
-        if args.dryrun:
-            continue
-
-        start_time = time.time()
-
-        with open(infile) as data_file:
-            jin = json.load(data_file)
-
-        ra_start = time.time()
-        jout = ra.region_analysis(jin)
-        timing['regionAnalysis'] = time.time()-ra_start
-
-        if 'versions' not in jout:
-            jout['versions'] = {}
-        jout['versions']['findRegions'] = ra.find_regions_version
-        jout['performance'] = {'timing': timing}
-
-        if 'depends' not in jout:
-            jout['depends'] = {}
-
-        git_rev = ra.git_revision(infile)
-        jout['depends'] = {'opticalFlow': {infile: git_rev}}
-
-        # Write results as a checkpoint
-        with open(outfile, 'w') as out:
-            json.dump(jout, out, indent=4)
-
-        url = jout["movie"]["URL"]
-
-        if not args.noclassify:
-            classifier_start = time.time()
-
-            classifier = gt_library.select(url)
-
-            jout = ra.classify_regions(jout, classifier, lazycache=qt,
-                                       first_n=args.first)
-            timing['classification'] = time.time()-classifier_start
-
-            if 'versions' not in jout:
-                jout['versions'] = {}
-            jout['versions']['classifyRegions'] = ra.classify_regions_version
-
-        timing['elapsedSeconds'] = time.time()-start_time
-
-        jout['performance'] = {'timing': timing}
-
-        # Write results
-        with open(outfile, 'w') as out:
-            json.dump(jout, out, indent=4)
+        ra.RegionFileMaker(first=args.first, dryrun=args.dryrun,
+                          force=args.force, noclassify=args.noclassify,
+                          gt_library=gt_library, lazycache=qt).make_region_file( infile, outfile )
 
         if os.path.isfile(outfile) and args.gitadd:
             subprocess.run(["git", "add", outfile])
