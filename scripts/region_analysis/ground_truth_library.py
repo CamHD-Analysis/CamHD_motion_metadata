@@ -9,15 +9,38 @@ import imreg_dft as ird
 
 import logging
 
+import random
+
 import re
 import json
 
 import pycamhd.lazycache as camhd
 
-from .classifier import *
+from .image_comparer import *
+from .region_file import *
+
 
 root_name_pattern = re.compile("CAMHDA301-[0-9T]*Z")
 img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*Z)_(\d*)\.")
+
+
+class GTImage:
+
+    def __init__(self, path):
+        img_match = img_pattern.search(path)
+        if not img_match:
+            self.valid = False
+            return
+
+        self.path = path
+        self.tag = img_match.group(1)
+        self.basename = img_match.group(2)
+        self.frame = int(img_match.group(3))
+        self.valid = True
+
+    @property
+    def abspath(self):
+        return path.abspath(self.path)
 
 
 class GroundTruthLibrary:
@@ -26,73 +49,65 @@ class GroundTruthLibrary:
         self.img_cache = {}
         self.imgs = {}
 
-        self.gt_urls = {}
-        self.gt_regions = {}
+        self.regions = {}
         self.gt_library = {}
         self.lazycache = lazycache
 
-    def load_ground_truth( self, ground_truth_file, img_path = "classification/images/" ):
-        with open( ground_truth_file ) as f:
-            gt_json = json.load( f )
+    def load_ground_truth(self, ground_truth_file,
+                          img_path="classification/images/"):
 
-        all_gt_images = glob.iglob( "%s/**/*.png" % img_path )
+        with open(ground_truth_file) as f:
+            gt_files = json.load(f)
 
-        for gt_file in gt_json:
-            gt_root = root_name_pattern.search(gt_file)
+        cached_images = glob.iglob("%s/**/*.png" % img_path)
 
-            if not gt_root:
-                continue
-            gt_root = gt_root.group(0)
-
-            gt_images = {}
+        for gt_file in gt_files:
 
             # Load gt_images with all of the identified regions in the files
-            with open(gt_file) as gt:
-                gt = json.load(gt)
-                if 'regions' not in gt:
-                    raise Exception( "Couldn't find regions in ground truth file \"%s\"" % gt_file )
+            regions = RegionFile.load(gt_file)
 
-                self.gt_regions[gt_file] = gt['regions']
-                self.gt_urls[gt_file]    = gt['movie']['URL']
+            # gt_root = root_name_pattern.search(gt_file)
+            #
+            # if not gt_root:
+            #     continue
+            # gt_root = gt_root.group(0)
 
-                for r in gt['regions']:
-                    if r['type'] != 'static':
-                        continue
+            imgs = {}
 
-                    if 'sceneTag' not in r:
-                        raise Exception( "Ground truth file \"%s\" contains static region without scene tag" % gt_file )
+            self.regions[regions.basename] = regions
 
-                    if r['sceneTag'] == 'unknown':
-                        raise Exception( "Unclassified static segment in ground truth file \"%s\"" % gt_file )
+            for r in regions.static_regions():
+                if r.scene_tag is None:
+                    raise Exception("Ground truth file \"%s\" contains static "
+                                    "region without scene tag" % gt_file)
 
-                    gt_images[r['sceneTag']] = []
+                if r.scene_tag is 'unknown':
+                    raise Exception("Unclassified static segment in ground "
+                                    "truth file \"%s\"" % gt_file)
 
+                imgs[r.scene_tag] = []
 
-            logging.info("Checking GT file %s for root %s" % (gt_file, gt_root))
+            logging.info("Checking GT cache for image files "
+                         "from %s" % (regions.basename))
 
-            for img_file in all_gt_images:
-                img_match = img_pattern.search( img_file )
-                if not img_match:
-                    continue
-                tag = img_match.group(1)
-                img_root = img_match.group(2)
-                frame = int(img_match.group(3))
+            for img_path in cached_images:
+                img = GTImage(img_path)
 
-                if img_root != gt_root:
+                if not img.valid or img.basename != regions.basename:
                     continue
 
-                gt_images[tag].append(path.abspath(img_file))
+                imgs[img.tag].append(img.abspath)
 
-            self.gt_library[gt_file] = gt_images
+            self.gt_library[regions.basename] = imgs
 
-        if len(self.gt_library) != len(gt_json):
+        if len(self.gt_library) != len(gt_files):
             raise Exception("Error loading ground truth library")
 
     def aggregate_images(self, keys):
         imgs = {}
         for key in keys:
             logging.info("Using %s as ground truth" % key)
-            for tag,gtimgs in self.gt_library[key].items():
+            for tag, gtimgs in self.gt_library[key].items():
                 if tag not in imgs:
                     imgs[tag] = []
 
@@ -100,69 +115,60 @@ class GroundTruthLibrary:
 
         return imgs
 
+    def download_new_gt_image(self, basename, frame, tag):
+        mov = self.regions[basename].mov
+        img = self.lazycache.get_frame(mov, frame, format='png')
 
-    def add_gt_image( self, gt, frame, tag ):
-        url = self.gt_urls[gt]
-        img = self.lazycache.get_frame( url, frame, format='png' )
-
-        bname = path.splitext( path.basename( url ))[0]
-        outfile = "classification/images/%s/%s_%08d.png" % (tag, bname, frame)
+        outfile = "classification/images/%s/%s_%08d.png" %\
+                  (tag, basename, frame)
         logging.info("Saving new ground truth file to %s" % outfile)
-
-        # if img.shape != (1080,1920,3):
-        #      logging.warning("Something went wrong with getting the image (shape %s)" % str(img.shape) )
-        #      continue
 
         os.makedirs(path.dirname(outfile), exist_ok=True)
         with open(outfile, 'wb') as f:
             img.save(f)
 
-        self.gt_library[gt][tag].append(path.abspath(outfile))
+        self.gt_library[basename][tag].append(GTImage(outfile))
 
+    def supplement_gt_images(self, basenames, short_tags):
 
-
-    def supplement_gt_images(self, gts, tags):
-        # Nothing for now
-
-        for tag,count in tags.items():
+        for tag, count in short_tags.items():
             logging.info("I need to draw %d more %s" % (count, tag))
 
             tries = 0
             while count > 0 and tries < 10:
                 tries += 1
-                gt = random.sample(gts, 1)[0]
 
-                if gt not in self.gt_regions:
-                    raise Exception("Can't find the regions for ground truth file \"%s\"" % gt)
+                # Select the ground truth file to draw a new image from
+                bn = random.sample(basenames, 1)[0]
 
-                ## Find relevant region(s) in the file
-                matching_regions = []
-                for r in self.gt_regions[gt]:
-                    if r['type'] != 'static':
-                        continue
+                if bn not in self.regions:
+                    raise Exception("Can't find the regions for "
+                                    "ground truth file \"%s\"" % gt)
 
-                    if r['sceneTag'] == tag:
-                        matching_regions.append( r )
+                # Find relevant region(s) in the file
+                matching_regions = self.regions[bn].static_regions(scene_tag=tag)
 
                 if len(matching_regions) == 0:
                     continue
 
-                logging.info("In %s have %d regions of tag %s" % (gt, len(matching_regions), tag))
+                logging.info("%s has %d regions of tag %s" %\
+                             (bn, len(matching_regions), tag))
 
-                use_region = random.sample(matching_regions, 1)[0]
+                # Draw a region from the matching regions
+                region = random.sample(matching_regions, 1)[0]
 
-                use_frame = use_region['startFrame'] + random.uniform(0.1,0.9) * (use_region['endFrame']-use_region['startFrame'])
+                frame = region.draw()
 
-                logging.info("Drawing from %d from %s regions from %d to %d" % (use_frame, gt, use_region['startFrame'], use_region['endFrame']))
+                logging.info("Retrieving frame %d from %s region %s which spans from %d to %d"
+                             % (frame, bn, tag, region.start_frame, region.end_frame))
 
-                self.add_gt_image(gt, use_frame, tag)
+                self.download_new_gt_image(bn, frame, tag)
                 count -= 1
 
-    def select(self, url):
-        mov_root = root_name_pattern.search(url).group(0)
+    def select(self, regions):
 
         # TODO. For now, just select a random ground truth in the library...
-        use_gts = random.sample(self.gt_library.keys(), 1)
+        use_gts = random.sample(self.regions.keys(), 1)
 
         imgs = self.aggregate_images(use_gts)
 
@@ -190,4 +196,4 @@ class GroundTruthLibrary:
         if len(short_tags) > 0:
             raise Exception("Couldn't produce enough ground truth images")
 
-        return Classifier(imgs, use_gts)
+        return ImageComparer(imgs, use_gts)
