@@ -128,7 +128,7 @@ class RegionClassifier:
             if prevGood is not None:
 
                 # TODO: use ImageComparer instead
-                prevResult = self.comparer.compare_images(self.images[prevGood][0], images[i])
+                prevResult = self.comparer.compare_images(self.images[prevGood][0], self.images[i][0])
                 logging.info("Comparing to nextGood: %f" % prevResult.rms)
 
                 if prevResult.rms < rms_threshold:
@@ -140,21 +140,23 @@ class RegionClassifier:
                     continue
                 else:
                     logging.info("Unknown region %d not a good match for "
-                                 "previous %d: %f" %
-                                 (i, prevGood, prevResult['success']))
+                                 "previous %d rms = %f" %
+                                 (i, prevGood, prevResult.rms))
 
             elif nextGood is not None:
                 # TODO: use ImageComparer instead
-                nextResult = self.comparer.compare_images(self.images[nextGood][0], images[i])
+                nextResult = self.comparer.compare_images(self.images[nextGood][0], self.images[i][0])
                 logging.info("Comparing to nextGood: %f" % nextResult.rms)
 
                 if nextResult.rms < rms_threshold:
                     regions.static_at(i).json[i].set_scene_tag( regions.static_at(nextGood).scene_tag,
                                                                 inferred_by="similarityToNextNeighbor")
-                    logging.info("Inferred tag %s by comparison to previous good match" % regions.static_at(nextGood).scene_tag)
+                    logging.info("Inferred tag %s by comparison to previous "
+                                "good match" % regions.static_at(nextGood).scene_tag)
                     continue
                 else:
-                    logging.info("Unknown region %d not a good match for previous %d: %f" % (i, nextGood, nextResult['success']))
+                    logging.info("Unknown region %d not a good match for "
+                                "previous %d, rms = %f" % (i, nextGood, nextResult.rms))
 
 
         return regions
@@ -193,13 +195,12 @@ class RegionClassifier:
 
                     if REFERENCE_SEQUENCE[k] == regions.static_at(prevGood).scene_tag and \
                        REFERENCE_SEQUENCE[k+delta] == regions.static_at(nextGood).scene_tag:
-                        ## Well, this sucks
-
-
-                        region.set_scene_tag( REFERENCE_SEQUENCE[k+etc],
-                                                    inferred_by="sequence")
 
                         logging.info("Inferred type %s by sequence" % regions.static_at(i).scene_tag)
+
+                        region.set_scene_tag( REFERENCE_SEQUENCE[k+eta],
+                                                    inferred_by="sequence")
+
                         break
 
             else:

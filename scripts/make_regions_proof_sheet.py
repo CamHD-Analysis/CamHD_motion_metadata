@@ -7,8 +7,12 @@ import argparse
 import os.path as path
 import os
 import json
+import random
 
 import region_analysis as ra
+
+import pycamhd.lazycache as camhd
+
 
 
 #import camhd_motion_analysis as ma
@@ -30,6 +34,11 @@ parser.add_argument('--output', dest='outfile', nargs='?', default='_html/proof.
 
 parser.add_argument('--image-size', dest='imgsize', nargs='?', default='320x240')
 
+parser.add_argument('--with-groundtruth', dest='groundtruth', action='store_true')
+
+parser.add_argument("--ground-truth", dest="groundtruthfile",
+                    default="classification/ground_truth.json")
+
 parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
                     help='URL to Lazycache repo server (only needed if classifying)')
 
@@ -37,20 +46,32 @@ args = parser.parse_args()
 
 logging.basicConfig( level=args.log.upper() )
 
-
-import pycamhd.lazycache as camhd
 qt = camhd.lazycache( args.lazycache )
 
 img_size = args.imgsize.split('x')
 img_size = ( int(img_size[0]), int(img_size[1]))
-print(img_size)
-
-# classifier = ra.Classifier()
-# classifier.load( "classification/images/" )
 
 tags = []
 images = []
 urls = []
+
+if args.groundtruth:
+    gt_library = ra.GroundTruthLibrary()
+    gt_library.load_ground_truth(args.groundtruthfile)
+
+    gt_path = random.sample(gt_library.regions.keys(), 1)
+
+    logging.info("Using ground truth image %s" % gt_path)
+
+    #gt_images = gt_library.aggregate_images( gt_path )
+
+    url = gt_library.urls[gt_path[0]]
+
+    for r in gt_library.regions[gt_path[0]].static_regions():
+        tags.append(r.scene_tag)
+        images.append({url: [r]})
+
+    urls.append(url)
 
 unknowns = {}
 
@@ -60,74 +81,65 @@ for pathin in args.input:
 
     for infile in glob.iglob( pathin, recursive=True):
 
-        with open(infile) as data_file:
-            jin = json.load( data_file )
+        logging.info("Processing %s" % infile)
 
-            if 'regions' not in jin:
-                logging.info("No regions in file %s" % infile)
+        regions = ra.RegionFile.load(infile)
+
+        mov = regions.mov
+
+        urls.append(mov)
+
+        unknowns[mov] = []
+
+        idx = 0
+        prevTag = None
+        for r in regions.static_regions():
+
+            if r.unknown:
+                unknowns[mov].append(r)
                 continue
 
-            url = jin['movie']['URL']
-            urls.append(url)
+            # Squash runs...
+            if r.scene_tag == prevTag and not args.squashruns:
+                images[idx-1][mov].append(r)
+                continue
 
-            unknowns[url] = []
+            prevTag = r.scene_tag
 
-            idx = 0
-            prevTag = None
-            for r in jin["regions"]:
-                if r['type'] != 'static':
-                    continue
+            logging.info("%s (%d,%d): %s" % (mov, r.start_frame, r.end_frame, r.scene_tag))
 
-                if 'sceneTag' not in r:
-                    #logging.info("Hm, static region isnt tagged")
-                    continue
+            if idx >= len(images):
+                tags.append(r.scene_tag)
+                images.append({mov: [r]})
+            elif r.scene_tag == tags[idx]:
+                images[idx][mov] = [r]
+            else:
+                logging.info("Tag doesn't match order... (%s != %s)" % (r.scene_tag, tags[idx]))
 
-                sceneTag = r['sceneTag']
+                MAX_JUMP = 5
+                success = False
+                for i in range(idx, min(idx+MAX_JUMP,len(tags))):
+                    logging.info("Checking %s against %s at %d" % (r.scene_tag, tags[i], i))
+                    if r.scene_tag == tags[i]:
+                        images[i][mov] = [r]
+                        idx = i
+                        success = True
+                        break
 
-                if sceneTag == 'unknown':
-                    unknowns[url].append(r)
-                    continue
+                if not success:
+                    logging.info("Couldn't find a match, insert...")
+                    # Couldn't find match.   insert
+                    tags.insert(idx, r.scene_tag)
+                    images.insert( idx, {mov: [r]} )
+                    #idx = idx-1 # Back up so we reconsider using this new entry
 
-                # Squash runs...
-                if sceneTag == prevTag and not args.squashruns:
-                    images[idx-1][url].append(r)
-                    continue
-
-                prevTag = sceneTag
-
-                logging.info("%s (%d,%d): %s" % (url, r['startFrame'], r['endFrame'], sceneTag))
-
-                if idx >= len(images):
-                    tags.append(sceneTag)
-                    images.append({url: [r]})
-                elif sceneTag == tags[idx]:
-                    images[idx][url] = [r]
-                else:
-                    logging.info("Tag doesn't match order... (%s != %s)" % (sceneTag, tags[idx]))
-
-                    MAX_JUMP = 5
-                    success = False
-                    for i in range(idx, min(idx+MAX_JUMP,len(tags))):
-                        logging.info("Checking %s against %s at %d" % (sceneTag, tags[i], i))
-                        if sceneTag == tags[i]:
-                            images[i][url] = [r]
-                            idx = i
-                            success = True
-                            break
-
-                    if not success:
-                        logging.info("Couldn't find a match, insert...")
-                        # Couldn't find match.   insert
-                        tags.insert( idx, sceneTag )
-                        images.insert( idx, {url: [r]} )
-                        #idx = idx-1 # Back up so we reconsider using this new entry
-
-                # On success
-                idx += 1
+            # On success
+            idx += 1
 
 img_path  = path.dirname(args.outfile) + "/images/"
 os.makedirs(img_path, exist_ok=True)
 
+logging.info(urls)
 urls = sorted(urls)
 
 html_file = args.outfile
@@ -157,7 +169,8 @@ with open(html_file, 'w') as html:
 
             region = regions[0]
 
-            sample_frame = region['startFrame'] + 0.5 * (region['endFrame'] - region['startFrame'])
+            logging.info(region)
+            sample_frame = region.start_frame + 0.5 * (region.end_frame - region.start_frame)
 
             img_file = img_path + "%s_%d.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
             thumb_file = img_path + "%s_%d_thumbnail.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
@@ -173,7 +186,7 @@ with open(html_file, 'w') as html:
             relapath = path.relpath( img_file, path.dirname(html_file) )
             relathumb = path.relpath( thumb_file, path.dirname(html_file) )
 
-            caption = ', '.join(["%d -- %d" % (r['startFrame'],r['endFrame']) for r in regions])
+            caption = ', '.join(["%d -- %d" % (r.start_frame,r.end_frame) for r in regions])
 
             html.write("<td><a href=\"%s\"><img src=\"%s\"/></a><br>%s</td>" % (relapath,relathumb,caption) )
 
@@ -194,6 +207,8 @@ with open(html_file, 'w') as html:
     html.write("<tr>")
     html.write("<td>Unknown</td>" )
 
+    logging.info("Processing unknowns")
+
     for url in urls:
         if url not in unknowns:
             html.write("<td></td>")
@@ -202,7 +217,7 @@ with open(html_file, 'w') as html:
         html.write("<td>")
         for region in unknowns[url]:
 
-            sample_frame = region['startFrame'] + 0.5 * (region['endFrame'] - region['startFrame'])
+            sample_frame = region.start_frame + 0.5 * (region.end_frame - region.start_frame)
 
             img_file = img_path + "%s_%d.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
             thumb_file = img_path + "%s_%d_thumbnail.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
@@ -218,7 +233,7 @@ with open(html_file, 'w') as html:
             relapath = path.relpath( img_file, path.dirname(html_file) )
             relathumb = path.relpath( thumb_file, path.dirname(html_file) )
 
-            html.write("<a href=\"%s\"><img src=\"%s\"/></a><br>%d -- %d<br>" % (relapath,relathumb,region['startFrame'],region['endFrame']) )
+            html.write("<a href=\"%s\"><img src=\"%s\"/></a><br>%d -- %d<br>" % (relapath,relathumb,region.start_frame,region.end_frame) )
         html.write("</td>")
 
 

@@ -48,6 +48,7 @@ class GroundTruthLibrary:
     def __init__(self, lazycache=camhd.lazycache()):
         self.img_cache = {}
         self.imgs = {}
+        self.urls = {}
 
         self.regions = {}
         self.gt_library = {}
@@ -73,6 +74,8 @@ class GroundTruthLibrary:
             # gt_root = gt_root.group(0)
 
             imgs = {}
+
+            self.urls[regions.basename] = regions.mov
 
             self.regions[regions.basename] = regions
 

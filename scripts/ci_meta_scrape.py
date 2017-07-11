@@ -63,11 +63,16 @@ if len(mov_paths) == 0:
     exit
 
 
-jobs = [delayed(repo.get_metadata)(mov, timeout=30) for mov in mov_paths]
+def get_metadata( mov ):
+    logging.info("Retrieving %s" % mov )
+    return repo.get_metadata(mov, timeout=600)
+
+
+jobs = [delayed(get_metadata)(mov) for mov in mov_paths]
 
 logging.info("Performing %d fetches" % len(jobs))
 
-results = compute(*jobs, get=dask.threaded.get)
+results = compute(*jobs, get=dask.threaded.get, num_workers=4)
 
 # Convert to a map
 out = {}
