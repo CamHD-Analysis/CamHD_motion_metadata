@@ -2,6 +2,7 @@
 
 import json
 import random
+import logging
 from os import path
 
 
@@ -56,18 +57,16 @@ class RegionFile:
         self.mov = self.json['movie']['URL']
         self.basename = path.splitext(path.basename(self.mov))[0]
 
-        self.regions = [Region(j) for j in self.json["regions"]]
-
     def save_json(self, outfile):
         with open(outfile, 'w') as out:
             json.dump(self.json, out, indent=4)
 
-        def is_classified(self):
-            for r in self.static_regions():
-                if r.sceneTag is None:
-                    return False
+    def is_classified(self):
+        for r in self.static_regions():
+            if r.sceneTag is None:
+                return False
 
-            return True
+        return True
 
     @classmethod
     def load(cls, filename):
@@ -90,11 +89,61 @@ class RegionFile:
                            'depends': {'opticalFlow': {oflow.path(): oflow.git_rev()}}
                            })
 
+    def regions(self):
+        return [Region(j) for j in self.json["regions"]]
+
+    def region_at(self, i):
+        return self.regions()[i]
+
     def static_regions(self, scene_tag=None):
         if scene_tag is None:
-            return [r for r in self.regions if r.static]
+            return [r for r in self.regions() if r.static]
         else:
-            return [r for r in self.regions if r.static and r.scene_tag == scene_tag]
+            return [r for r in self.regions() if r.static and r.scene_tag == scene_tag]
 
     def static_at( self, i ):
         return self.static_regions()[i]
+
+
+    def merge_regions(self, i, j):
+        self.json["regions"][j]["startFrame"] = self.json["regions"][i]["startFrame"]
+        del self.json["regions"][i:j]
+
+
+    def squash_gaps( self, delta = 20 ):
+
+        i = 1
+        while i < len(self.regions())-1:
+            dt = self.region_at(i).end_frame - self.region_at(i).start_frame
+
+            if dt <= delta:
+                logging.info("Region %d from %d to %d is only %d long, squashing" % (i, self.region_at(i).start_frame, self.region_at(i).end_frame, dt))
+                self.merge_regions( i-1, i+1 )
+            else:
+                i += 1
+
+
+    def squash_scene_tag_sandwiches( self, delta = 20):
+
+        i = 0
+        while i < len(self.regions())-1:
+            if self.region_at(i).scene_tag == None:
+                i += 1
+                continue
+
+            for j in range(i+1, len(self.regions())):
+                if self.region_at(i).scene_tag == self.region_at(j).scene_tag:
+                    break;
+
+            if j < len(self.regions()):
+                dt = self.region_at(j).start_frame - self.region_at(i).end_frame
+
+                logging.info("Examining gap of %d between %d and %d of type %s"
+                             % (dt, self.region_at(i).end_frame,
+                                self.region_at(j).start_frame,
+                                self.region_at(j).scene_tag))
+                if dt <= delta:
+                    logging.info("Merging regions %d and %d" % (i, j))
+                    self.merge_regions(i,j)
+            else:
+                i += 1

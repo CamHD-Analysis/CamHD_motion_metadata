@@ -7,9 +7,13 @@ from .timer import *
 from .optical_flow_file import *
 from .find_regions import *
 from .classify_regions import *
+from .similarity_analysis import *
 
 
 class RegionFileMaker:
+    # RegionFileMaker is the top level class called by make_regions_file.
+    #
+
 
     def __init__(self, force=False, dryrun=False,
                  noclassify=False, first=None,
@@ -36,9 +40,10 @@ class RegionFileMaker:
                 regions = find_regions(oflow)
             timing['regionAnalysis'] = t.interval
 
-            # if 'versions' not in jout:
-            #     jout['versions'] = {}
             regions.json['versions']['findRegions'] = find_regions_version
+
+            regions.squash_gaps()
+
 
             regions.json['performance'] = {'timing': timing}
 
@@ -50,16 +55,16 @@ class RegionFileMaker:
                 with Timer() as t:
                     classifier = self.gt_library.select(regions)
 
-                    classify_regions(regions,
-                                     classifier,
-                                     self.lazycache,
-                                     first=self.first)
+                    regions = RegionClassifier( classifier, self.lazycache ).classify_regions(regions, first=self.first)
+
 
                 timing['classification'] = t.interval
 
                 regions.json['versions']['classifyRegions'] = classify_regions_version
 
         timing['elapsedSeconds'] = full_time.interval
+
+        #regions.squash_scene_tag_sandwiches()
 
         regions.json['performance'] = {'timing': timing}
 
