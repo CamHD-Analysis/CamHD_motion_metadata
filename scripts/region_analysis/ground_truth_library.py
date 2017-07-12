@@ -49,6 +49,7 @@ class GroundTruthLibrary:
         self.img_cache = {}
         self.imgs = {}
         self.urls = {}
+        self.dates = {}
 
         self.regions = {}
         self.gt_library = {}
@@ -76,7 +77,7 @@ class GroundTruthLibrary:
             imgs = {}
 
             self.urls[regions.basename] = regions.mov
-
+            self.dates[regions.basename] = regions.datetime()
             self.regions[regions.basename] = regions
 
             for r in regions.static_regions():
@@ -170,8 +171,14 @@ class GroundTruthLibrary:
 
     def select(self, regions):
 
-        # TODO. For now, just select a random ground truth in the library...
-        use_gts = random.sample(self.regions.keys(), 1)
+        setTime = regions.datetime()
+
+        if not setTime:
+            return
+
+        use_gts = sorted(self.regions.keys(), key=lambda mov: abs( self.dates[mov] - setTime) )[0:1]
+
+        logging.info( "Using ground truth from: %s" %  use_gts )
 
         paths = self.aggregate_images(use_gts)
 
@@ -194,7 +201,7 @@ class GroundTruthLibrary:
         if len(short_tags) > 0:
             self.supplement_gt_images(use_gts, short_tags)
             paths = self.aggregate_images(use_gts)
-            short_tags = collect_short_tags(imgs)
+            short_tags = collect_short_tags(paths)
 
         if len(short_tags) > 0:
             raise Exception("Couldn't produce enough ground truth images")
