@@ -48,6 +48,7 @@ class GroundTruthLibrary:
     def __init__(self, lazycache=camhd.lazycache()):
         self.img_cache = {}
         self.imgs = {}
+        self.urls = {}
 
         self.regions = {}
         self.gt_library = {}
@@ -73,6 +74,8 @@ class GroundTruthLibrary:
             # gt_root = gt_root.group(0)
 
             imgs = {}
+
+            self.urls[regions.basename] = regions.mov
 
             self.regions[regions.basename] = regions
 
@@ -170,13 +173,13 @@ class GroundTruthLibrary:
         # TODO. For now, just select a random ground truth in the library...
         use_gts = random.sample(self.regions.keys(), 1)
 
-        imgs = self.aggregate_images(use_gts)
+        paths = self.aggregate_images(use_gts)
 
         MIN_IMAGES = 5
 
-        def collect_short_tags(imgs, min_images=MIN_IMAGES):
+        def collect_short_tags(paths, min_images=MIN_IMAGES):
             short_tags = {}
-            for tag, gtimgs in imgs.items():
+            for tag, gtimgs in paths.items():
                 logging.info("  For tag \"%s\", have %d ground truth images" %
                              (tag, len(gtimgs)))
 
@@ -185,15 +188,15 @@ class GroundTruthLibrary:
                     short_tags[tag] = deficit
             return short_tags
 
-        short_tags = collect_short_tags(imgs)
+        short_tags = collect_short_tags(paths)
 
         # If there aren't enough images, get some more
         if len(short_tags) > 0:
             self.supplement_gt_images(use_gts, short_tags)
-            imgs = self.aggregate_images(use_gts)
+            paths = self.aggregate_images(use_gts)
             short_tags = collect_short_tags(imgs)
 
         if len(short_tags) > 0:
             raise Exception("Couldn't produce enough ground truth images")
 
-        return ImageComparer(imgs, use_gts)
+        return ImageComparer(paths, use_gts)
