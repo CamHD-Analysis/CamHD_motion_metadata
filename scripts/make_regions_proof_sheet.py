@@ -55,6 +55,8 @@ tags = []
 images = []
 urls = []
 
+gt_urls = []
+
 if args.groundtruth:
     gt_library = ra.GroundTruthLibrary()
     gt_library.load_ground_truth(args.groundtruthfile)
@@ -72,69 +74,80 @@ if args.groundtruth:
         images.append({url: [r]})
 
     urls.append(url)
+    gt_urls.append(url)
 
 unknowns = {}
 
+
+
+def process( infile ):
+    logging.info("Processing %s" % infile)
+
+    regions = ra.RegionFile.load(infile)
+
+    mov = regions.mov
+
+    urls.append(mov)
+
+    unknowns[mov] = []
+
+    idx = 0
+    prevTag = None
+    for r in regions.static_regions():
+
+        if r.unknown or not r.scene_tag:
+            unknowns[mov].append(r)
+            continue
+
+        # Squash runs...
+        if r.scene_tag == prevTag and not args.squashruns:
+            images[idx-1][mov].append(r)
+            continue
+
+        prevTag = r.scene_tag
+
+        logging.info("%s (%d,%d): %s" % (mov, r.start_frame, r.end_frame, r.scene_tag))
+
+        if idx >= len(images):
+            tags.append(r.scene_tag)
+            images.append({mov: [r]})
+        elif r.scene_tag == tags[idx]:
+            images[idx][mov] = [r]
+        else:
+            logging.info("Tag doesn't match order... (%s != %s)" % (r.scene_tag, tags[idx]))
+
+            MAX_JUMP = 5
+            success = False
+            for i in range(idx, min(idx+MAX_JUMP,len(tags))):
+                logging.info("Checking %s against %s at %d" % (r.scene_tag, tags[i], i))
+                if r.scene_tag == tags[i]:
+                    images[i][mov] = [r]
+                    idx = i
+                    success = True
+                    break
+
+            if not success:
+                logging.info("Couldn't find a match, insert...")
+                # Couldn't find match.   insert
+                tags.insert(idx, r.scene_tag)
+                images.insert( idx, {mov: [r]} )
+                #idx = idx-1 # Back up so we reconsider using this new entry
+
+        # On success
+        idx += 1
+
+
 for pathin in args.input:
-    if path.isdir(pathin):
-        pathin += "*_regions.json"
+    for infile in glob.iglob(pathin):
 
-    for infile in glob.iglob( pathin, recursive=True):
+        # Iterate again
+        if path.isdir(infile):
+            infile += "*_regions.json"
+            for f in glob.iglob(infile):
+                process(f)
+        else:
+            process( infile )
 
-        logging.info("Processing %s" % infile)
-
-        regions = ra.RegionFile.load(infile)
-
-        mov = regions.mov
-
-        urls.append(mov)
-
-        unknowns[mov] = []
-
-        idx = 0
-        prevTag = None
-        for r in regions.static_regions():
-
-            if r.unknown:
-                unknowns[mov].append(r)
-                continue
-
-            # Squash runs...
-            if r.scene_tag == prevTag and not args.squashruns:
-                images[idx-1][mov].append(r)
-                continue
-
-            prevTag = r.scene_tag
-
-            logging.info("%s (%d,%d): %s" % (mov, r.start_frame, r.end_frame, r.scene_tag))
-
-            if idx >= len(images):
-                tags.append(r.scene_tag)
-                images.append({mov: [r]})
-            elif r.scene_tag == tags[idx]:
-                images[idx][mov] = [r]
-            else:
-                logging.info("Tag doesn't match order... (%s != %s)" % (r.scene_tag, tags[idx]))
-
-                MAX_JUMP = 5
-                success = False
-                for i in range(idx, min(idx+MAX_JUMP,len(tags))):
-                    logging.info("Checking %s against %s at %d" % (r.scene_tag, tags[i], i))
-                    if r.scene_tag == tags[i]:
-                        images[i][mov] = [r]
-                        idx = i
-                        success = True
-                        break
-
-                if not success:
-                    logging.info("Couldn't find a match, insert...")
-                    # Couldn't find match.   insert
-                    tags.insert(idx, r.scene_tag)
-                    images.insert( idx, {mov: [r]} )
-                    #idx = idx-1 # Back up so we reconsider using this new entry
-
-            # On success
-            idx += 1
 
 img_path  = path.dirname(args.outfile) + "/images/"
 os.makedirs(img_path, exist_ok=True)
@@ -149,7 +162,12 @@ with open(html_file, 'w') as html:
 
     html.write("<table>\n<tr><th>Scene Tag</th>")
     for name in urls:
-        html.write("<th>%s</th>" % path.basename(name))
+        if name in gt_urls:
+            html.write("<th>GROUND TRUTH<br>%s</th>" % path.basename(name))
+        else:
+            html.write("<th>%s</th>" % path.basename(name))
+
+
     html.write("</tr>\n")
     #><th>Reference image from class</th>\n")
 
@@ -169,7 +187,6 @@ with open(html_file, 'w') as html:
 
             region = regions[0]
 
-            logging.info(region)
             sample_frame = region.start_frame + 0.5 * (region.end_frame - region.start_frame)
 
             img_file = img_path + "%s_%d.jpg" % (path.splitext(path.basename(url))[0], sample_frame)

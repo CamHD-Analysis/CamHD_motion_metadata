@@ -67,13 +67,14 @@ class RegionClassifier:
             self.images[i] = ref_images
             results = self.comparer.classify(ref_images, test_count=test_count)
 
-            max_test_ratio = 1.2
+            max_test_ratio = 1.1
 
             best_result = results[0]
             second_result = results[1]
 
             # Use simple ratio test
             ratio = second_result.rms / best_result.rms
+            logging.info("1st/2nd best labels: %s, %s" % (best_result.tag, second_result.tag))
             logging.info("1st/2nd best scores: %f, %f    : ratio = %f" % (best_result.rms, second_result.rms, ratio))
             if ratio > max_test_ratio:
                 logging.info("Using label of \"%s\"" % best_result.tag)
@@ -129,18 +130,18 @@ class RegionClassifier:
 
                 # TODO: use ImageComparer instead
                 prevResult = self.comparer.compare_images(self.images[prevGood][0], self.images[i][0])
-                logging.info("Comparing to nextGood: %f" % prevResult.rms)
+                logging.info("Comparing to prevGood: %f" % prevResult.rms)
 
                 if prevResult.rms < rms_threshold:
-                    regions.static_at(i).json[i].set_scene_tag(regions.static_at(prevGood).scene_tag,
+                    regions.static_at(i).set_scene_tag(regions.static_at(prevGood).scene_tag,
                                                             inferred_by="similarityToPrevNeighbor")
                     logging.info("Inferred tag %s by comparison to previous "
                                  "good match" %
                                  regions.static_at(prevGood).scene_tag)
                     continue
                 else:
-                    logging.info("Unknown region %d not a good match for "
-                                 "previous %d rms = %f" %
+                    logging.info("Unknown region %d does not match "
+                                 "previous region %d rms = %f" %
                                  (i, prevGood, prevResult.rms))
 
             elif nextGood is not None:
@@ -149,14 +150,14 @@ class RegionClassifier:
                 logging.info("Comparing to nextGood: %f" % nextResult.rms)
 
                 if nextResult.rms < rms_threshold:
-                    regions.static_at(i).json[i].set_scene_tag( regions.static_at(nextGood).scene_tag,
+                    regions.static_at(i).set_scene_tag( regions.static_at(nextGood).scene_tag,
                                                                 inferred_by="similarityToNextNeighbor")
                     logging.info("Inferred tag %s by comparison to previous "
                                 "good match" % regions.static_at(nextGood).scene_tag)
                     continue
                 else:
-                    logging.info("Unknown region %d not a good match for "
-                                "previous %d, rms = %f" % (i, nextGood, nextResult.rms))
+                    logging.info("Unknown region %d does not match "
+                                "next region %d, rms = %f" % (i, nextGood, nextResult.rms))
 
 
         return regions

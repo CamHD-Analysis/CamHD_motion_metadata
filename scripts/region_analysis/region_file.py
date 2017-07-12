@@ -5,6 +5,8 @@ import random
 import logging
 from os import path
 
+import re
+import datetime
 
 class Region:
     def __init__(self, json):
@@ -16,7 +18,7 @@ class Region:
 
     def draw(self, range=(0.1, 0.9)):
         ''' Should be better parameterized '''
-        return frame_at( random(range[0], range[1]))
+        return self.frame_at(random.uniform(range[0], range[1]))
 
     def frame_at(self, pct):
         return round(self.start_frame + pct * (self.end_frame-self.start_frame))
@@ -56,6 +58,18 @@ class RegionFile:
 
         self.mov = self.json['movie']['URL']
         self.basename = path.splitext(path.basename(self.mov))[0]
+
+    def datetime(self):
+
+        prog = re.compile("CAMHDA301-(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z")
+        match = re.match(prog, self.basename)
+
+        if match:
+            return datetime.datetime(int(match.group(1)), int(match.group(2)),
+                                     int(match.group(3)), int(match.group(4)),
+                                     int(match.group(5)), int(match.group(6)))
+
+
 
     def save_json(self, outfile):
         with open(outfile, 'w') as out:

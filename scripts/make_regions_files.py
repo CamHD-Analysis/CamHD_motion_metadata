@@ -60,8 +60,9 @@ if not args.noclassify:
 
 for inpath in args.input:
     if path.isdir(inpath):
-        inpath += "/*_optical_flow.json"
+        inpath += "**/*_optical_flow.json"
 
+    logging.info("Checking %s" % inpath)
     for infile in sorted(glob.iglob(inpath, recursive=True)):
         outfile = os.path.splitext(infile)[0] + "_regions.json"
 
