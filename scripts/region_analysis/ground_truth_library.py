@@ -15,10 +15,9 @@ import re
 import json
 
 import pycamhd.lazycache as camhd
+import pycamhd.motionmetadata as mdd
 
 from .image_comparer import *
-from .region_file import *
-
 
 root_name_pattern = re.compile("CAMHDA301-[0-9T]*Z")
 img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*Z)_(\d*)\.")
@@ -70,7 +69,7 @@ class GroundTruthLibrary:
             logging.info("Loading ground truth file %s" % gt_file)
 
             # Load gt_images with all of the identified regions in the files
-            regions = RegionFile.load(gt_file)
+            regions = mdd.RegionFile.load(gt_file)
 
             # gt_root = root_name_pattern.search(gt_file)
             #
