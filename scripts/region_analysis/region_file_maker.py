@@ -4,10 +4,12 @@ import logging
 import json
 
 from .timer import *
-from .optical_flow_file import *
 from .find_regions import *
 from .classify_regions import *
 from .similarity_analysis import *
+
+
+import pycamhd.motionmetadata as mdd
 
 
 class RegionFileMaker:
@@ -34,7 +36,7 @@ class RegionFileMaker:
         timing = {}
         with Timer() as full_time:
 
-            oflow = OpticalFlowFile(infile)
+            oflow = mdd.OpticalFlowFile(infile)
 
             with Timer() as t:
                 regions = find_regions(oflow)

@@ -6,14 +6,14 @@ import time
 from os import path
 import pandas as pd
 
-find_regions_version = "1.0"
+import pycamhd.motionmetadata as mdd
 
-from .region_file import *
+find_regions_version = "1.0"
 
 
 def contiguous_region(series, delta = 10):
     series['dt'] = series.index.to_series().diff(1).fillna(0)
-    series['block'] = (series.index.to_series().diff(1) > (delta*1.01) ).cumsum()
+    series['block'] = (series.index.to_series().diff(1) > (delta*1.01)).cumsum()
     #print(series)
 
     blocks = series.groupby('block')
@@ -114,4 +114,4 @@ def find_regions(oflow):
     classify.sort(key=lambda x: x["startFrame"])
 
     # Write metainformation
-    return RegionFile.from_optical_flow(oflow, regions=classify)
+    return mdd.RegionFile.from_optical_flow(oflow, regions=classify)
