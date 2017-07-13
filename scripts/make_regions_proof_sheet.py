@@ -12,7 +12,7 @@ import random
 import region_analysis as ra
 
 import pycamhd.lazycache as camhd
-
+import pycamhd.motionmetadata as mmd
 
 
 #import camhd_motion_analysis as ma
@@ -83,7 +83,7 @@ unknowns = {}
 def process( infile ):
     logging.info("Processing %s" % infile)
 
-    regions = ra.RegionFile.load(infile)
+    regions = mmd.RegionFile.load(infile)
 
     mov = regions.mov
 
