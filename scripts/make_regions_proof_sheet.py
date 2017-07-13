@@ -87,6 +87,10 @@ def process( infile ):
 
     mov = regions.mov
 
+    # Skip if already processed  (handles ground truth files)
+    if  mov in urls:
+        return
+
     urls.append(mov)
 
     unknowns[mov] = []
