@@ -156,7 +156,6 @@ for pathin in args.input:
 img_path  = path.dirname(args.outfile) + "/images/"
 os.makedirs(img_path, exist_ok=True)
 
-logging.info(urls)
 urls = sorted(urls)
 
 html_file = args.outfile
