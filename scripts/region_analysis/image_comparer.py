@@ -35,8 +35,8 @@ class CompareResult:
 class ImageComparer:
 
     # TODO.   Move img_cache up to Library, it can be shared between ImageComparer instances
-    def __init__(self, paths, gt_files=[]):
-        self.img_cache = {}
+    def __init__(self, paths, gt_files=[], img_cache={}):
+        self.img_cache = img_cache
         self.paths = paths
         self.gt_files = gt_files
 

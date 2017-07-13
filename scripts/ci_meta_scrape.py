@@ -74,8 +74,8 @@ logging.info("Performing %d fetches" % len(jobs))
 
 results = compute(*jobs, get=dask.threaded.get, num_workers=4)
 
-with open('map.json') as f:
-    json.dump(results,f,indent=4)
+with open('map.json', 'w') as f:
+    json.dump(results, f, indent=4)
 
 
 # Convert to a map
