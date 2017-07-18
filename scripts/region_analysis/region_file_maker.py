@@ -44,7 +44,7 @@ class RegionFileMaker:
 
             regions.json['versions']['findRegions'] = find_regions_version
 
-            regions.squash_gaps()
+            regions.squash_gaps( delta=30 )
 
 
             regions.json['performance'] = {'timing': timing}

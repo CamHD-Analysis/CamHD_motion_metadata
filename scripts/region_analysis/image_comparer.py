@@ -27,9 +27,10 @@ import dask.threaded
 
 class CompareResult:
 
-    def __init__(self, tag, error):
+    def __init__(self, tag, rms, shift=None ):
         self.tag = tag
-        self.rms = error
+        self.rms = rms
+        self.shift = shift
 
 
 class ImageComparer:
@@ -77,10 +78,15 @@ class ImageComparer:
         results = {}
 
         for r in res:
-            #logging.info("%s : %f" % (r.tag, r.rms))
+            # logging.info("%s : %f, (%f,%f)" % (r.tag, r.rms, r.shift[0], r.shift[1]))
 
             if r.tag not in results:
                 results[r.tag] = []
+
+            ## Shift test
+            MAX_SHIFT = (10,10)
+            if r.shift[0] > MAX_SHIFT[0] or r.shift[1] > MAX_SHIFT[1]:
+                continue
 
             results[r.tag].append(r.rms)
 
@@ -91,10 +97,15 @@ class ImageComparer:
 
         for tag, res in results.items():
             # sort the resulting errors
-            r = sorted(res)
+            if len(res) == 0:
+                r = [1.0]
+            else:
+                r = sorted(res)
 
-            # drop first and last
-            r = r[1:-1]
+                # drop first and last
+                if len(r) > 2:
+                    r = r[1:-1]
+
 
             all_results.append(CompareResult(tag, np.mean(r)))
 
@@ -119,4 +130,4 @@ class ImageComparer:
 
         (shift, rms, phase) = skf.register_translation(ref_img, test_img)
 
-        return CompareResult( tag, rms )
+        return CompareResult( tag, rms, shift )
