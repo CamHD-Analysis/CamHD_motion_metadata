@@ -67,7 +67,7 @@ class RegionClassifier:
             self.images[i] = ref_images
             results = self.comparer.classify(ref_images, test_count=test_count)
 
-            max_test_ratio = 1.1
+            max_test_ratio = 1.05
 
             best_result = results[0]
             second_result = results[1]
@@ -197,10 +197,10 @@ class RegionClassifier:
                     if REFERENCE_SEQUENCE[k] == regions.static_at(prevGood).scene_tag and \
                        REFERENCE_SEQUENCE[k+delta] == regions.static_at(nextGood).scene_tag:
 
-                        logging.info("Inferred type %s by sequence" % regions.static_at(i).scene_tag)
-
                         region.set_scene_tag( REFERENCE_SEQUENCE[k+eta],
                                                     inferred_by="sequence")
+
+                        logging.info("Inferred type %s by sequence" % regions.static_at(i).scene_tag)
 
                         break
 

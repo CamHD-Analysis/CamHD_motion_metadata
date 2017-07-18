@@ -46,6 +46,8 @@ args = parser.parse_args()
 
 logging.basicConfig( level=args.log.upper() )
 
+logging.info("Outfile is %s" % args.outfile)
+
 qt = camhd.lazycache( args.lazycache )
 
 img_size = args.imgsize.split('x')
@@ -64,8 +66,6 @@ if args.groundtruth:
     gt_path = random.sample(gt_library.regions.keys(), 1)
 
     logging.info("Using ground truth image %s" % gt_path)
-
-    #gt_images = gt_library.aggregate_images( gt_path )
 
     url = gt_library.urls[gt_path[0]]
 
@@ -159,6 +159,9 @@ os.makedirs(img_path, exist_ok=True)
 urls = sorted(urls)
 
 html_file = args.outfile
+
+logging.info("Saving to %s" % html_file)
+
 with open(html_file, 'w') as html:
     html.write("<html><body>\n")
     html.write("<h2>Proof sheet</h2>\n\n")
@@ -215,11 +218,11 @@ with open(html_file, 'w') as html:
 
     # And unknowns (how's the DRY?)
 
-    html.write("</table><hr>\n")
+    # html.write("</table><hr>\n")
+    #
+    # html.write("<h2>Unidentified images</h2>")
 
-    html.write("<h2>Unidentified images</h2>")
-
-    html.write("<table>\n<tr><th>Scene Tag</th>")
+    html.write("<tr><th>Scene Tag</th>")
     for name in urls:
         html.write("<th>%s</th>" % path.basename(name))
     html.write("</tr>\n")

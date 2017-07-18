@@ -5,8 +5,6 @@ import os.path as path
 import glob
 import random
 
-import imreg_dft as ird
-
 import logging
 
 import random
