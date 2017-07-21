@@ -19,7 +19,7 @@ parser.add_argument('input', metavar='N', nargs='*',
 parser.add_argument('--dry-run', dest='dryrun', action='store_true',
                     help='Dry run, don\'t actually process')
 
-parser.add_argument('--force', dest='force', action='store_true', help='')
+parser.add_argument('--force', dest='force', action='store_true', help='Remake existing files (will not overwrite ground truth files)')
 
 parser.add_argument('--force-unclassified', dest='forceunclassified',
                     action='store_true',
@@ -55,7 +55,6 @@ if not args.noclassify:
 
     gt_library = ra.GroundTruthLibrary()
     gt_library.load_ground_truth(args.groundtruth)
-    # classifier.load( "classification/images/" )
 
 for inpath in args.input:
     if path.isdir(inpath):
@@ -66,11 +65,12 @@ for inpath in args.input:
         outfile = os.path.splitext(infile)[0] + "_regions.json"
 
         if os.path.isfile(outfile):
-            if gt_library and outfile in gt_library.gt_library.keys():
+
+            if gt_library and outfile in gt_library.files.values():
                 logging.info("%s is a ground truth file, skipping..." % outfile)
                 continue
             elif args.forceunclassified and not ra.is_classified(outfile):
-                logging.info("%s exists but isn't classified" % outfile)
+                logging.info("%s exists but isn't classified, overwriting" % outfile)
             elif args.force is True:
                 logging.info("%s exists, overwriting" % outfile)
             else:

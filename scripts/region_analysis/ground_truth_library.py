@@ -51,6 +51,7 @@ class GroundTruthLibrary:
         self.imgs = {}
         self.urls = {}
         self.dates = {}
+        self.files = {}
 
         self.regions = {}
         self.gt_library = {}
@@ -76,6 +77,7 @@ class GroundTruthLibrary:
             # gt_root = gt_root.group(0)
 
 
+            self.files[regions.basename] = gt_file
             self.urls[regions.basename] = regions.mov
             self.dates[regions.basename] = regions.datetime()
             self.regions[regions.basename] = regions

@@ -32,6 +32,12 @@ class CompareResult:
         self.rms = rms
         self.shift = shift
 
+    def __repr__(self):
+        return "%f (%d,%d)" % (self.rms, self.shift[0], self.shift[1])
+
+    def __str__(self):
+        return "%f (%d,%d)" % (self.rms, self.shift[0], self.shift[1])
+
 
 class ImageComparer:
 
@@ -71,6 +77,9 @@ class ImageComparer:
                 for ref_img in self.sample_images(tag,test_count):
                     jobs.append(delayed(self.compare_images)(ref_img,test_img,tag))
 
+        width, height = test_images[0].shape
+        logging.info("Test image is %d by %d" % (width,height))
+
         logging.info("Performing %d comparisons" % len(jobs))
 
         res = compute(*jobs, get=dask.threaded.get)
@@ -83,12 +92,12 @@ class ImageComparer:
             if r.tag not in results:
                 results[r.tag] = []
 
-            ## Shift test
-            MAX_SHIFT = (10,10)
-            if r.shift[0] > MAX_SHIFT[0] or r.shift[1] > MAX_SHIFT[1]:
+            # Shift test
+            MAX_SHIFT = (width/2.0, height/2.0)
+            if abs(r.shift[0]) > MAX_SHIFT[0] or abs(r.shift[1]) > MAX_SHIFT[1]:
                 continue
 
-            results[r.tag].append(r.rms)
+            results[r.tag].append(r)
 
         for tag, vals in results.items():
             logging.info("%s: %s" % (tag, vals))
@@ -96,11 +105,14 @@ class ImageComparer:
         all_results = []
 
         for tag, res in results.items():
+
+            r = [t.rms for t in res]
+
             # sort the resulting errors
             if len(res) == 0:
                 r = [1.0]
             else:
-                r = sorted(res)
+                r = sorted(r)
 
                 # drop first and last
                 if len(r) > 2:
