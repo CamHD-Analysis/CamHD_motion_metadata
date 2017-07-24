@@ -1,0 +1,192 @@
+# Data Status
+
+__Last Updated:__   24 July 2017.
+
+
+
+
+
+"In process" means I'm computing it _right now_.
+
+
+<table>
+  <tr><th>Year</th><th>Month</th><th>Number of Videos</th>
+        <th><a href="OpticalFlowJson.md">Optical Flow?</a></th>
+        <th><a href="OpticalFlowRegionsJson.md">Regions?</a></th>
+  </tr>
+  <tr>
+    <td>2015</td>
+    <td>07</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2015</td>
+    <td>08</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2015</td>
+    <td>09</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2015</td>
+    <td>10</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2015</td>
+    <td>11</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2015</td>
+    <td>12</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>01</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td>__Complete__</td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>02</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td>In process</td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>03</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td>In process</td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>04</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td>In process</td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>05</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>06</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>07</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>08</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>09</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>10</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>11</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2016</td>
+    <td>12</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2017</td>
+    <td>01</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2017</td>
+    <td>02</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2017</td>
+    <td>03</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2017</td>
+    <td>04</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2017</td>
+    <td>05</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2017</td>
+    <td>06</td>
+    <td></td>
+    <td>__Complete__</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>2017</td>
+    <td>07</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
