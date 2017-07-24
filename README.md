@@ -1,6 +1,10 @@
 # CamHD Motion Metadata
 
+
+>  See the [Metadata Status](docs/MetadataStatus.md) for current information on the metadata.
+
 >  __PLEASE NOTE:__  The metadata files in this repo are generated automatically.   We're still developing our QA/QC processes!    _Please_ use the Github issue tracker to flag missing files, data quality issues, etc.
+
 
 [CamHD](http://www.interactiveoceans.washington.edu/story/High_Definition_Video_Camera), an HD camera installed at 1500m water depth at [Axial Seamount](https://en.wikipedia.org/wiki/Axial_Seamount), generates ~13-minute HD videos of an active hydrothermal vent ecosystem, eight times a day.   These files are stored in the [Ocean Observatories Initiative](http://oceanobservatories.org/) [raw data repository](https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/).
 
