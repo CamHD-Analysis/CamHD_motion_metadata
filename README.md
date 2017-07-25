@@ -6,8 +6,9 @@
 
 This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
 
-Please see out [Zenodo record](https://zenodo.org/badge/latestdoi/90894043)
+Please see out [Zenodo record](https://zenodo.org/badge/latestdoi/90894043) for citation information.
 
+## Introduction
 
 
 >  See the [Metadata Status](docs/MetadataStatus.md) for current information on the metadata.
