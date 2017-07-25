@@ -1,6 +1,9 @@
 # CamHD Motion Metadata
 
 
+[![DOI](https://zenodo.org/badge/90894043.svg)](https://zenodo.org/badge/latestdoi/90894043)
+
+
 >  See the [Metadata Status](docs/MetadataStatus.md) for current information on the metadata.
 
 >  __PLEASE NOTE:__  The metadata files in this repo are generated automatically.   We're still developing our QA/QC processes!    _Please_ use the Github issue tracker to flag missing files, data quality issues, etc.
