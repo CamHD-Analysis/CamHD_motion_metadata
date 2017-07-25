@@ -2,6 +2,13 @@
 
 [![DOI](https://zenodo.org/badge/90894043.svg)](https://zenodo.org/badge/latestdoi/90894043)
 
+[![CC-SA-4.0 License](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-sa/4.0/)
+
+This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
+
+Please see out [Zenodo record](https://zenodo.org/badge/latestdoi/90894043)
+
+
 
 >  See the [Metadata Status](docs/MetadataStatus.md) for current information on the metadata.
 
@@ -32,16 +39,6 @@ All JSON files contain some common fields described [here](docs/JsonCommon.md). 
  * The optical flow files are then processed to isolate sequences where the camera motion is consistent (e.g. tilting upward, zooming in, static).  These "regions" of consistent behavior are described in a `*_optical_flow_regions.json` file described [here](docs/OpticalFlowRegionsJson.md).
 
 Right now, the JSON file formats are __unstable__.   The [file format](docs/JsonCommon.md) allows for semantic versioning of the file contents, and we describe format changes in the [Change Log](docs/ChangeLog.md).
-
-
-## License / Citing the data
-
-[![CC-SA-4.0 License](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-sa/4.0/)
-
-This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
-
-Please see out [Zenodo record](https://zenodo.org/badge/latestdoi/90894043)
-
 
 ## How the files are generated.
 
