@@ -32,6 +32,8 @@ logging.info("Outfile is %s" % args.outfile)
 with open(args.outfile, 'w') as f:
     csv_file = csv.writer(f)
 
+    csv._file.writerow(["basename","start_frame","end_frame","scene_tag"])
+
     def process_region_file( infile, csv_file ):
         logging.info("Processing %s" % infile)
 
