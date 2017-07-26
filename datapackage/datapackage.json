@@ -67,6 +67,49 @@
                     }
                 ]
             }
+        },
+        {
+            "name": "movie_metadata",
+            "path": "movie_metadata.csv",
+            "schema": {
+                "fields": [
+                    {
+                        "name": "mov_basename",
+                        "title": "MOV basename",
+                        "description": "The base name for the video file: just the filename with no extension e.g. CAMHDA301-20160506T060000Z.",
+                        "type": "string",
+                        "format": "default"
+                    },
+                    {
+                        "name": "date_time",
+                        "title": "Date/Time",
+                        "description": "UTC start time for video file as derived from file name (not actual clock time when video was started).",
+                        "type": "string",
+                        "format": "datetime"
+                    },
+                    {
+                        "name": "num_frames",
+                        "title": "Number of Frames",
+                        "description": "Number of frames in video.",
+                        "type": "integer",
+                        "format": "default"
+                    },
+                    {
+                        "name": "duration",
+                        "title": "Duration",
+                        "description": "Estimated duration of video in seconds.",
+                        "type": "float",
+                        "format": "default"
+                    },
+                    {
+                        "name": "file_size",
+                        "title": "File size",
+                        "description": "File size in bytes.",
+                        "type": "integer",
+                        "format": "default"
+                    }
+                ]
+            }
         }
     ]
 }
