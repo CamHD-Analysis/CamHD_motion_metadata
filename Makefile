@@ -2,6 +2,7 @@
 PYTHON = python3
 
 
+## Convert all optical_flow_regions.json files into the flat CSV file format.
 csv:  datapackage/regions.csv
 .PHONY: csv datapackage/regions.csv
 
