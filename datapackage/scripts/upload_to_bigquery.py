@@ -15,7 +15,7 @@ import datapackage
 
 url="https://raw.githubusercontent.com/CamHD-Analysis/CamHD_motion_metadata/master/datapackage/datapackage.json"
 
-package = "../datapackage.json"
+package = "datapackage.json"
 
 # Get resources
 dp = datapackage.DataPackage(package)
