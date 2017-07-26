@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-
+#
+# TODO:   Parse CamHD filename into UTC time and add to CSV file
 
 import glob
 import logging
@@ -9,10 +10,6 @@ import os
 import csv
 
 import pycamhd.motionmetadata as mmd
-
-
-#import camhd_motion_analysis as ma
-
 
 parser = argparse.ArgumentParser(description='Convert JSON regions files to a flat CSV format')
 
@@ -32,21 +29,23 @@ logging.info("Outfile is %s" % args.outfile)
 with open(args.outfile, 'w') as f:
     csv_file = csv.writer(f)
 
+    csv_file.writerow(["mov_basename","date_time","start_frame","end_frame","scene_tag"])
+
     def process_region_file( infile, csv_file ):
         logging.info("Processing %s" % infile)
 
         regions = mmd.RegionFile.load(infile)
 
         basename = regions.basename
+        datetime = regions.datetime().isoformat()
 
         for r in regions.static_regions():
 
-            csv_file.writerow( [basename, r.start_frame, r.end_frame, r.scene_tag] )
-
-
+            csv_file.writerow( [basename, datetime, r.start_frame, r.end_frame, r.scene_tag] )
 
     for pathin in args.input:
-        for infile in glob.iglob(pathin):
+
+        for infile in glob.iglob(pathin, recursive=True):
 
             # Iterate again
             if path.isdir(infile):
