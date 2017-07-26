@@ -1,19 +1,18 @@
 # CamHD Motion Metadata
 
-[![DOI](https://zenodo.org/badge/90894043.svg)](https://zenodo.org/badge/latestdoi/90894043)
+_DOI for all version of this dataset:_ [![DOI](https://zenodo.org/badge/90894043.svg)](https://zenodo.org/badge/latestdoi/90894043)  
+
+Please see our [Zenodo record](https://zenodo.org/badge/latestdoi/90894043) for citation information and for DOIs associated with specific releases of the data.
 
 [![CC-SA-4.0 License](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-sa/4.0/)
 
 This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
 
-Please see out [Zenodo record](https://zenodo.org/badge/latestdoi/90894043) for citation information.
-
 ## Introduction
 
+>  See the [Metadata Status](docs/MetadataStatus.md) for information on the current state of the metadata.
 
->  See the [Metadata Status](docs/MetadataStatus.md) for current information on the metadata.
-
->  __PLEASE NOTE:__  The metadata files in this repo are generated automatically.   We're still developing our QA/QC processes!    _Please_ use the Github issue tracker to flag missing files, data quality issues, etc.
+>  _Please_ use the Github issue tracker to flag missing files, data quality issues, etc.
 
 
 [CamHD](http://www.interactiveoceans.washington.edu/story/High_Definition_Video_Camera), an HD camera installed at 1500m water depth at [Axial Seamount](https://en.wikipedia.org/wiki/Axial_Seamount), generates ~13-minute HD videos of an active hydrothermal vent ecosystem, eight times a day.   These files are stored in the [Ocean Observatories Initiative](http://oceanobservatories.org/) [raw data repository](https://rawdata.oceanobservatories.org/files/RS03ASHS/PN03B/06-CAMHDA301/).
@@ -24,7 +23,9 @@ This repo is the primary distribution point for those metadata files.   The Git 
 
 For additional information on this project, please see [the project blog](https://camhd-analysis.github.io/public-www/)
 
-## Using the data
+# Data in JSON format
+
+The "raw" data format is a set of one or more JSON files for each video in the CI.
 
 The directory structure within this repository mirrors that of the raw data
 archive.  Since we only analyze CamHD data, all of the metadata files is under the
@@ -41,7 +42,33 @@ All JSON files contain some common fields described [here](docs/JsonCommon.md). 
 
 Right now, the JSON file formats are __unstable__.   The [file format](docs/JsonCommon.md) allows for semantic versioning of the file contents, and we describe format changes in the [Change Log](docs/ChangeLog.md).
 
-## How the files are generated.
+
+
+# Data in CSV format
+
+The static region information is also exported in a CSV format which complies with the
+[Frictionless Data](http://frictionlessdata.io/) data package standard.   The CSV file itself
+is stored as [datapackage/regions.csv](datapackage/regions.csv) and the associated metadata
+information is at [datapackage/datapackage.json](datapackage/datapackage.json)
+
+The datapackage format simplifies access to the data using their extensive [library of tools](http://frictionlessdata.io/tools/):
+
+    import datapackage
+
+    url = "https://raw.githubusercontent.com/CamHD-Analysis/CamHD_motion_metadata/master/datapackage/datapackage.json"
+
+    dp = datapackage.DataPackage(url)
+
+    print(dp.descriptor['title'])
+
+
+
+The [datapackage/scripts](datapackage/scripts/) directory contains Python scripts specific
+to the datapackage format.
+
+
+
+## Preparation
 
 The metadata files are generated using software these github repos:
 
@@ -57,6 +84,9 @@ As well as Python tools included in the `scripts/` directory of this repo:
     1. Uses a set of hand-labelled ground truth files to attempt to label each static section with its corresponding [region](docs/Regions.md).
 
   See [docs/MakeRegionsFile.md](docs/MakeRegionsFile.md) for more detail.
+
+The CSV/datapackage format is prepared using the [scripts/make_csv.py](scripts/make_csv.py) script
+or the `make csv` rule in the top-level Makefile.
 
 ## Todos
 
