@@ -85,7 +85,7 @@ As well as Python tools included in the `scripts/` directory of this repo:
 
   See [docs/MakeRegionsFile.md](docs/MakeRegionsFile.md) for more detail.
 
-The CSV/datapackage format is prepared using the [scripts/make_csv.py](scripts/make_csv.py) script
+The CSV datapackage format is prepared using the [scripts/make_csv.py](scripts/make_csv.py) script
 or the `make csv` rule in the top-level Makefile.
 
 ## Todos
