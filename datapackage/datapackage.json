@@ -1,6 +1,7 @@
 {
     "name": "camhd_motion_metadata",
     "title": "CamHD_motion_metadata",
+    "id": "doi://10.5281/zenodo.834740",
     "resources": [
         {
             "name": "regions",
@@ -9,29 +10,36 @@
                 "fields": [
                     {
                         "name": "mov_basename",
-                        "title": "",
-                        "description": "",
+                        "title": "MOV basename",
+                        "description": "The base name for the video file: just the filename with no extension e.g. CAMHDA301-20160506T060000Z.",
                         "type": "string",
                         "format": "default"
                     },
                     {
+                        "name": "date_time",
+                        "title": "Date/Time",
+                        "description": "UTC start time for video file as derived from file name (not actual clock time when video was started).",
+                        "type": "string",
+                        "format": "datetime"
+                    },
+                    {
                         "name": "start_frame",
-                        "title": "",
-                        "description": "",
+                        "title": "Start Frame",
+                        "description": "Frame number for start of static region.",
                         "type": "integer",
                         "format": "default"
                     },
                     {
                         "name": "end_frame",
-                        "title": "",
-                        "description": "",
+                        "title": "End Frame",
+                        "description": "Frame number for end of static region.",
                         "type": "integer",
                         "format": "default"
                     },
                     {
                         "name": "scene_tag",
-                        "title": "",
-                        "description": "",
+                        "title": "Scene Tag",
+                        "description": "Descriptive scene tag applied to scene.",
                         "type": "string",
                         "format": "default"
                     }
