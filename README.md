@@ -28,8 +28,8 @@ For additional information on this project, please see [the project blog](https:
 The "raw" data format is a set of one or more JSON files for each video in the CI.
 
 The directory structure within this repository mirrors that of the raw data
-archive.  Since we only analyze CamHD data, all of the metadata files is under the
-directory `RS03ASHS/PN03B/06-CAMHDA301/`.   Metadata files share a common root
+archive.  Since we only analyze one instrument, all of the metadata files are under the
+directory `RS03ASHS/PN03B/06-CAMHDA301/`.   The metadata files share a common root
 name with video files, followed by a suffix which describes the metadata
 (described in greater detail below).  All metadata is stored in JSON-encoded
 text files, and all files use the `.json` extension.   
@@ -38,7 +38,9 @@ All JSON files contain some common fields described [here](docs/JsonCommon.md). 
 
  * `*_optical_flow.json` files contain the estimated camera motion for a subset of frames in in each video.  The format is described [here](docs/OpticalFlowJson.md).
 
- * The optical flow files are then processed to isolate sequences where the camera motion is consistent (e.g. tilting upward, zooming in, static).  These "regions" of consistent behavior are described in a `*_optical_flow_regions.json` file described [here](docs/OpticalFlowRegionsJson.md).
+ * The optical flow files are then processed to isolate sequences where the camera motion is consistent (e.g. tilting upward, zooming in, static).   We are particularly interested in static segments and attempt to label them by comparison to a set of ground truth video sequences.
+
+  These "regions" of consistent behavior are described in a `*_optical_flow_regions.json` file described [here](docs/OpticalFlowRegionsJson.md).
 
 Right now, the JSON file formats are __unstable__.   The [file format](docs/JsonCommon.md) allows for semantic versioning of the file contents, and we describe format changes in the [Change Log](docs/ChangeLog.md).
 
@@ -46,12 +48,12 @@ Right now, the JSON file formats are __unstable__.   The [file format](docs/Json
 
 # Data in CSV format
 
-The static region information is also exported in a CSV format which complies with the
-[Frictionless Data](http://frictionlessdata.io/) data package standard.   The CSV file itself
+The static region information is also exported in a CSV format and includes
+[Frictionless Data](http://frictionlessdata.io/) data packaging information.   The CSV file itself
 is stored as [datapackage/regions.csv](datapackage/regions.csv) and the associated metadata
 information is at [datapackage/datapackage.json](datapackage/datapackage.json)
 
-The datapackage format simplifies access to the data using their extensive [library of tools](http://frictionlessdata.io/tools/):
+The extensive [library of datapackage tools](http://frictionlessdata.io/tools/) simplifies development:
 
     import datapackage
 
@@ -67,6 +69,26 @@ The [datapackage/scripts](datapackage/scripts/) directory contains Python script
 to the datapackage format.
 
 
+# Data in Google Bigquery
+
+As an experiment, the CSV version is also uploaded to [Google Bigquery](https://cloud.google.com/bigquery/), their scalable database.  This db is publicly readable and is available [here](https://bigquery.cloud.google.com/queries/camhd-motion-metadata)
+
+The db can be accessed using standard tools.   For example, using the `bq`
+ command line tool:
+
+     >  bq query --project_id camhd-motion-metadata "SELECT mov_basename,start_frame,end_frame FROM camhd.regions WHERE scene_tag='d2_p0_z0' ORDER BY date_time LIMIT 6"
+
+     Waiting on bqjob_r542e368cb71317b8_0000015d806335c0_1 ... (0s) Current status: DONE
+     +----------------------------+-------------+-----------+
+     |        mov_basename        | start_frame | end_frame |
+     +----------------------------+-------------+-----------+
+     | CAMHDA301-20160101T000000Z |       23601 |     23931 |
+     | CAMHDA301-20160101T000000Z |       13101 |     13381 |
+     | CAMHDA301-20160101T000000Z |        1711 |      2191 |
+     | CAMHDA301-20160101T000000Z |        4691 |      4961 |
+     | CAMHDA301-20160101T000000Z |        7531 |      7811 |
+     | CAMHDA301-20160101T000000Z |       21031 |     21351 |
+     +----------------------------+-------------+-----------+
 
 ## Preparation
 
@@ -76,7 +98,7 @@ The metadata files are generated using software these github repos:
 
   * [CamHD-Analysis/camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy) contains scripts and documentation on running the 'camhd_motion_analysis' in parallel on a cluster formed with Docker swarm.
 
-As well as Python tools included in the `scripts/` directory of this repo:
+The Python tools in the `scripts/` directory are also use:
 
   * [make_regions_files.py](docs/MakeRegionsFile.md) takes the [optical flow](docs/OpticalFlowJson.md) files as input and:
 
@@ -89,5 +111,3 @@ The CSV datapackage format is prepared using the [scripts/make_csv.py](scripts/m
 or the `make csv` rule in the top-level Makefile.
 
 ## Todos
-
- [ ] Use photometric comparison to squash identical segments

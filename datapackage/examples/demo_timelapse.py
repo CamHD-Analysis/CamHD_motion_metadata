@@ -69,7 +69,7 @@ for basename in keys:
     logging.info("Using regions from frames %d to %d" % (region['start_frame'], region['end_frame']))
 
     # Select the precise frame to retrieve
-    frame = math.floor( region['end_frame'] - region['start_frame']/2.0 )
+    frame = math.floor( (region['end_frame'] + region['start_frame'])/2.0 )
 
     logging.info("Retrieving frame %d" % frame)
     img = qt.get_frame( camhd.convert_basename(basename), frame, format='png', timeout=30 )
