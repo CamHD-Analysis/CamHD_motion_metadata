@@ -37,12 +37,14 @@ storage = Storage(service, project, dataset)
 for table in reversed(storage.buckets):
     storage.delete(table)
 
-table = 'regions'
 
-# Create tables
-storage.create(table, regions.descriptor['schema'])
+for resource in dp.resources:
+    table = resource.descriptor['name']
 
-storage.write(table, [d.values() for d in regions.iter()])
+    # Create tables
+    storage.create(table, resource.descriptor['schema'])
+
+    storage.write(table, [d.values() for d in resource.iter()])
 
 # List tables
 print(storage.buckets)
