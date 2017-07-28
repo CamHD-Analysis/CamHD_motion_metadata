@@ -18,28 +18,28 @@ __Last Updated:__   24 July 2017.
     <td>2015</td>
     <td>07</td>
     <td></td>
-    <td></td>
+    <td>__Complete__</td>
     <td></td>
   </tr>
   <tr>
     <td>2015</td>
     <td>08</td>
     <td></td>
-    <td></td>
+    <td>__Complete__</td>
     <td></td>
   </tr>
   <tr>
     <td>2015</td>
     <td>09</td>
     <td></td>
-    <td></td>
+    <td>__Complete__</td>
     <td></td>
   </tr>
   <tr>
     <td>2015</td>
     <td>10</td>
     <td></td>
-    <td></td>
+    <td>__Complete__</td>
     <td></td>
   </tr>
   <tr>
@@ -68,35 +68,35 @@ __Last Updated:__   24 July 2017.
     <td>02</td>
     <td></td>
     <td>__Complete__</td>
-    <td>In process</td>
+    <td>__Complete__</td>
   </tr>
   <tr>
     <td>2016</td>
     <td>03</td>
     <td></td>
     <td>__Complete__</td>
-    <td>In process</td>
+    <td>__Complete__</td>
   </tr>
   <tr>
     <td>2016</td>
     <td>04</td>
     <td></td>
     <td>__Complete__</td>
-    <td>In process</td>
+    <td>__Complete__</td>
   </tr>
   <tr>
     <td>2016</td>
     <td>05</td>
     <td></td>
     <td>__Complete__</td>
-    <td></td>
+    <td>__Complete__</td>
   </tr>
   <tr>
     <td>2016</td>
     <td>06</td>
     <td></td>
     <td>__Complete__</td>
-    <td></td>
+    <td>In process</td>
   </tr>
   <tr>
     <td>2016</td>

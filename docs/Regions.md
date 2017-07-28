@@ -1,10 +1,40 @@
+Each time CamHD is serviced or replaced, we call that a different "deployment".   While the camera is nominally put in the same place every time, there are minor differences in
+the camera position, camera lighting, and even the camera behavior (one of them zooms faster than the other) which can confound matching.   When the camera is cycled, the biofouling is
+cleared, which also introduces a step change in the appearance.
+
+We also use the deployment number to track changes in collection routine.  For example, `d2` is the "standard" pre-programmed routine during the 2015-2016 deployment.   `d1` is the pre-history before the pre-programmed routine was codified, while `d3` is the "standard" preprogrammed routine during the 2016-2017 deployment.    The photometric difference between the two routines can be seen in this sample:
+
+<table>
+  <tr>
+    <td><img src="images/CAMHDA301-20160725T210000Z_5000.jpg"><br>
+      CAMHDA301-20160725T210000Z, frame 5000</td>
+    <td><img src="images/CAMHDA301-20160729T000000Z_6000.jpg"><br>
+      CAMHDA301-20160729T000000Z, frame 6000</td>
+  </tr>
+</table>
+
+(note, these are not exactly the same scene (yet)....)
+
+
+Since the pre-programmed routine is nominally the same between instances,
+the `p` positions should be equivalent between deployments.
+
+<table>
+  <tr><th>Deployment</th>
+      <th>Starts at</th>
+      <th>Ends at</th>
+  </tr>
+  <tr><td>`d2`</td><td></td><td>2016/07/25/CAMHDA301-20160725T210000Z</td></tr>
+  <tr><td>`d3`</td><td>2016/07/29/CAMHDA301-20160729T000000Z</td><td></td></tr>
+</table>
+
 # Regions
 
 <table>
   <tr>
   <th>Name</th>
   <th>Action before</th>
-  <th>Example</th>
+  <th>Deployment `d2`</th>
   </tr>
 
   <tr>
