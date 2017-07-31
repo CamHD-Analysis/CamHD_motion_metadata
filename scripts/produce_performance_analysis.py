@@ -13,7 +13,7 @@ import numpy as np
 import region_analysis as ra
 
 
-parser = argparse.ArgumentParser(description='Distill performance data from *_regions.json files')
+parser = argparse.ArgumentParser(description='Extract performance data from *_regions.json files')
 
 parser.add_argument('input', metavar='inputfiles', nargs='+',
                     help='Regions files to process')

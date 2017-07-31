@@ -4,11 +4,12 @@ PYTHON = python3
 
 ## Convert all optical_flow_regions.json files into the flat CSV file format.
 csv:  datapackage/regions.csv
-.PHONY: csv datapackage/regions.csv
 
 datapackage/regions.csv:
 	${PYTHON} scripts/regions_to_csv.py --output $@ RS03ASHS/PN03B/06-CAMHDA301/**/*regions.json
 
+html_to_google_drive:
+	gsutil -m rsync -a public-read -d -r _html/ gs://camhd_region_proofs/
 
 
 
@@ -20,3 +21,6 @@ ci_scrape:
 
 datapackage/movie_metadata.csv:
 	${PYTHON} scripts/ci_scrape_to_csv.py --output $@ ci_scrape_*.json
+
+
+.PHONY: csv datapackage/regions.csv html_to_google_drive
