@@ -7,7 +7,7 @@ import logging
 
 years = [2016]
 
-months = [1,2,3,4,5,6]
+months = [1,2,3,4,5,6,7]
 
 subsets = { '0?': 0,
             '1?': 1,
@@ -27,6 +27,7 @@ for year in years:
 
             subprocess.run(['python', 'scripts/make_regions_proof_sheet.py',
 			                "--lazycache-url", "http://ursine:8080//v1/org/oceanobservatories/rawdata/files/",
+					"--with-groundtruth",
                             "--output", "_html/%s" % html_file,
                             "RS03ASHS/PN03B/06-CAMHDA301/%04d/%02d/%s/*_regions.json" % (year, month, reg)])
 
