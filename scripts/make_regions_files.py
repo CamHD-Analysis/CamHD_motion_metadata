@@ -51,9 +51,9 @@ logging.basicConfig(level=args.log.upper())
 classifier = None
 if not args.noclassify:
     import pycamhd.lazycache as camhd
-    qt = camhd.lazycache(args.lazycache)
+    qt = camhd.lazycache(args.lazycache, verbose=True)
 
-    gt_library = ra.GroundTruthLibrary()
+    gt_library = ra.GroundTruthLibrary(qt)
     gt_library.load_ground_truth(args.groundtruth)
 
 for inpath in args.input:

@@ -57,6 +57,8 @@ class GroundTruthLibrary:
         self.gt_library = {}
         self.lazycache = lazycache
 
+        logging.info(self.lazycache.verbose)
+
     def load_ground_truth(self, ground_truth_file,
                           img_path="classification/images/"):
 
@@ -136,6 +138,12 @@ class GroundTruthLibrary:
         mov = self.regions[basename].mov
         img = self.lazycache.get_frame(mov, frame, format='png')
 
+        # TODO.  Quick hack to catch bad downloads from Lazycache
+        # (e.g. if lazycache instance can't be found)
+        # change to make more robust
+        if not img:
+            assert "Got bad ground truth image"
+
         outfile = "classification/images/%s/%s_%08d.png" %\
                   (tag, basename, frame)
         logging.info("Saving new ground truth file to %s" % outfile)
@@ -144,7 +152,7 @@ class GroundTruthLibrary:
         with open(outfile, 'wb') as f:
             img.save(f)
 
-        self.gt_library[basename][tag].append(GTImage(outfile))
+        self.gt_library[basename][tag].append(GTImage(outfile).abspath)
 
     def supplement_gt_images(self, basenames, short_tags):
 
