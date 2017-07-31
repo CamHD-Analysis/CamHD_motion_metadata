@@ -24,7 +24,7 @@ with open("_html/index.html", 'w') as f:
 
         for month in months:
 
-            f.write("<h2>%d %d</h2></br>" % (year, month))
+            f.write("<br/><h2>%d %d</h2>" % (year, month))
             f.write("<ul>\n")
 
             for regex, s in subsets.items():
