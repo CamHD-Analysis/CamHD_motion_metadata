@@ -15,26 +15,28 @@ from dask import compute, delayed
 import dask.threaded
 
 
-parser = argparse.ArgumentParser(description='Generate a movie metafile from the CI')
+parser = argparse.ArgumentParser(description='Walks the directory tree at CI'
+                                 ' gathering movie metadata (length, size, etc)')
 
 parser.add_argument('input', metavar='N', nargs='*',
-                    help='CI paths to process')
+                    help='CI paths to process (e.g. RS03ASHS/PN03B/06-CAMHDA301/2016/07/ will scrape all of the movies from July 2016)')
 
 parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
-                    help='Logging level')
+                    help='Logging level (debug, info, warning, error, critical)')
 
 parser.add_argument('--output', dest='outfile', nargs='?',
                     default='ci_scrape.json', help='Output JSON file')
 
 parser.add_argument('--lazycache-url', dest='lazycache',
                     default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
-                    help='URL to Lazycache repo server (only needed if classifying)')
+                    help='URL to Lazycache repo server')
 
 args = parser.parse_args()
 
 logging.basicConfig(level=args.log.upper())
 
 repo = camhd.lazycache(args.lazycache)
+
 
 def iterate_path(path):
 
@@ -76,7 +78,6 @@ results = compute(*jobs, get=dask.threaded.get, num_workers=4)
 
 with open('map.json', 'w') as f:
     json.dump(results, f, indent=4)
-
 
 # Convert to a map
 out = {}
