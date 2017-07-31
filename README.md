@@ -1,6 +1,6 @@
 # CamHD Motion Metadata
 
-_DOI for all version of this dataset:_ [![DOI](https://zenodo.org/badge/90894043.svg)](https://zenodo.org/badge/latestdoi/90894043)  
+_DOI for all versions of this dataset:_ [![DOI](https://zenodo.org/badge/90894043.svg)](https://zenodo.org/badge/latestdoi/90894043)  
 
 Please see our [Zenodo record](https://zenodo.org/badge/latestdoi/90894043) for citation information and for DOIs associated with specific releases of the data.
 
@@ -19,13 +19,14 @@ This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 Inter
 
 Under the NSF OTIC-sponsored program [_Cloud-Capable Tools for CamHD Data Analysis_](https://camhd-analysis.github.io/public-www/), we are investigating the use of video analytics / machine vision to generate ancillary metadata about each video: camera motion and position, and identification of sections (sequences of frames, time bounds) within each video when the camera is still, and looking and particular known "stations" on the vent.
 
-This repo is the primary distribution point for those metadata files.   The Git format lets us version files as they are created, flag and track data quality issues, etc.
+This repo is the primary distribution point for that metadata.   Git lets us
+version files as they are created, flag and track data quality issues, etc.
 
 For additional information on this project, please see [the project blog](https://camhd-analysis.github.io/public-www/)
 
 # Data in JSON format
 
-The "raw" data format is a set of one or more JSON files for each video in the CI.
+The "canonical" data format is a set of one or more JSON files for each video in the CI.
 
 The directory structure within this repository mirrors that of the raw data
 archive.  Since we only analyze one instrument, all of the metadata files are under the
@@ -48,12 +49,11 @@ Right now, the JSON file formats are __unstable__.   The [file format](docs/Json
 
 # Data in CSV format
 
-The static region information is also exported in a CSV format and includes
-[Frictionless Data](http://frictionlessdata.io/) data packaging information.   The CSV file itself
-is stored as [datapackage/regions.csv](datapackage/regions.csv) and the associated metadata
-information is at [datapackage/datapackage.json](datapackage/datapackage.json)
+The [scripts/regions_to_csv.py](scripts/regions_to_csv.py) script converts the JSON
+regions files to a [tabular CSV format](datapackage/regions.csv).
 
-The extensive [library of datapackage tools](http://frictionlessdata.io/tools/) simplifies development:
+We provide a
+[Frictionless Data](http://frictionlessdata.io/)  [datapackage.json](datapackage/datapackage.json) file, so their extensive [library of datapackage tools](http://frictionlessdata.io/tools/) can be used to access the region data:
 
     import datapackage
 
@@ -65,15 +65,19 @@ The extensive [library of datapackage tools](http://frictionlessdata.io/tools/) 
 
 
 
-The [datapackage/scripts](datapackage/scripts/) directory contains Python scripts specific
-to the datapackage format.
+The [datapackage/scripts/](datapackage/scripts/) directory contains
+Python scripts specific to the datapackage format.
+
+The [datapackage/examples/](datapackage/examples/) directory contains
+more examples written using the datapackage.
 
 
 # Data in Google Bigquery
 
-As an experiment, the CSV version is also uploaded to [Google Bigquery](https://cloud.google.com/bigquery/), their scalable database.  This db is publicly readable and is available [here](https://bigquery.cloud.google.com/queries/camhd-motion-metadata)
+As an experiment, the CSV version has been uploaded to [Google Bigquery](https://cloud.google.com/bigquery/).  
+This db is publicly readable and is available [here](https://bigquery.cloud.google.com/queries/camhd-motion-metadata)
 
-The db can be accessed using standard tools.   For example, using the `bq`
+The db can be accessed using the tools/libraries provided by Google.   For example, using the `bq`
  command line tool:
 
      >  bq query --project_id camhd-motion-metadata "SELECT mov_basename,start_frame,end_frame FROM camhd.regions WHERE scene_tag='d2_p0_z0' ORDER BY date_time LIMIT 6"
@@ -92,13 +96,15 @@ The db can be accessed using standard tools.   For example, using the `bq`
 
 ## Preparation
 
-The metadata files are generated using software these github repos:
+The metadata files are generated using a couple of different software tools:
 
-  * [CamHD-Analysis/camhd_motion_analysis](https://github.com/CamHD-Analysis/camhd_motion_analysis) contains the C++ and Python files which perform the optical flow calculation.
+  * [CamHD-Analysis/camhd_motion_analysis](https://github.com/CamHD-Analysis/camhd_motion_analysis) uses C++ and Python files which perform the optical flow calculation.
 
-  * [CamHD-Analysis/camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy) contains scripts and documentation on running the 'camhd_motion_analysis' in parallel on a cluster formed with Docker swarm.
+  * [CamHD-Analysis/camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy) contains scripts and documentation on running  `camhd_motion_analysis`
+  on a Docker swarm.
 
-The Python tools in the `scripts/` directory are also use:
+The Python tools in the [`scripts/`](scripts/) directory are used for
+further manipulation of the optical flow files:
 
   * [make_regions_files.py](docs/MakeRegionsFile.md) takes the [optical flow](docs/OpticalFlowJson.md) files as input and:
 
@@ -107,7 +113,9 @@ The Python tools in the `scripts/` directory are also use:
 
   See [docs/MakeRegionsFile.md](docs/MakeRegionsFile.md) for more detail.
 
-The CSV datapackage format is prepared using the [scripts/make_csv.py](scripts/make_csv.py) script
-or the `make csv` rule in the top-level Makefile.
+[scripts/make_csv.py](scripts/make_csv.py) converts the JSON data to tabular format.
+`make csv` in the top-level Makefile will refresh the CSV with all existing region files.
+
+[scripts/ci_meta_scrape.py](scripts/ci_meta_scrape.py) scrapes movie meta-information from the CI into JSON files.   [scripts/ci_scrape_to_csv.py](scripts/ci_scrape_to_csv.py) converts these JSON files to  [CSV](datapackage/movie_metadata.csv).
 
 ## Todos
