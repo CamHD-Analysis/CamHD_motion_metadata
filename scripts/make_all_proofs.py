@@ -6,7 +6,7 @@
 #
 
 import subprocess
-
+import json
 
 
 years = {2015: [11, 12],
@@ -19,6 +19,9 @@ subsets = {'0?': 0,
 with open("_html/index.html", 'w') as f:
 
     f.write("<html><body>\n")
+
+    f.write("<ul><li><a href='ground_truth.html'>Ground Truth</a>"
+            "</ul><br/><br/>")
 
     for year, months in years.items():
 
@@ -33,8 +36,8 @@ with open("_html/index.html", 'w') as f:
 
                 subprocess.run(['python',
                                 'scripts/make_regions_proof_sheet.py',
-        		                "--lazycache-url", "http://ursine:8080//v1/org/oceanobservatories/rawdata/files/",
-        				        "--with-groundtruth",
+                                "--lazycache-url", "http://ursine:8080//v1/org/oceanobservatories/rawdata/files/",
+                                "--with-groundtruth",
                                 "--output", "_html/%s" % html_file,
                                 "RS03ASHS/PN03B/06-CAMHDA301/%04d/%02d/%s/*_regions.json" % (year, month, regex)])
 
@@ -42,6 +45,15 @@ with open("_html/index.html", 'w') as f:
 
             f.write("</ul>\n")
 
-
-
     f.write("</html></body>\n")
+
+
+## Make a ground truth proof file
+gt_file = "classification/ground_truth.json"
+
+with open(gt_file) as f:
+    gt = json.load(f)
+
+subprocess.run(['python', 'scripts/make_regions_proof_sheet.py',
+                "--lazycache-url", "http://ursine:8080//v1/org/oceanobservatories/rawdata/files/",
+                "--output", "_html/ground_truth.html"] + gt )

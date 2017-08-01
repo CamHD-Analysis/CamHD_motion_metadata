@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 #
-# TODO:   Parse CamHD filename into UTC time and add to CSV file
 
 import glob
 import logging
