@@ -44,7 +44,7 @@ with open(args.outfile, 'w') as f:
 
     for pathin in args.input:
 
-        for infile in glob.iglob(pathin, recursive=True):
+        for infile in sorted(glob.iglob(pathin, recursive=True)):
 
             # Iterate again
             if path.isdir(infile):

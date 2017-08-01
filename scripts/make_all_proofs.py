@@ -48,6 +48,16 @@ with open("_html/index.html", 'w') as f:
     f.write("</html></body>\n")
 
 
+# Ugly but fast
+# Overwrite the file you just made
+
+subprocess.run(['python',
+                'scripts/make_regions_proof_sheet.py',
+                "--lazycache-url", "http://ursine:8080//v1/org/oceanobservatories/rawdata/files/",
+                "--with-groundtruth",
+                "--output", "_html/2016_07_2.html",
+                "RS03ASHS/PN03B/06-CAMHDA301/2016/07/2[0-5]/*_regions.json"])
+
 ## Make a ground truth proof file
 gt_file = "classification/ground_truth.json"
 
