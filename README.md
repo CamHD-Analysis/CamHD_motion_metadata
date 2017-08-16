@@ -119,3 +119,5 @@ further manipulation of the optical flow files:
 [scripts/ci_meta_scrape.py](scripts/ci_meta_scrape.py) scrapes movie meta-information from the CI into JSON files.   [scripts/ci_scrape_to_csv.py](scripts/ci_scrape_to_csv.py) converts these JSON files to  [CSV](datapackage/movie_metadata.csv).
 
 ## Todos
+
+Add installation instructions and pointer to demos
