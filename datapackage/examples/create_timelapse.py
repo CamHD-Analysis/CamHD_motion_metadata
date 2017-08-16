@@ -32,20 +32,20 @@ for dirpath, dirnames, filenames in os.walk(frames):
 f = [i[19:35] for i in f]
 
 
-# # create initial timelapse
-# create_vid = "ffmpeg -framerate 10 -pattern_type glob -i '" + frames + \
-# 	"*.png' -c:v libx264 -pix_fmt yuv420p " + videos + scene + "-time_lapse.mp4"
-# process = subprocess.Popen(create_vid,shell=True)
-# process.wait()
+# create initial timelapse
+create_vid = "ffmpeg -framerate 10 -pattern_type glob -i '" + frames + \
+	"*.png' -c:v libx264 -pix_fmt yuv420p " + videos + scene + "-time_lapse.mp4"
+process = subprocess.Popen(create_vid,shell=True)
+process.wait()
 
 
-# # stabilize timelapse
-# detect_vid = "ffmpeg -i " + videos + scene + "-time_lapse.mp4 -vf vidstabdetect -f null -"
-# process = subprocess.Popen(detect_vid,shell=True)
-# process.wait()
-# stab_vid = "ffmpeg -i "+ videos + scene + "-time_lapse.mp4 -vf vidstabtransform " + videos + scene + "-time_lapse_stabilized.mp4"
-# process = subprocess.Popen(stab_vid,shell=True)
-# process.wait()
+# stabilize timelapse
+detect_vid = "ffmpeg -i " + videos + scene + "-time_lapse.mp4 -vf vidstabdetect -f null -"
+process = subprocess.Popen(detect_vid,shell=True)
+process.wait()
+stab_vid = "ffmpeg -i "+ videos + scene + "-time_lapse.mp4 -vf vidstabtransform " + videos + scene + "-time_lapse_stabilized.mp4"
+process = subprocess.Popen(stab_vid,shell=True)
+process.wait()
 
 
 # get input video duration
