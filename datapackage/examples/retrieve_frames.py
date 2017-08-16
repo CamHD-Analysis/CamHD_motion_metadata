@@ -47,7 +47,8 @@ if not args.scene_tag:
 
 qt = camhd.lazycache( args.lazycache )
 
-os.mkdir(args.outdir)
+if not os.path.exists("output/" + args.scene_tag + "/frames"):
+    os.makedirs("output/" + args.scene_tag + "/frames")
 
 img_size = None
 if args.imgsize:
@@ -73,9 +74,6 @@ for r in regions.iter():
 
 keys = sorted( mov.keys() )
 
-
-if not os.path.exists("output/" + args.scene_tag + "/frames"):
-    os.makedirs("output/" + args.scene_tag + "/frames")
 
 
 for basename in keys:
@@ -104,4 +102,5 @@ for basename in keys:
     img.save( filename )
 
     count += 1
+
 
