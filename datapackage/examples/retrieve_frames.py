@@ -1,6 +1,4 @@
-
-#
-# retrieve_frames.py uses the regions.csv datapackage and Lazycache to pull down
+# retrieve_frames.py uses the regions.csv datapackage and Lazycache to pull
 # sequences of images for making timelapses (the actual timelapse generation
 # is done using e.g, ffmpeg)
 #
@@ -28,24 +26,31 @@ parser.add_argument('--scene-tag', metavar='scene_tag', nargs='?',
 parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
                     help='Logging level')
 
-parser.add_argument('--output', dest='outdir', nargs='?', default='output/' + parser.parse_args().scene_tag + '/frames', help='Directory for timelapse images')
+parser.add_argument('--output', dest='outdir', nargs='?', default=None,
+                    help='Directory for timelapse images')
 
 parser.add_argument('--image-size', dest='imgsize', nargs='?', default=None)
 
-parser.add_argument('--data-package', dest='datapackage', default=DEFAULT_DATAPACKAGE_URL)
+parser.add_argument('--data-package', dest='datapackage',
+                    default=DEFAULT_DATAPACKAGE_URL)
 
-parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", DEFAULT_LAZYCACHE_URL),
+parser.add_argument('--lazycache-url', dest='lazycache',
+                    default=os.environ.get("LAZYCACHE_URL", DEFAULT_LAZYCACHE_URL),
                     help='URL to Lazycache repo server (only needed if classifying)')
 
 args = parser.parse_args()
 
-logging.basicConfig( level=args.log.upper() )
+logging.basicConfig(level=args.log.upper())
 
 if not args.scene_tag:
     logging.fatal("Scene tag must be specified with --scene-tag")
     exit(-1)
 
-qt = camhd.lazycache( args.lazycache )
+if not args.outdir:
+    args.outdir = 'output/' + parser.parse_args().scene_tag + '/frames'
+
+
+qt = camhd.lazycache(args.lazycache)
 
 if not os.path.exists("output/" + args.scene_tag + "/frames"):
     os.makedirs("output/" + args.scene_tag + "/frames")
@@ -72,8 +77,7 @@ for r in regions.iter():
 
         mov[basename].append(r)
 
-keys = sorted( mov.keys() )
-
+keys = sorted(mov.keys())
 
 
 for basename in keys:
@@ -84,23 +88,23 @@ for basename in keys:
     # Select which region
     region = r[math.floor(len(r)/2)] if len(r) > 1 else r[0]
 
-    logging.info("Using regions from frames %d to %d" % (region['start_frame'], region['end_frame']))
+    logging.info("Using regions from frames %d to %d" %
+                 (region['start_frame'], region['end_frame']))
 
     # Select the precise frame to retrieve
-    frame = math.floor( (region['end_frame'] + region['start_frame'])/2.0 )
+    frame = math.floor((region['end_frame'] + region['start_frame'])/2.0)
 
     logging.info("Retrieving frame %d" % frame)
-    img = qt.get_frame( camhd.convert_basename(basename), frame, format='png', timeout=30 )
+    img = qt.get_frame(camhd.convert_basename(basename), frame,
+                       format='png', timeout=30)
 
     if img_size:
-        img.thumbnail( img_size )
+        img.thumbnail(img_size)
 
     # Make filename
     filename = "%s/%s_%06d.png" % (args.outdir, basename, frame)
 
     logging.info("Saving to %s" % filename)
-    img.save( filename )
+    img.save(filename)
 
     count += 1
-
-
