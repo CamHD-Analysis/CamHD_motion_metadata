@@ -26,7 +26,7 @@ logging.basicConfig( level=args.log.upper() )
 logging.info("Outfile is %s" % args.outfile)
 
 with open(args.outfile, 'w') as f:
-    csv_file = csv.writer(f)
+    csv_file = csv.writer(f, lineterminator='\n')
 
     csv_file.writerow(["mov_basename","date_time","start_frame","end_frame","scene_tag"])
 

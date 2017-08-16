@@ -9,7 +9,7 @@ import subprocess
 import json
 
 
-years = {2015: [11, 12],
+years = {2015: [11,12],
          2016: [1, 2, 3, 4, 5, 6, 7]}
 
 subsets = {'0?': 0,
