@@ -49,6 +49,8 @@ args = parser.parse_args()
 logging.basicConfig(level=args.log.upper())
 
 classifier = None
+gt_library = None
+qt = None
 if not args.noclassify:
     import pycamhd.lazycache as camhd
     qt = camhd.lazycache(args.lazycache, verbose=True)
