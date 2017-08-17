@@ -5,15 +5,6 @@ import datetime
 scene = 'd2_p8_z1'
 
 
-# function to get video duration
-def getLength(filename):
-  result = subprocess.Popen(["ffprobe", filename],
-    stdout = subprocess.PIPE, stderr = subprocess.STDOUT, encoding='utf8')
-  length = [line for line in result.stdout.readlines() if "Duration" in line]
-  length = length[0][12:23]
-  return length
-
-
 # prepare paths
 videos = "output/" + scene + '/videos/'
 frames = "output/" + scene + '/frames/'
