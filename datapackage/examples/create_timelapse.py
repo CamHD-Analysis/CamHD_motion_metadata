@@ -5,15 +5,6 @@ import datetime
 scene = 'd2_p8_z1'
 
 
-# function to get video duration
-def getLength(filename):
-  result = subprocess.Popen(["ffprobe", filename],
-    stdout = subprocess.PIPE, stderr = subprocess.STDOUT, encoding='utf8')
-  length = [line for line in result.stdout.readlines() if "Duration" in line]
-  length = length[0][12:23]
-  return length
-
-
 # prepare paths
 videos = "output/" + scene + '/videos/'
 frames = "output/" + scene + '/frames/'
@@ -48,43 +39,28 @@ process = subprocess.Popen(stab_vid,shell=True)
 process.wait()
 
 
-# get input video duration
-filename = videos + scene + "-time_lapse_stabilized.mp4"
-timestring = getLength(filename)
-pt =datetime.datetime.strptime(timestring,'%H:%M:%S.%f')
-total_microseconds = pt.microsecond+pt.second*1e+6+pt.minute*6e+7+pt.hour*3.6e+9
-
 
 # create subtitle srt file
-step = total_microseconds/len(f)
-sub_time = step
+images_per_sec = 10.0
+dt = datetime.timedelta(seconds=(1.0/images_per_sec))
 
-srt_file = open(videos + scene + '.srt','w+')
-srt_file.write('1'+'\n'+'0:00:00.00')
-srt_file.write(" --> " + str(datetime.timedelta(microseconds=sub_time))[:-4] +'\n')
-srt_file.write(f[0] + '\n\n')
+with open(videos + scene + '.srt', 'w') as srt:
+    count = 1
+    this_time = datetime.datetime(1,1,1)
 
-counter = 2
-for i in f[1:]:
+    for i in f[1:]:
+        srt.write("%d\n" % count)
 
-	srt_file.write(str(counter)+'\n')
+        next_time = this_time + dt
+        srt.write("%02d:%02d:%02d,%03d --> %02d:%02d:%02d,%03d\n" %
+                  (this_time.hour, this_time.minute, this_time.second, this_time.microsecond/1000,
+                   next_time.hour, next_time.minute, next_time.second, next_time.microsecond/1000))
 
-	if len(str(datetime.timedelta(microseconds=sub_time))) == 14:
-		srt_file.write(str(datetime.timedelta(microseconds=sub_time))[:-4])
-	else:
-		srt_file.write(str(datetime.timedelta(microseconds=sub_time)) + '.00')
+        # Write the actual subtitle
+        srt.write(i + '\n\n')
 
-	sub_time = sub_time + step
-
-	if len(str(datetime.timedelta(microseconds=sub_time))) == 14:
-		srt_file.write(" --> " + str(datetime.timedelta(microseconds=sub_time))[:-4] +'\n')
-	else:
-		srt_file.write(" --> " + str(datetime.timedelta(microseconds=sub_time)) +'.00\n')
-		
-
-	srt_file.write(i + '\n\n')
-	counter = counter + 1
-
+        this_time = next_time
+        count = count + 1
 
 # convert srt to ass
 convert_sub = "ffmpeg -i " + videos + scene + ".srt " + videos + scene +".ass"
