@@ -39,12 +39,6 @@ process = subprocess.Popen(stab_vid,shell=True)
 process.wait()
 
 
-# get input video duration
-filename = videos + scene + "-time_lapse_stabilized.mp4"
-timestring = getLength(filename)
-pt =datetime.datetime.strptime(timestring,'%H:%M:%S.%f')
-total_microseconds = pt.microsecond+pt.second*1e+6+pt.minute*6e+7+pt.hour*3.6e+9
-
 
 # create subtitle srt file
 images_per_sec = 10.0
