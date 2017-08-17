@@ -7,12 +7,11 @@ csv:  datapackage/regions.csv
 
 ## Process only d2 right now
 datapackage/regions.csv:
-	${PYTHON} scripts/regions_to_csv.py --output $@ RS03ASHS/PN03B/06-CAMHDA301/2015/11/2[5-9]/*regions.json \
-																									RS03ASHS/PN03B/06-CAMHDA301/2015/11/3?/*regions.json \
+	${PYTHON} scripts/regions_to_csv.py --output $@ RS03ASHS/PN03B/06-CAMHDA301/2015/11/[23]?/*regions.json \
 																									RS03ASHS/PN03B/06-CAMHDA301/2015/12/*/*regions.json \
-																									RS03ASHS/PN03B/06-CAMHDA301/2016/0[1-5]/*/*regions.json \
-																									RS03ASHS/PN03B/06-CAMHDA301/2016/06/[01]?/*regions.json \
-																									RS03ASHS/PN03B/06-CAMHDA301/2016/06/2[0-5]/*regions.json \
+																									RS03ASHS/PN03B/06-CAMHDA301/2016/0[1-6]/*/*regions.json \
+																									RS03ASHS/PN03B/06-CAMHDA301/2016/07/[01]?/*regions.json \
+																									RS03ASHS/PN03B/06-CAMHDA301/2016/07/2[0-5]/*regions.json \
 
 html_to_google_drive:
 	gsutil -m rsync -a public-read -d -r _html/ gs://camhd_region_proofs/
