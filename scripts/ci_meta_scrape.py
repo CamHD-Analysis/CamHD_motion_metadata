@@ -28,7 +28,7 @@ parser.add_argument('--output', dest='outfile', nargs='?',
                     default='ci_scrape.json', help='Output JSON file')
 
 parser.add_argument('--lazycache-url', dest='lazycache',
-                    default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
+                    default=os.environ.get("LAZYCACHE_URL", None),
                     help='URL to Lazycache repo server')
 
 args = parser.parse_args()

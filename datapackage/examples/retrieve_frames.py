@@ -16,7 +16,6 @@ import math
 import pycamhd.lazycache as camhd
 
 DEFAULT_DATAPACKAGE_URL = "https://raw.githubusercontent.com/CamHD-Analysis/CamHD_motion_metadata/master/datapackage/datapackage.json"
-DEFAULT_LAZYCACHE_URL   = "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"
 
 parser = argparse.ArgumentParser(description='Generate HTML proofs')
 
@@ -35,7 +34,7 @@ parser.add_argument('--data-package', dest='datapackage',
                     default=DEFAULT_DATAPACKAGE_URL)
 
 parser.add_argument('--lazycache-url', dest='lazycache',
-                    default=os.environ.get("LAZYCACHE_URL", DEFAULT_LAZYCACHE_URL),
+                    default=os.environ.get("LAZYCACHE_URL", None),
                     help='URL to Lazycache repo server (only needed if classifying)')
 
 args = parser.parse_args()
@@ -49,7 +48,7 @@ if not args.scene_tag:
 if not args.outdir:
     args.outdir = 'output/' + parser.parse_args().scene_tag + '/frames'
 
-
+# I'm sure there's a more pythonic way to do this...
 qt = camhd.lazycache(args.lazycache)
 
 if not os.path.exists("output/" + args.scene_tag + "/frames"):

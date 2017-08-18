@@ -10,13 +10,13 @@ import datapackage
 import pycamhd.lazycache as camhd
 
 DATAPACKAGE = "https://raw.githubusercontent.com/CamHD-Analysis/CamHD_motion_metadata/master/datapackage/datapackage.json"
-LAZYCACHE   = "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"
 
 scene_tag = 'd2_p1_z0'
 outdir = "_timelapse"
 
 
-qt = camhd.lazycache( LAZYCACHE )
+## Use package-default Lazycache instance
+qt = camhd.lazycache()
 
 os.makedirs(outdir, exist_ok=True)
 

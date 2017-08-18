@@ -41,7 +41,7 @@ parser.add_argument('--git-add', dest='gitadd', action='store_true',
                     help='Run "git add" on resulting file')
 
 parser.add_argument('--lazycache-url', dest='lazycache',
-                    default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
+                    default=os.environ.get("LAZYCACHE_URL", None),
                     help='URL to Lazycache repo server (only needed if classifying)')
 
 args = parser.parse_args()

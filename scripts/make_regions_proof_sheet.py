@@ -8,6 +8,7 @@ import os.path as path
 import os
 import json
 import random
+import re
 
 import region_analysis as ra
 
@@ -39,7 +40,7 @@ parser.add_argument('--with-groundtruth', dest='groundtruth', action='store_true
 parser.add_argument("--ground-truth", dest="groundtruthfile",
                     default="classification/ground_truth.json")
 
-parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", "http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files"),
+parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", None),
                     help='URL to Lazycache repo server (only needed if classifying)')
 
 args = parser.parse_args()
@@ -79,6 +80,16 @@ if args.groundtruth:
 unknowns = {}
 
 
+def scene_tag_match( a, b ):
+    ## Disregard deployment
+    astem = re.sub( r'd\d{1}_', "", a )
+    bstem = re.sub( r'd\d{1}_', "", b )
+
+    print("a    : %s;  b     = %s" % (a,b))
+    print("astem: %s;  bstem = %s" % (astem,bstem))
+
+    return astem == bstem
+
 
 def process( infile ):
     logging.info("Processing %s" % infile)
@@ -115,7 +126,7 @@ def process( infile ):
         if idx >= len(images):
             tags.append(r.scene_tag)
             images.append({mov: [r]})
-        elif r.scene_tag == tags[idx]:
+        elif scene_tag_match(r.scene_tag, tags[idx]):
             images[idx][mov] = [r]
         else:
             logging.info("Tag doesn't match order... (%s != %s)" % (r.scene_tag, tags[idx]))
@@ -124,7 +135,7 @@ def process( infile ):
             success = False
             for i in range(idx, min(idx+MAX_JUMP,len(tags))):
                 logging.info("Checking %s against %s at %d" % (r.scene_tag, tags[i], i))
-                if r.scene_tag == tags[i]:
+                if scene_tag_match(r.scene_tag, tags[i]):
                     images[i][mov] = [r]
                     idx = i
                     success = True
