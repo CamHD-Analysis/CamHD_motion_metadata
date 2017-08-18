@@ -8,3 +8,8 @@ build:
         name: run qa scripts
         code: |
           make qa
+
+  - script:
+      name: Delete data to shrink artifacts
+      code: |
+        rm -rf $WERCKER_SOURCE_DIR/.git/
