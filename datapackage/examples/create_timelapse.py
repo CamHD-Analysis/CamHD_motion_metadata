@@ -70,22 +70,22 @@ process.wait()
 
 # position the timestamp in the video and change font size
 with open(videos + scene + ".ass") as ass_file:
-	lines = ass_file.readlines()
-	new_lines = []
-	for line in lines:
-		if line.startswith('Dialogue'):
-			line = line[:43] + line[43:44].replace('0', '300') + line[44:] 
-			line = line[:49] + line[49:50].replace('0', '260') + line[50:]
-			new_lines.extend(line)
-		elif line.startswith('Style'):
-			line = line[:21] + line[21:23].replace('16', '12') + line[23:]
-			new_lines.extend(line)
-		else:
-			new_lines.extend(line)
-	
+    lines = ass_file.readlines()
+    new_lines = []
+    for line in lines:
+        if line.startswith('Dialogue'):
+            line = line[:43] + line[43:44].replace('0', '300') + line[44:]
+            line = line[:49] + line[49:50].replace('0', '260') + line[50:]
+            new_lines.extend(line)
+        elif line.startswith('Style'):
+            line = line[:21] + line[21:23].replace('16', '12') + line[23:]
+            new_lines.extend(line)
+        else:
+            new_lines.extend(line)
+
 
 with open(videos + scene + ".ass", "w") as ass_file:
-	ass_file.writelines(new_lines)
+    ass_file.writelines(new_lines)
 
 
 
