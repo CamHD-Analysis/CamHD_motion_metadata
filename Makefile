@@ -5,6 +5,8 @@ PYTHON = python3
 ## Convert all optical_flow_regions.json files into the flat CSV file format.
 csv:  datapackage/regions.csv
 
+.PHONY: csv datapackage/regions.csv html_to_google_drive qa
+
 ## Process only d2 right now
 datapackage/regions.csv:
 	${PYTHON} scripts/regions_to_csv.py --output $@ RS03ASHS/PN03B/06-CAMHDA301/2015/11/[23]?/*regions.json \
@@ -14,8 +16,7 @@ datapackage/regions.csv:
 																									RS03ASHS/PN03B/06-CAMHDA301/2016/07/2[0-5]/*regions.json \
 
 html_to_google_drive:
-	gsutil -m rsync -a public-read -d -r _html/ gs://camhd_region_proofs/
-
+	gsutil -m rsync -a public-read -d -r _html/ gs://camhd-region-proofs/
 
 
 ## Note:   this will take a long time...
@@ -28,4 +29,7 @@ datapackage/movie_metadata.csv:
 	${PYTHON} scripts/ci_scrape_to_csv.py --output $@ ci_scrape_*.json
 
 
-.PHONY: csv datapackage/regions.csv html_to_google_drive
+
+## Run quality control scripts
+qc:
+	for f in quality_control/*.py; do python "$$f"; done
