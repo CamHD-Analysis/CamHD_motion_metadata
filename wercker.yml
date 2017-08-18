@@ -12,4 +12,4 @@ build:
     - script:
         name: delete .git directory to shrink artifacts
         code: |
-          rm -rf $WERCKER_SOURCE_DIR/.git/
+          rm -rf $WERCKER_SOURCE_DIR/*
