@@ -9,7 +9,7 @@ build:
         code: |
           make qa
 
-  - script:
-      name: Delete data to shrink artifacts
-      code: |
-        rm -rf $WERCKER_SOURCE_DIR/.git/
+    - script:
+        name: delete .git directory to shrink artifacts
+        code: |
+          rm -rf $WERCKER_SOURCE_DIR/.git/
