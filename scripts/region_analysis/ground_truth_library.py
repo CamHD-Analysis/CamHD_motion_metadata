@@ -17,8 +17,8 @@ import pycamhd.motionmetadata as mdd
 
 from .image_comparer import *
 
-root_name_pattern = re.compile("CAMHDA301-[0-9T]*Z")
-img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*Z)_(\d*)\.")
+root_name_pattern = re.compile("CAMHDA301-[0-9T]*")
+img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*[Z]?)_(\d*)\.")
 
 
 class GTImage:
@@ -107,6 +107,9 @@ class GroundTruthLibrary:
                 if not img.valid or img.basename != regions.basename:
                     continue
 
+                if not img.tag in imgs:
+                    continue
+
                 imgs[img.tag].append(img.abspath)
 
             self.gt_library[regions.basename] = imgs
@@ -193,6 +196,8 @@ class GroundTruthLibrary:
     def select(self, regions):
 
         setTime = regions.datetime()
+
+        logging.info("Selecting ground truth for %s, date %s" % (regions.mov, regions.datetime()) )
 
         if not setTime:
             return

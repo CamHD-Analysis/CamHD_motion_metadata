@@ -15,10 +15,6 @@ import region_analysis as ra
 import pycamhd.lazycache as camhd
 import pycamhd.motionmetadata as mmd
 
-
-#import camhd_motion_analysis as ma
-
-
 parser = argparse.ArgumentParser(description='Generate HTML proofs')
 
 parser.add_argument('input', metavar='inputfiles', nargs='+',
@@ -39,6 +35,8 @@ parser.add_argument('--with-groundtruth', dest='groundtruth', action='store_true
 
 parser.add_argument("--ground-truth", dest="groundtruthfile",
                     default="classification/ground_truth.json")
+
+parser.add_argument("--image-format", dest="imageext", default='jpg')
 
 parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get("LAZYCACHE_URL", None),
                     help='URL to Lazycache repo server (only needed if classifying)')
@@ -206,12 +204,12 @@ with open(html_file, 'w') as html:
 
             sample_frame = region.start_frame + 0.5 * (region.end_frame - region.start_frame)
 
-            img_file = img_path + "%s_%d.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
-            thumb_file = img_path + "%s_%d_thumbnail.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
+            img_file = img_path + "%s_%d.%s" % (path.splitext(path.basename(url))[0], sample_frame, args.imageext)
+            thumb_file = img_path + "%s_%d_thumbnail.%s" % (path.splitext(path.basename(url))[0], sample_frame, args.imageext)
 
             if args.force or not path.exists( img_file ) or not path.exists( thumb_file ):
                 logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, path.basename(url)))
-                img = qt.get_frame( url, sample_frame, format='jpg' )
+                img = qt.get_frame( url, sample_frame, format=args.imageext )
                 img.save( img_file )
                 img.thumbnail( img_size )  # PIL.thumbnail preserves aspect ratio
 
@@ -253,8 +251,8 @@ with open(html_file, 'w') as html:
 
             sample_frame = region.start_frame + 0.5 * (region.end_frame - region.start_frame)
 
-            img_file = img_path + "%s_%d.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
-            thumb_file = img_path + "%s_%d_thumbnail.jpg" % (path.splitext(path.basename(url))[0], sample_frame)
+            img_file = img_path + "%s_%d.%s" % (path.splitext(path.basename(url))[0], sample_frame, args.imageext)
+            thumb_file = img_path + "%s_%d_thumbnail.%s" % (path.splitext(path.basename(url))[0], sample_frame, args.imageext)
 
             if args.force or not path.exists( img_file ) or not path.exists( thumb_file ):
                 logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, path.basename(url)))
