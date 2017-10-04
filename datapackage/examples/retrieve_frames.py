@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # retrieve_frames.py uses the regions.csv datapackage and Lazycache to pull
 # sequences of images for making timelapses (the actual timelapse generation
 # is done using e.g, ffmpeg)
@@ -51,7 +53,6 @@ if not args.scene_tag:
 if not args.outdir:
     args.outdir = 'output/' + parser.parse_args().scene_tag + '/frames'
 
-# I'm sure there's a more pythonic way to do this...
 qt = camhd.lazycache(args.lazycache)
 
 if not os.path.exists("output/" + args.scene_tag + "/frames"):
@@ -67,9 +68,10 @@ dp = datapackage.DataPackage(args.datapackage)
 regions = dp.resources[0]
 
 mov = {}
-count = 0
 
+count = 0
 for r in regions.iter():
+    count += 1
     if r['scene_tag'] == args.scene_tag:
         basename = r['mov_basename']
 
@@ -81,6 +83,10 @@ for r in regions.iter():
 keys = sorted(mov.keys())
 
 
+logging.info("Found scene tag %s in %d / %d keys" % (args.scene_tag,len(keys),count))
+
+
+count = 0
 for basename in keys:
     print(basename)
 
