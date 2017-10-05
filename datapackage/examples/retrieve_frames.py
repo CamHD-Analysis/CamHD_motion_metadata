@@ -12,7 +12,7 @@
 import argparse
 import logging
 import os
-import datapackage
+from datapackage import Package
 import math
 
 import pycamhd.lazycache as camhd
@@ -63,14 +63,14 @@ if args.imgsize:
     img_size = args.imgsize.split('x')
     img_size = (int(img_size[0]), int(img_size[1]))
 
-dp = datapackage.DataPackage(args.datapackage)
+dp = Package(args.datapackage)
 
-regions = dp.resources[0]
+regions = dp.get_resource('regions')
 
 mov = {}
 
 count = 0
-for r in regions.iter():
+for r in regions.iter(keyed=True):
     count += 1
     if r['scene_tag'] == args.scene_tag:
         basename = r['mov_basename']
@@ -109,15 +109,16 @@ for basename in keys:
         continue
 
     logging.info("Retrieving frame %d" % frame)
-    img = qt.get_frame(camhd.convert_basename(basename), frame,
-                       format='png', timeout=30)
+    logging.info("Saving to %s" % filename)
+
 
     if img_size:
+        img = qt.get_frame(camhd.convert_basename(basename), frame,
+                       format='Image', timeout=30)
         img.thumbnail(img_size)
-
-
-
-    logging.info("Saving to %s" % filename)
-    img.save(filename)
+        img.save(filename)
+    else:
+        img = qt.save_frame(camhd.convert_basename(basename), frame, filename,
+                           format='png', timeout=30)
 
     count += 1
