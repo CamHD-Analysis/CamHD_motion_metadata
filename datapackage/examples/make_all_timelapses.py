@@ -41,3 +41,7 @@ for scene in scenes:
     execute(['./retrieve_frames.py', '--scene-tag', scene,
              '--log', 'INFO',
              '--lazycache-url', "http://localhost:8080/v1/org/oceanobservatories/rawdata/files/"])
+
+    execute(['./create_timelapse.py', '--scene-tag', scene,
+             '--log', 'INFO',
+             '--prores'])

@@ -1,4 +1,5 @@
-#
+#!/usr/bin/env python3
+
 # For video stabilization documentation, see:
 #     https://github.com/georgmartius/vid.stab
 
