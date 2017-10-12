@@ -52,6 +52,11 @@ qt = camhd.lazycache( args.lazycache )
 img_size = args.imgsize.split('x')
 img_size = ( int(img_size[0]), int(img_size[1]))
 
+
+## TODO.  This needs to be done in a more permanent way
+blacklist = [ "CAMHDA301-20170915T184600_optical_flow_regions.json" ]
+
+
 tags = []
 images = []
 urls = []
@@ -98,6 +103,9 @@ def process( infile ):
 
     # Skip if already processed  (handles ground truth files)
     if  mov in urls:
+        return
+
+    if os.path.basename(infile) in blacklist:
         return
 
     urls.append(mov)

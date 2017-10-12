@@ -17,6 +17,7 @@ import re
 import json
 
 import numpy as np
+from scipy import stats
 
 from operator import attrgetter
 
@@ -27,16 +28,20 @@ import dask.threaded
 
 class CompareResult:
 
-    def __init__(self, tag, rms, shift=None ):
+    def __init__(self, tag, rms, shift=None, p=None, ks=None, pvalue=None, truerms=None ):
         self.tag = tag
         self.rms = rms
         self.shift = shift
+        self.p = p
+        self.ks = ks
+        self.pvalue = pvalue
+        self.truerms = truerms
 
     def __repr__(self):
-        return "%f (%d,%d)" % (self.rms, self.shift[0], self.shift[1])
+        return "%f:%.2f:%.2f:%.2f (%d,%d)" % (self.rms, self.truerms, self.p, self.ks, self.shift[0], self.shift[1])
 
     def __str__(self):
-        return "%f (%d,%d)" % (self.rms, self.shift[0], self.shift[1])
+        return "%f:%.2f:%.2f:%.2f (%d,%d)" % (self.rms, self.truerms, self.p, self.ks, self.shift[0], self.shift[1])
 
 
 class ImageComparer:
@@ -77,7 +82,7 @@ class ImageComparer:
                 for ref_img in self.sample_images(tag,test_count):
                     jobs.append(delayed(self.compare_images)(ref_img,test_img,tag))
 
-        width, height = test_images[0].shape
+        height, width = test_images[0].shape
         logging.info("Test image is %d by %d" % (width,height))
 
         logging.info("Performing %d comparisons" % len(jobs))
@@ -87,15 +92,19 @@ class ImageComparer:
         results = {}
 
         for r in res:
-            # logging.info("%s : %f, (%f,%f)" % (r.tag, r.rms, r.shift[0], r.shift[1]))
+            # logging.info("%s : %s" % (r.tag, r))
 
             if r.tag not in results:
                 results[r.tag] = []
 
             # Shift test
-            MAX_SHIFT = (width/2.0, height/2.0)
+            MAX_SHIFT = (height/4.0, width/4.0)
             if abs(r.shift[0]) > MAX_SHIFT[0] or abs(r.shift[1]) > MAX_SHIFT[1]:
                 continue
+
+            # Pvalue test
+            # if r.pvalue < 0.1:
+            #     continue
 
             results[r.tag].append(r)
 
@@ -110,16 +119,19 @@ class ImageComparer:
 
             # sort the resulting errors
             if len(res) == 0:
-                r = [1.0]
+                continue
             else:
                 r = sorted(r)
 
                 # drop first and last
-                if len(r) > 2:
+                if len(r) > 5:
                     r = r[1:-1]
-
+                else:
+                    continue
 
             all_results.append(CompareResult(tag, np.mean(r)))
+
+        ## What happens if all_results has zero length?
 
         return sorted(all_results, key=attrgetter('rms'))
 
@@ -136,10 +148,18 @@ class ImageComparer:
 
         errors = []
 
-        # Deprecated imreg_dft-based method
-        # Odds = 0 : don't consider image rotated by 180
-        # result = ird.translation(test_img, ref_img, odds=0)
-
         (shift, rms, phase) = skf.register_translation(ref_img, test_img)
 
-        return CompareResult( tag, rms, shift )
+        ks = stats.ks_2samp(np.reshape(ref_img, (-1)),
+                                    np.reshape(test_img, (-1)))
+
+        pvalue = ks[1]
+        ks = ks[0]
+
+        # Calculate survival factor for lateral shift
+        var = 5
+        p = stats.chi2.cdf( np.linalg.norm([shift[0]/var, shift[1]/var]), 2 )
+
+        adjrms = rms * (1-0.9*(1-p)) * ks
+
+        return CompareResult(tag, adjrms, shift, p, ks, pvalue, rms)
