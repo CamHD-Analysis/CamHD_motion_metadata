@@ -9,8 +9,11 @@ import subprocess
 import json
 
 
-years = {2015: [11,12],
-         2016: [1, 2, 3, 4, 5, 6, 7]}
+# years = {2015: [11,12],
+#          2016: [1, 2, 3, 4, 5, 6, 7],
+#          2017: [9, 10] }
+
+years = { 2017: [9, 10] }
 
 subsets = {'0?': 0,
            '1?': 1,
@@ -37,9 +40,11 @@ with open("_html/index.html", 'w') as f:
                 subprocess.run(['python',
                                 'scripts/make_regions_proof_sheet.py',
                                 "--lazycache-url", "http://ursine:8080//v1/org/oceanobservatories/rawdata/files/",
-                                "--with-groundtruth",
                                 "--output", "_html/%s" % html_file,
                                 "RS03ASHS/PN03B/06-CAMHDA301/%04d/%02d/%s/*_regions.json" % (year, month, regex)])
+
+#                                "--with-groundtruth",
+
 
                 f.write("<li><a href=\"%s\">%s</a>" % (html_file, html_file))
 

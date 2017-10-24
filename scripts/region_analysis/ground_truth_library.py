@@ -4,6 +4,7 @@ import os
 import os.path as path
 import glob
 import random
+import datetime
 
 import logging
 
@@ -20,11 +21,11 @@ from .image_comparer import *
 root_name_pattern = re.compile("CAMHDA301-[0-9T]*")
 img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*[Z]?)_(\d*)\.")
 
-
 class GTImage:
 
     def __init__(self, path):
         img_match = img_pattern.search(path)
+
         if not img_match:
             logging.warning("Funny, image name %s not parseable" % path)
             self.valid = False
@@ -202,13 +203,27 @@ class GroundTruthLibrary:
         if not setTime:
             return
 
-        use_gts = sorted(self.regions.keys(), key=lambda mov: abs( self.dates[mov] - setTime) )[0:1]
+        sorted_gts = sorted(self.regions.keys(), key=lambda mov: abs( self.dates[mov] - setTime) )
+
+        dt = abs( self.dates[sorted_gts[0]] - setTime )
+        # logging.info("dt: %s" % dt)
+
+        envelope = dt + datetime.timedelta(0,24*3600)
+        # logging.info("dt: %s" % envelope)
+
+        print("%s" % [abs(self.dates[gt] - setTime) for gt in sorted_gts])
+
+        use_gts = [gt for gt in sorted_gts if abs(self.dates[gt] - setTime) < envelope ]
 
         logging.info( "Using ground truth from: %s" %  use_gts )
 
         paths = self.aggregate_images(use_gts)
 
         MIN_IMAGES = 5
+
+        # Drop unknown
+        if 'unknown' in paths:
+            del(paths['unknown'])
 
         def collect_short_tags(paths, min_images=MIN_IMAGES):
             short_tags = {}

@@ -59,7 +59,7 @@ class RegionClassifier:
                 frame = r.frame_at(sample_pct)
                 logging.info("Retrieving test frame %d" % frame)
 
-                ref_img = self.lazycache.get_frame(regions.mov, frame)
+                ref_img = self.lazycache.get_frame(regions.mov, frame, format='np')
                 ref_img = self.comparer.preprocess_image(ref_img)
                 #images.append(ref_img)
                 ref_images.append(ref_img)
@@ -69,26 +69,39 @@ class RegionClassifier:
 
             max_test_ratio = 1.05
 
-            best_result = results[0]
-            second_result = results[1]
-
-            # Use simple ratio test
-            ratio = second_result.rms / best_result.rms
-            logging.info("1st/2nd best labels: %s, %s" % (best_result.tag, second_result.tag))
-            logging.info("1st/2nd best scores: %f, %f    : ratio = %f" % (best_result.rms, second_result.rms, ratio))
-            if ratio > max_test_ratio:
-                logging.info("Using label of \"%s\"" % best_result.tag)
-                r.set_scene_tag(best_result.tag, inferred_by="matchToGroundTruth")
-            else:
-                logging.info("Unable to determine best fit")
+            if len(results) == 0:
+                logging.info("No good results")
                 r.set_scene_tag("unknown")
+            elif len(results) == 1:
+                logging.info("Only one good result")
+                r.set_scene_tag(results[0].tag, inferred_by="matchToGroundTruth")
+            else:
+                best_result = results[0]
+                second_result = results[1]
+
+                if best_result == 0.0:
+                    logging.info("Best result has score of 0")
+                    r.set_scene_tag(best_result.tag, inferred_by="matchToGroundTruth")
+                else:
+                    # Use simple ratio test
+                    ratio = second_result.rms / best_result.rms
+                    logging.info("1st/2nd best labels: %s, %s" % (best_result.tag, second_result.tag))
+                    logging.info("1st/2nd best scores: %f, %f    : ratio = %f" % (best_result.rms, second_result.rms, ratio))
+                    if ratio > max_test_ratio:
+                        logging.info("Using label \"%s\" for %d to %d" % (best_result.tag,r.start_frame,r.end_frame))
+                        r.set_scene_tag(best_result.tag, inferred_by="matchToGroundTruth")
+                    else:
+                        logging.info("Unable to determine best fit")
+                        r.set_scene_tag("unknown")
 
             # Document lowest RMS errors in the JSON file
             scene_tag_guesses = {}
-            threshold = best_result.rms * 1.5
-            for res in results:
-                if res.rms < threshold:
-                    scene_tag_guesses[res.tag] = res.rms
+
+            if len(results) > 0:
+                threshold = results[0].rms * 1.5
+                for res in results:
+                    if res.rms < threshold:
+                        scene_tag_guesses[res.tag] = res.rms
 
             r.json['sceneTagMeta']['topTenPct'] = scene_tag_guesses
 
