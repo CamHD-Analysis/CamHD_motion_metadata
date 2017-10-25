@@ -38,6 +38,10 @@ class RegionFileMaker:
 
             oflow = mdd.OpticalFlowFile(infile)
 
+            if oflow.valid.empty:
+                logging.info("It doesn't look like there are any regions in this optical flow file")
+                return
+
             with Timer() as t:
                 regions = find_regions(oflow)
             timing['regionAnalysis'] = t.interval
