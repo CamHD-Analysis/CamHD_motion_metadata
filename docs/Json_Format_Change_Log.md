@@ -2,7 +2,7 @@
 
 # June 16 2017
 
-## (OpticalFlow)[OpticalFlow.md] v1.0 -> v1.1
+## OpticalFlow v1.0 -> v1.1
 
 v1.0 `optical_flow.json` files can be converted to v1.1 using the script [20170616_optical_flow_v1_0_to_v1_1.py](../scripts/migrations/20170616_optical_flow_v1_0_to_v1_1.py).
 
@@ -23,7 +23,7 @@ Migration scripts are written to be safe when run on post-migration files.
 which includes a "timing"
 
 
-## OpticalFlowRegions[OpticalFlowRegions] v1.0 -> v1.1
+## OpticalFlowRegions v1.0 -> v1.1
 
 v1.0 `optical_flow_regions.json` files can be converted by reprocessing (with the --force option) using [make_regions_files.py](../scripts/make_regions.files.py).
 
