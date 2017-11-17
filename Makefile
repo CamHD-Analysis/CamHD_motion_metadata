@@ -9,7 +9,7 @@ csv:  datapackage/regions.csv
 
 ## Process only d2 right now
 datapackage/regions.csv:
-	${PYTHON} scripts/regions_to_csv.py --output $@ RS03ASHS/PN03B/06-CAMHDA301/2015/11/[23]?/*regions.json \
+	${PYTHON} scripts/regions_to_datapackage.py --output $@ RS03ASHS/PN03B/06-CAMHDA301/2015/11/[23]?/*regions.json \
 																									RS03ASHS/PN03B/06-CAMHDA301/2015/12/*/*regions.json \
 																									RS03ASHS/PN03B/06-CAMHDA301/2016/0[1-6]/*/*regions.json \
 																									RS03ASHS/PN03B/06-CAMHDA301/2016/07/[01]?/*regions.json \
