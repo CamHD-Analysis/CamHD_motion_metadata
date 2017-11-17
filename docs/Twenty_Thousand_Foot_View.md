@@ -43,3 +43,43 @@ The results of this analysis are stored in this repository as a [JSON file](Json
 This JSON file is then loaded by a [Python script](https://github.com/CamHD-Analysis/CamHD_motion_metadata/blob/master/scripts/make_regions_files.py) which finds the segments of each movie where the camera is believed to be static (the yellow bands in the image above).   Using a set of reference data files, it attempts to label each of those static segments using the naming scheme defined [here](Regions.md).  The result of this labelling is then stored as a separate [JSON file](Json_Regions_File_Format.md) in this repository, again, one per movie.   
 
 This regions file can then be loaded and used for analysis.  We also provide a simple [Python module](https://github.com/CamHD-Analysis/pycamhd-motion-metadata) which provides a light OO wrapper around the JSON files.
+
+# Low-Level
+
+Here's a more complete diagram:
+
+![](images/twenty_thousand_view_two.svg)
+
+
+Movie processing is coordinated through a [job queue](http://python-rq.org) running on a Redis server.   A scheduled
+"injector" program checks the raw data server and looks for files which haven't been processed yet.
+
+Optical flow analysis is expensive, so it's spread out across multiple machines.   This is coordinated using [Docker swarms](https://docs.docker.com/engine/swarm/).  As they're all coordinated by RQ, multiple swarms can be processing data at one time.  Each swarm runs two different types of Docker images:
+
+ * `lazycache` containers contain an instance of [Lazycache](https://github.com/amarburg/go-lazycache) a
+  Go-based REST-ful service which:
+
+   * Converts the OOI raw data server directory structure to machine-readable JSON
+   * Reads movie metadata (length, size) from the OOI raw data server
+   * Extracts individual frames from movies on the OOI raw data server.
+
+  Lazycache is the secret sauce as it allows the rest of the processing to run (albeit a bit slowly)
+    without having a local copy of the data.
+
+
+
+  * The other nodes run a Python script from [camhd-motion-analysis-deploy](https://github.com/CamHD-Analysis/camhd-motion-analysis-deploy).  This client waits for jobs to be available in the RQ database.   Right now, it's a wrapper around some C++ code based on [OpenCV](https://opencv.org) and [Ceres](http://ceres-solver.org).   Yeah, ugly, I know.   The end result is the [optical flow file](Json_Optical_Flow_File_Format.md).
+
+
+  * The static region analysis is run manually right now, as the results require more careful quality control.   It's all initiated from the [make_regions_file.py script](https://github.com/CamHD-Analysis/CamHD_motion_metadata/blob/master/scripts/make_regions_files.py),
+  but it actually proceeds in two steps.   The first step identifies the static regions --- this is cheap --- then writes the results to
+  a [regions file](Json_Regions_File_Format.md) with static regions, but without labels.
+
+   The second step labels the static regions, and re-writes the regions file.
+
+
+  * Once the regions file has been created, there are a couple of post-processing scripts:
+
+     * [make_regions_proof_sheet.py](https://github.com/CamHD-Analysis/CamHD_motion_metadata/blob/master/scripts/make_regions_proof_sheet.py) reads one or more regions files and produces an HTML-based "proof sheet" which can be used to check data quality.
+
+    * [regions_to_datapackage.py](https://github.com/CamHD-Analysis/CamHD_motion_metadata/blob/master/scripts/regions_to_datapackage.py) reads all of the  regions JSON  files and produces a CSV file which complies with the [Frictionless Data](http://frictionlessdata.io) specification.  This file is stored as as `regions.csv` in the  [datapackage/](https://github.com/CamHD-Analysis/CamHD_motion_metadata/tree/master/datapackage) directory.   The directory also contains scripts and examples on how to use this data.
