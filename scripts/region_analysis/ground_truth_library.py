@@ -196,23 +196,31 @@ class GroundTruthLibrary:
 
     def select(self, regions):
 
+        # setTime is the timestamp for the file to be labelled
         setTime = regions.datetime()
 
         logging.info("Selecting ground truth for %s, date %s" % (regions.mov, regions.datetime()) )
 
+        # if you can't figure out the timestamp for the file, fail
         if not setTime:
             return
 
+        # This sorts all of the ground truth keys by their absolute distance
+        # from setTime
         sorted_gts = sorted(self.regions.keys(), key=lambda mov: abs( self.dates[mov] - setTime) )
 
+        # dt is the smallest time delta -- the time difference between the
+        # setTime and the closest ground truth file
         dt = abs( self.dates[sorted_gts[0]] - setTime )
         # logging.info("dt: %s" % dt)
 
+        # Add 1 day to dt
         envelope = dt + datetime.timedelta(0,24*3600)
         # logging.info("dt: %s" % envelope)
 
         print("%s" % [abs(self.dates[gt] - setTime) for gt in sorted_gts])
 
+        # Finds all ground truth files within 'envelope' of the setTime
         use_gts = [gt for gt in sorted_gts if abs(self.dates[gt] - setTime) < envelope ]
 
         logging.info( "Using ground truth from: %s" %  use_gts )
