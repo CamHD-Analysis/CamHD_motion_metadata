@@ -167,7 +167,7 @@ if args.prores:
     prores_extension = 'mov'
 
     # create initial timelapse
-    movie_file            = videos_path + scene + "-time_lapse.%s" % prores_extension
+    #movie_file            = videos_path + scene + "-time_lapse.%s" % prores_extension
     stabilized_movie_file = videos_path + scene + "-time_lapse_stabilized.%s" % prores_extension
 
     # Video stabilization from images to Prores works (prores -> prores doesn't)
