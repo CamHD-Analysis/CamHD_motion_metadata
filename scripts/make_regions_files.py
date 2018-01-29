@@ -8,8 +8,8 @@ import os
 import json
 import time
 import subprocess
-
 import region_analysis as ra
+
 
 parser = argparse.ArgumentParser(description='Generate _optical_flow_region.json files from _optical_flow.json files')
 
@@ -61,7 +61,7 @@ if not args.noclassify:
 for inpath in args.input:
     if path.isdir(inpath):
         inpath += "**/*_optical_flow.json"
-
+    
     logging.info("Checking %s" % inpath)
     for infile in sorted(glob.iglob(inpath, recursive=True)):
         outfile = os.path.splitext(infile)[0] + "_regions.json"

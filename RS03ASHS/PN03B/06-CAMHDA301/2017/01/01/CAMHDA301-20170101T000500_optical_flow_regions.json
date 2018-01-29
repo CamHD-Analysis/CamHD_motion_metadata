@@ -1,0 +1,114 @@
+{
+    "movie": {
+        "Duration": 347.6806640625,
+        "NumFrames": 10420,
+        "URL": "/RS03ASHS/PN03B/06-CAMHDA301/2017/01/01/CAMHDA301-20170101T000500.mov",
+        "cacheURL": "http://lazycache:8080/v1/org/oceanobservatories/rawdata/files/RS03ASHS/PN03B/06-CAMHDA301/2017/01/01/CAMHDA301-20170101T000500.mov"
+    },
+    "contents": {
+        "regions": "1.1"
+    },
+    "versions": {
+        "findRegions": "1.0",
+        "classifyRegions": "1.1"
+    },
+    "regions": [
+        {
+            "startFrame": 501,
+            "endFrame": 991,
+            "type": "static",
+            "stats": {
+                "scaleMean": 1.0003321868323485,
+                "txMean": -0.08630179719328801,
+                "tyMean": 0.07235676774302806,
+                "size": 637
+            },
+            "sceneTag": "d2_p6_z2",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p6_z2": 0.036810776340250026,
+                    "d2_p1_z0": 0.04896284074358457
+                }
+            }
+        },
+        {
+            "startFrame": 1001,
+            "endFrame": 1231,
+            "type": "zoom_in",
+            "stats": {
+                "scaleMean": 1.0537814978297921,
+                "txMean": 1.4681784384896628,
+                "tyMean": 1.0354033059949164,
+                "size": 299
+            }
+        },
+        {
+            "startFrame": 1231,
+            "endFrame": 1371,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9999938410425058,
+                "txMean": -0.04108655639372884,
+                "tyMean": 0.05702099664884204,
+                "size": 182
+            },
+            "sceneTag": "d2_p3_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p3_z1": 0.021162189610448735
+                }
+            }
+        },
+        {
+            "startFrame": 1381,
+            "endFrame": 1801,
+            "type": "N",
+            "stats": {
+                "scaleMean": 0.95667901561697,
+                "txMean": 0.10623398957619136,
+                "tyMean": 12.94447470617214,
+                "size": 546
+            }
+        },
+        {
+            "startFrame": 1801,
+            "endFrame": 10411,
+            "type": "static",
+            "stats": {
+                "scaleMean": 1.000007858657916,
+                "txMean": -0.015226315802376192,
+                "tyMean": 0.015537639948373202,
+                "size": 11193
+            },
+            "sceneTag": "d2_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d2_p0_z0": 0.06434030199503202,
+                    "d2_p6_z0": 0.08092775396988332,
+                    "d2_p4_z1": 0.08202005173930539,
+                    "d2_p6_z2": 0.0917323652158365
+                }
+            }
+        }
+    ],
+    "depends": {
+        "opticalFlow": {
+            "RS03ASHS/PN03B/06-CAMHDA301/2017/01/01/CAMHDA301-20170101T000500_optical_flow.json": "ee0e8f74e319e297118c652698b610e1b53a6708"
+        },
+        "classifyRegions": {
+            "groundTruth": {
+                "CAMHDA301-20160701T000000Z": ""
+            }
+        }
+    },
+    "performance": {
+        "timing": {
+            "regionAnalysis": 0.043301000000000034,
+            "classification": 288.509806,
+            "elapsedSeconds": 288.90474400000005
+        }
+    }
+}
