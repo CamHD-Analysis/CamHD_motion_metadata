@@ -10,7 +10,7 @@ import json
 import random
 import re
 
-import region_analysis as ra
+import pycamhd.region_analysis as ra
 
 import pycamhd.lazycache as camhd
 import pycamhd.motionmetadata as mmd
