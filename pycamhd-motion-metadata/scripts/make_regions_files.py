@@ -9,7 +9,7 @@ import json
 import time
 import subprocess
 
-import region_analysis as ra
+import pycamhd.region_analysis as ra
 
 parser = argparse.ArgumentParser(description='Generate _optical_flow_region.json files from _optical_flow.json files')
 

@@ -1,10 +1,21 @@
+# Dependencies
+
+The script takes a whole raft of Python dependencies.   I believe the conda-format
+file `scripts/requirements.yml` is correct.  With [conda](https://conda.io/docs/) installed, the command
+
+    conda env create -f scripts/requirements.yml
+
+If the env already exists, then `conda env update` should be used
+
+    conda env update -f scripts/requirements.yml
+
 # make_regions_file.py
 
 The [make_regions_file.py](../scripts/make_regions_file.py) script is the
 command-line interface into the Python modules which convert [optical flow](OpticalFlowJson.md)
 metadata files into [regions](OpticalFlowRegionsJson).   It runs in two stages:
 
-  1. Break the video into time frames with consistent camera behavior (camera static, zooming in, panning left, etc.).  
+  1. Break the video into time frames with consistent camera behavior (camera static, zooming in, panning left, etc.).
   1. Use a set of hand-labelled ground truth files to attempt to label each static section with its corresponding [region](Regions.md).
 
 To run the script, from the top level of the repo
@@ -20,7 +31,7 @@ and
     python script/make_regions_file.py RS03ASHS/PN03B/06-CAMHDA301/2016/01/*/
 
 Are equivalent.   It will automatically determine the region filename and place it
-in the same directory as the optical flow file unless otherwise configured.   
+in the same directory as the optical flow file unless otherwise configured.
 It __will not__ overwrite existing files, unless given the `--force` flag.
 
 ## Flags
@@ -30,7 +41,7 @@ It __will not__ overwrite existing files, unless given the `--force` flag.
   * If given the `--force` option, the script will overwrite any existing `_optical_flow_regions.json` files.
 
   * If given the `--force-unclassified` option, the script will recreate any
-  existing files _only_ if any static regions in the file are unclassified.  
+  existing files _only_ if any static regions in the file are unclassified.
   This option is for handling any existing regions files which contain only the
   segment analysis but predate the static region labelling functionality -- or were processed
   with the `--no-classify` option (below).
@@ -51,7 +62,7 @@ It __will not__ overwrite existing files, unless given the `--force` flag.
   * The `--git-add` argument causes the script to `git add` any new regions files
   it may create (including when overwriting an existing file).
 
-  * The script will download image frames as needed for region labelling.   
+  * The script will download image frames as needed for region labelling.
   Ground truth images are cached in the `classification/images/` directory,
   while images from test files are not cached.
 
@@ -94,7 +105,7 @@ files and files under test, which  is done using
 will aggressively cache and reuse images extracted from ground truth files but
 does not retain images extracted from test videos.
 
-A list of validated ground truth files is kept in [classification/ground_truth.json](../classification/ground_truth.json).   
+A list of validated ground truth files is kept in [classification/ground_truth.json](../classification/ground_truth.json).
 This file contains a JSON list of regions files which are taken as ground truth.
 The `GroundTruthLibrary` Python class loads the contents of this file, and from there
 stores the static region information for those files.

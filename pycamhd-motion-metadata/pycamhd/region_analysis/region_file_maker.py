@@ -6,7 +6,7 @@ import json
 from .timer import *
 from .find_regions import *
 from .classify_regions import *
-from .similarity_analysis import *
+#from .similarity_analysis import *
 
 
 import pycamhd.motionmetadata as mdd
