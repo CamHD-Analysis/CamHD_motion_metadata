@@ -121,7 +121,7 @@ def process( infile ):
             continue
 
         # Squash runs...
-        if r.scene_tag == prevTag and not args.squashruns:
+        if r.scene_tag == prevTag and args.squashruns:
             images[idx-1][mov].append(r)
             continue
 
