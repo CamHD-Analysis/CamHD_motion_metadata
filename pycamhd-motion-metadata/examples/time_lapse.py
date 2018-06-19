@@ -104,5 +104,4 @@ for regions in files:
     count += 1
 
 
-
-logging.info("Run \"ffmpeg -framerate 10 -pattern_type glob -i '%s/*.png' -c:v libx264 -pix_fmt yuv420p out.mp4\"" % args.outdir)
+logging.info("Now run \"ffmpeg -framerate 10 -pattern_type glob -i '%s/*.png' -c:v libx264 -pix_fmt yuv420p out.mp4\"" % args.outdir)
