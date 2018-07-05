@@ -1,7 +1,9 @@
 Documentation
 =============
 
-For a high-level overview, see [Twenty_Thousand_Foot_View.md](Twenty_Thousand_Foot_View.md) -- which is a work in progress!
+For a high-level overview of the processing of CamHD video, see [Twenty_Thousand_Foot_View.md](Twenty_Thousand_Foot_View.md) -- which is a work in progress!
+
+ * [CamHD_Biography.md](CamHD_Biography.md) is a history of the CamHD program.
 
  * [Regions.md](Regions.md) describes the region labelling system ('d2_p2_z0' etc.) and provides
     sample images from each static region.
