@@ -45,7 +45,7 @@ While there has only been one CamHD design, it has evolved over its life, result
     <td>Unit suffered from ground faults within first few weeks of deployment.  Was able to limp along by turning off one light.   Unit powered down 13 Nov 2017.</td>
   </tr>
   <tr>
-    <td>`d5`</td>
+    <td>[`d5`](Deployment_d5.md)</td>
     <td>P1 _rev2_</td>
     <td>July 4, 2018</td>
     <td>ongoing</td>

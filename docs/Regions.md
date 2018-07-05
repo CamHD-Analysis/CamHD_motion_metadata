@@ -27,14 +27,14 @@ More details on the evolution of CamHD can be found in the [CamHD Biography](Cam
       <th>Ends at</th>
   </tr>
   <tr><td>`d2`</td><td>2015/11/18/CAMHDA301-20151118T000020Z (approx)</td><td>2016/07/25/CAMHDA301-20160725T210000Z</td></tr>
-  <tr><td>`d3`</td><td>2016/07/29/CAMHDA301-20160729T000000Z</td><td>2017/06/14/CAMHDA301-20170614T231900($)</td></tr>
-  <tr><td>`d4`</td><td>2017/08/14/CAMHDA301-20170814T211500</td><td>2017/11/13/CAMHDA301-20171113T211500($$)</td></tr>
-  <tr><td>`d5`</td><td>2018/07/04/CAMHDA301-20180704T.....</td><td>Ongoing</td>
+  <tr><td>`d3`</td><td>2016/07/29/CAMHDA301-20160729T000000Z</td><td>2017/06/14/CAMHDA301-20170614T231900^</td></tr>
+  <tr><td>`d4`</td><td>2017/08/14/CAMHDA301-20170814T211500</td><td>2017/11/13/CAMHDA301-20171113T211500^^</td></tr>
+  <tr><td>[`d5`](Deployment_d5.md)</td><td>2018/07/04/CAMHDA301-20180704T.....</td><td>_Ongoing_</td></tr>
 </table>
 
-$ Deployment `d3` was cut short by a growing ground fault in June of 2016.
+^ Deployment `d3` was cut short by a growing ground fault in June of 2016.
 
-$$ Deployment `d4` suffered from ground faults almost immediately.  The camera was run in a degraded condition with one light through 13 November 2017, then was powered off.
+^^ Deployment `d4` suffered from ground faults almost immediately.  The camera was run in a degraded condition with one light through 13 November 2017, then was powered off.  See the [CamHD Biography](CamHD_Biography.md)
 
 In both cases, the _camera_ was stopped but the _recording_ was not.   This resulted in  sequence of videos containing ~12 minutes of black.   These videos are readily identifiable as the black frame compress relatively well, with the Quicktime files at ~550MB in sie (versus 14GB).
 
