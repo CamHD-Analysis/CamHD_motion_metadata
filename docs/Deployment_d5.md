@@ -28,8 +28,8 @@ CamHD P1 _rev2_ was installed by ROV Jason at ~1AM PT on 4 July 2018.   After an
 <table>
   <tr>
     <th>Region</th>
-    <th>Reference from D2</th>
-    <th>Reference from D4</th>
+    <th>Reference from D2 (2014-2016)</th>
+    <th>Reference from D4 (2017-2018)</th>
     <th>As deployed (from _CAMHDA301-20180705T211500_)</th>
   </tr>
   <tr>
