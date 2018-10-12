@@ -1,0 +1,52 @@
+{
+    "movie": {
+        "Duration": 901.0000610351562,
+        "NumFrames": 27003,
+        "URL": "/RS03ASHS/PN03B/06-CAMHDA301/2018/08/03/CAMHDA301-20180803T200000.mov",
+        "cacheURL": "http://lazycache:8080/v1/org/oceanobservatories/rawdata/files//RS03ASHS/PN03B/06-CAMHDA301/2018/08/03/CAMHDA301-20180803T200000.mov"
+    },
+    "contents": {
+        "regions": "1.1"
+    },
+    "versions": {
+        "findRegions": "1.0",
+        "classifyRegions": "1.1"
+    },
+    "regions": [
+        {
+            "startFrame": 9,
+            "endFrame": 26989,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9999597952322834,
+                "txMean": -0.040082811372282284,
+                "tyMean": -0.016124991565667043,
+                "size": 1196
+            },
+            "sceneTag": "d5A_p8_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p8_z1": 0.007909010138331767
+                }
+            }
+        }
+    ],
+    "depends": {
+        "opticalFlow": {
+            "RS03ASHS/PN03B/06-CAMHDA301/2018/08/03/CAMHDA301-20180803T200000_optical_flow.json": "3cca3486863ba4dc782aaf662bdeb733426c58c7"
+        },
+        "classifyRegions": {
+            "groundTruth": {
+                "CAMHDA301-20180715T001500": ""
+            }
+        }
+    },
+    "performance": {
+        "timing": {
+            "regionAnalysis": 0.03682900000421796,
+            "classification": 21.940534000008483,
+            "elapsedSeconds": 23.015982000011718
+        }
+    }
+}

@@ -1,0 +1,139 @@
+{
+    "movie": {
+        "Duration": 900.0658569335938,
+        "NumFrames": 26975,
+        "URL": "/RS03ASHS/PN03B/06-CAMHDA301/2018/08/01/CAMHDA301-20180801T124500.mov",
+        "cacheURL": "http://lazycache:8080/v1/org/oceanobservatories/rawdata/files//RS03ASHS/PN03B/06-CAMHDA301/2018/08/01/CAMHDA301-20180801T124500.mov"
+    },
+    "contents": {
+        "regions": "1.1"
+    },
+    "versions": {
+        "findRegions": "1.0",
+        "classifyRegions": "1.1"
+    },
+    "regions": [
+        {
+            "startFrame": 9,
+            "endFrame": 17759,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9958902904231627,
+                "txMean": -4.109870369748115,
+                "tyMean": 1.606444510413145,
+                "size": 117
+            },
+            "sceneTag": "d5A_p3_z2",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p3_z2": 0.01208637588820238
+                }
+            }
+        },
+        {
+            "startFrame": 17769,
+            "endFrame": 17939,
+            "type": "E",
+            "stats": {
+                "scaleMean": 0.9791954256884683,
+                "txMean": -19.30973193965834,
+                "tyMean": 8.10125180093171,
+                "size": 39
+            }
+        },
+        {
+            "startFrame": 17939,
+            "endFrame": 18839,
+            "type": "static",
+            "stats": {
+                "scaleMean": 1.000617437413217,
+                "txMean": 0.5114382468126849,
+                "tyMean": -0.00963826035390066,
+                "size": 1170
+            },
+            "sceneTag": "d5A_p3_z2",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p3_z2": 0.016850011443044304
+                }
+            }
+        },
+        {
+            "startFrame": 18849,
+            "endFrame": 18899,
+            "type": "SW",
+            "stats": {
+                "scaleMean": 0.9874505330024199,
+                "txMean": 50.2287199458317,
+                "tyMean": -196.22642184518554,
+                "size": 65
+            }
+        },
+        {
+            "startFrame": 18899,
+            "endFrame": 18999,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9989789463103765,
+                "txMean": -0.450352944364555,
+                "tyMean": -0.17139119101926997,
+                "size": 130
+            },
+            "sceneTag": "d5A_p3_z2",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p3_z2": 0.011720834010093134
+                }
+            }
+        },
+        {
+            "startFrame": 19009,
+            "endFrame": 19049,
+            "type": "E",
+            "stats": {
+                "scaleMean": 0.9774170285076044,
+                "txMean": -19.261266928388,
+                "tyMean": -7.27658052940237,
+                "size": 52
+            }
+        },
+        {
+            "startFrame": 19049,
+            "endFrame": 26969,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9999771950108819,
+                "txMean": 0.02602170260091031,
+                "tyMean": -0.011740171233640644,
+                "size": 182
+            },
+            "sceneTag": "d5A_p3_z2",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p3_z2": 0.020776752830934303
+                }
+            }
+        }
+    ],
+    "depends": {
+        "opticalFlow": {
+            "RS03ASHS/PN03B/06-CAMHDA301/2018/08/01/CAMHDA301-20180801T124500_optical_flow.json": "7a489626aed6d01cd5bd3e9f130b7870d5546ed1"
+        },
+        "classifyRegions": {
+            "groundTruth": {
+                "CAMHDA301-20180715T001500": ""
+            }
+        }
+    },
+    "performance": {
+        "timing": {
+            "regionAnalysis": 0.13643600000068545,
+            "classification": 90.80795800000124,
+            "elapsedSeconds": 92.04912700000023
+        }
+    }
+}

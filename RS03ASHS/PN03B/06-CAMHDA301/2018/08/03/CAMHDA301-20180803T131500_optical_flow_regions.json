@@ -1,0 +1,81 @@
+{
+    "movie": {
+        "Duration": 901.0000610351562,
+        "NumFrames": 27003,
+        "URL": "/RS03ASHS/PN03B/06-CAMHDA301/2018/08/03/CAMHDA301-20180803T131500.mov",
+        "cacheURL": "http://lazycache:8080/v1/org/oceanobservatories/rawdata/files//RS03ASHS/PN03B/06-CAMHDA301/2018/08/03/CAMHDA301-20180803T131500.mov"
+    },
+    "contents": {
+        "regions": "1.1"
+    },
+    "versions": {
+        "findRegions": "1.0",
+        "classifyRegions": "1.1"
+    },
+    "regions": [
+        {
+            "startFrame": 9,
+            "endFrame": 13459,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9968800290899438,
+                "txMean": 1.26924701219049,
+                "tyMean": 1.4479030352965663,
+                "size": 26
+            },
+            "sceneTag": "d5A_p7_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p7_z1": 0.01307453120486683
+                }
+            }
+        },
+        {
+            "startFrame": 13469,
+            "endFrame": 13569,
+            "type": "unknown",
+            "stats": {
+                "scaleMean": 1.011362248919459,
+                "txMean": 0.17523469061193697,
+                "tyMean": -2.0599993851519747,
+                "size": 13
+            }
+        },
+        {
+            "startFrame": 13569,
+            "endFrame": 26989,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9998885409199388,
+                "txMean": -0.021275702251592896,
+                "tyMean": 0.05811333816527156,
+                "size": 754
+            },
+            "sceneTag": "d5A_p7_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p7_z1": 0.01241009864512184
+                }
+            }
+        }
+    ],
+    "depends": {
+        "opticalFlow": {
+            "RS03ASHS/PN03B/06-CAMHDA301/2018/08/03/CAMHDA301-20180803T131500_optical_flow.json": "3cca3486863ba4dc782aaf662bdeb733426c58c7"
+        },
+        "classifyRegions": {
+            "groundTruth": {
+                "CAMHDA301-20180715T001500": ""
+            }
+        }
+    },
+    "performance": {
+        "timing": {
+            "regionAnalysis": 0.15012299999943934,
+            "classification": 43.91313000000082,
+            "elapsedSeconds": 45.08014600000752
+        }
+    }
+}
