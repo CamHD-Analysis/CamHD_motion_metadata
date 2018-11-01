@@ -11,6 +11,7 @@ from dateutil import rrule
 import argparse
 import glob
 import json
+import logging
 import os
 import random
 
@@ -31,11 +32,15 @@ def get_args():
                         required=True,
                         help="The end date for sampling the ground truth region files in yyyymmdd format.")
     parser.add_argument("--count",
+                        type=int,
                         default=10,
                         help="The number of ground truth files to be sampled.")
     parser.add_argument("--outfile",
                         required=True,
                         help="The path to the target_file to which the output needs to be written.")
+    parser.add_argument("--log",
+                        default="WARN",
+                        help="Specify the log level. Default: WARN.")
 
     args = parser.parse_args()
     return args
@@ -76,6 +81,7 @@ def sample_ground_truth_files(data_root_dir, from_date, to_date, count):
     """
     all_region_files = []
     required_dates = _get_ymd_ranges(from_date, to_date)
+
     for date_ymd in required_dates:
         file_search_str = os.path.join(args.root,
                                        METADATA_ROOT_DIR_CAMHD_SUFFIX,
@@ -83,7 +89,11 @@ def sample_ground_truth_files(data_root_dir, from_date, to_date, count):
                                        date_ymd[1],
                                        date_ymd[2],
                                        "*_regions.json")
-        all_region_files.extend(glob.glob(file_search_str))
+
+        logging.debug("Checking {}".format(file_search_str))
+        region_files = glob.glob(file_search_str)
+        logging.debug("Found {}".format(region_files))
+        all_region_files.extend(region_files)
 
     random.shuffle(all_region_files)
 
@@ -101,4 +111,5 @@ def write_ground_truth_file(args):
 
 if __name__ == "__main__":
     args = get_args()
+    logging.basicConfig(level=args.log.upper())
     write_ground_truth_file(args)
