@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+"""
+Generate the confusion matrix from a given set of regions files which have been validated (QC).
+
+Usage: (Running from the root directory of the repository.)
+python scripts/utils/get_performance_metrics.py ../RS03ASHS/PN03B/06-CAMHDA301/2018/07/2[56789] --labels ../classification/labels/d5A_labels.json --outfile ../temp_out.csv --cm-plot
+
+"""
+
 import argparse
 import glob
 import itertools
