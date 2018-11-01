@@ -14,6 +14,7 @@ import itertools
 import json
 import logging
 import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,7 +32,6 @@ def get_args():
                         required=True,
                         help='The file path containing the list of labels. The same order of labels will be inferred.')
     parser.add_argument('--outfile',
-                        required=True,
                         help='The file path (CSV) to which the output needs to be written to.')
     parser.add_argument('--cm-plot',
                         action="store_true",
@@ -141,11 +141,13 @@ def get_performance_metrics(args):
     accuracy = accuracy_score(y_true, y_pred)
     conf_mat = confusion_matrix(y_true, y_pred, labels=labels)
 
-    with open(args.outfile, "w") as fp:
-        header_lines = ["Total Accuracy,{}".format(accuracy),
-                        "Total scenes,{}".format(len(y_pred))]
-        fp.write("\n".join(header_lines) + "\n\n")
-        _format_write_conf_mat(conf_mat, labels, fp)
+    # Format and output the confusion matrix.
+    fp = open(args.outfile, "w") if args.outfile else sys.stdout
+    header_lines = ["Total Accuracy,{}".format(accuracy),
+                    "Total scenes,{}".format(len(y_pred))]
+    fp.write("\n".join(header_lines) + "\n\n")
+    _format_write_conf_mat(conf_mat, labels, fp)
+    fp.close()
 
     if args.cm_plot:
         np.set_printoptions(precision=2)
