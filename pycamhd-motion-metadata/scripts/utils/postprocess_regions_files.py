@@ -15,7 +15,7 @@ python scripts/utils/postprocess_regions_files.py ../RS03ASHS/PN03B/06-CAMHDA301
 import pycamhd.lazycache as camhd
 import pycamhd.motionmetadata as mmd
 
-from skimage.filters import threshold_minimum
+from skimage.filters import threshold_yen
 from skimage.io import imread
 from skimage.morphology import erosion, square
 
@@ -29,7 +29,7 @@ import os
 # Threshold represents proportion of positive pixels after otsu_threshold and erosion on grayscale image
 # for the scene (lower bound).
 scene_tag_thresholds = {
-    "d5A_p4_z1": 0.009
+    "d5A_p4_z1": 0.0135
 }
 
 def get_args():
@@ -75,7 +75,7 @@ def _correct_sequencing_region_zoom_d5A_p4(regions_file, img_path, qt):
 
         """
         img = imread(img_path, as_gray=True)
-        thresh = threshold_minimum(img)
+        thresh = threshold_yen(img)
         img_binary = img > thresh
         eroded_img = erosion(img_binary, square(3))
         return eroded_img.sum() / eroded_img.size
