@@ -88,9 +88,9 @@ def _correct_sequencing_region_zoom_d5A_p4(regions_file, img_path, qt):
 
     initial_scene_index = None
     end_scene_index = None
-    print (initial_scene_tag, end_scene_tag)
+    logging.debug(initial_scene_tag, end_scene_tag)
     for i, region in enumerate(regions_file.static_regions()):
-        print (region.scene_tag)
+        logging.debug(region.scene_tag)
         if initial_scene_index is None and region.scene_tag == initial_scene_tag:
             initial_scene_index = i
         elif end_scene_index is None and region.scene_tag == end_scene_tag:
