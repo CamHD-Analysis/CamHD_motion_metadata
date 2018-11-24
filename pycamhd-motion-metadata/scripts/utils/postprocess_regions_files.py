@@ -43,10 +43,9 @@ def get_args():
                         metavar='N',
                         nargs='*',
                         help='Files or paths to process.')
-    parser.add_argument('--scene',
-                        default="d5A_p4",
-                        help="The scene for which the respective scene_tags (various zooms) need to be corrected."
-                             " Defaults to scene: d5A_p4.")
+    parser.add_argument('--deployment',
+                        default="d5A",
+                        help="The deployment prefix. Defaults to scene: d5A.")
     parser.add_argument('--image-path',
                         dest='img_path',
                         required=True,
@@ -84,12 +83,13 @@ def get_args():
     return args
 
 
-def _correct_sequencing_region_zoom_d5A_p4(regions_file, img_path, img_ext="jpg"):
+def _correct_sequencing_region_zoom_p4(regions_file, img_path, img_ext, deployment):
     """
     Note that this catches only the first occurrence of the initial and the final scene_tags.
 
     """
-    scene = "d5A_p4"
+    region = "p4"
+    scene = "%s_%s" % (deployment, region)
     inferred_by = "p4SequenceCheck"
 
     def _get_foreground_proportion(sample_frame_img_path):
@@ -181,6 +181,108 @@ def _correct_sequencing_region_zoom_d5A_p4(regions_file, img_path, img_ext="jpg"
         logging.warning("p4_z2 was not found.")
 
 
+def _correct_sequencing_region_zoom_p5_z0(regions_file, img_path, img_ext, deployment):
+    """
+    This corrected only the scenes followed by p5_z2 which are marked as p8_z0 to p5_z0.
+
+    """
+    inferred_by = "p5z0SequenceCheck"
+
+    incorrect_scene = "p8_z0"
+    incorrect_scene_tag = "%s_%s" % (deployment, incorrect_scene)
+
+    correct_scene = "p5_z0"
+    correct_scene_tag = "%s_%s" % (deployment, correct_scene)
+
+    num_static_regions = len(regions_file.static_regions())
+
+    # Case 1: Correction of of p8_z0 -> p5_z0 after processing the zooms of p5.
+    context_scene = "p5_z2"
+    context_scene_tag = "%s_%s" % (deployment, context_scene)
+
+    prev_scene_tag = None
+    i = 0
+    while (prev_scene_tag != context_scene_tag and i < num_static_regions):
+        prev_scene_tag = regions_file.static_at(i).scene_tag
+        i += 1
+
+    # p5_z2 may not have been found.
+    if i >= num_static_regions:
+        return
+
+    # The static scene at i now refers to the static scene tag after the context_scene_tag.
+    # TODO: Multiple consecutive incorrect scenes could also be corrected.
+    region = regions_file.static_at(i)
+    if region.scene_tag == incorrect_scene_tag:
+        region.set_scene_tag(correct_scene_tag, inferred_by=inferred_by)
+        logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
+                                                                  region.end_frame,
+                                                                  correct_scene_tag))
+
+    # Case 2: Correction of of p8_z0 -> p5_z0 before processing the zooms of p5.
+    context_scene = "p5_z1"
+    context_scene_tag = "%s_%s" % (deployment, context_scene)
+
+    # Finding the first occurrence of context (p5_z1).
+    for i in range(num_static_regions):
+        if regions_file.static_at(i).scene_tag == context_scene_tag:
+            break
+
+    # The static scene at i - 1 now refers to the static scene tag before the context_scene_tag.
+    region = regions_file.static_at(i - 1)
+    if region.scene_tag == incorrect_scene_tag:
+        region.set_scene_tag(correct_scene_tag, inferred_by=inferred_by)
+        logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
+                                                                  region.end_frame,
+                                                                  correct_scene_tag))
+
+
+def _correct_sequencing_region_zoom_p0_z1(regions_file, img_path, img_ext, deployment):
+    """
+    This corrected only the scenes followed by (p6_z0 followed by p0_z0) which are marked as p6_z0 to p0_z1.
+
+    """
+    inferred_by = "p0z1SequenceCheck"
+
+    incorrect_scene = "p6_z0"
+    incorrect_scene_tag = "%s_%s" % (deployment, incorrect_scene)
+
+    correct_scene = "p0_z1"
+    correct_scene_tag = "%s_%s" % (deployment, correct_scene)
+
+    context_scene_1 = "p6_z0"
+    context_scene_1_tag = "%s_%s" % (deployment, context_scene_1)
+    context_scene_2 = "p0_z0"
+    context_scene_2_tag = "%s_%s" % (deployment, context_scene_2)
+
+    num_static_regions = len(regions_file.static_regions())
+
+    prev_scene_tag = None
+    for i in range(num_static_regions):
+        cur_scene_tag = regions_file.static_at(i).scene_tag
+
+        if prev_scene_tag != context_scene_1_tag:
+            prev_scene_tag = cur_scene_tag
+            continue
+
+        if regions_file.static_at(i + 1).scene_tag == context_scene_2_tag:
+            # Next region is context_2, and the region after that is the one that needs to be checked.
+            i += 2
+            break
+
+    # Context may not have been found.
+    if i >= num_static_regions:
+        return
+
+    # The static scene at i now refers to the static scene tag after the context has been found.
+    # TODO: Multiple consecutive incorrect scenes could also be corrected.
+    region = regions_file.static_at(i)
+    if region.scene_tag == incorrect_scene_tag:
+        region.set_scene_tag(correct_scene_tag, inferred_by=inferred_by)
+        logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
+                                                                  region.end_frame,
+                                                                  correct_scene_tag))
+
 
 def _get_all_sample_frames(regions_file, img_path, qt, img_size=(320, 240), img_ext="jpg"):
     """
@@ -207,8 +309,10 @@ def _get_all_sample_frames(regions_file, img_path, qt, img_size=(320, 240), img_
 
 
 def postprocess(args):
-    if args.scene != "d5A_p4":
-        raise NotImplementedError("Supported scene are: d5A_p4.")
+    # TODO: The postprocessing algorithms need to be verified for each new deployment.
+    if args.deployment != "d5A":
+        logging.warning("The postprocessing algorithms have been checked for deployment d5A."
+                        "It has not been verified for the current provided deployment: %s" % args.deployment)
 
     def _process(infile):
         logging.info("Postprocessing the regions file: {}".format(infile))
@@ -217,8 +321,17 @@ def postprocess(args):
         _get_all_sample_frames(regions_file, args.img_path, args.qt, args.img_size, args.img_ext)
 
         # TODO: Currently, supports only scene d5A_p4.
-        logging.info("Correcting scene_tags for d5A_p4 based on prior ordering of z1 and z2.")
-        _correct_sequencing_region_zoom_d5A_p4(regions_file, args.img_path, args.img_ext)
+        # Postprocess1:
+        logging.info("Postprocess1: Correcting scene_tags for d5A_p4 based on prior ordering of z1 and z2.")
+        _correct_sequencing_region_zoom_p4(regions_file, args.img_path, args.img_ext, args.deployment)
+
+        # Postprocess2:
+        logging.info("Postprocess2: Correcting scene_tags for p8_z0 to p5_z0 for scenes followed by p5_z2.")
+        _correct_sequencing_region_zoom_p5_z0(regions_file, args.img_path, args.img_ext, args.deployment)
+
+        # Postprocess3:
+        logging.info("Postprocess3: Correcting scene_tags for p6_z0 to p0_z1 for scenes having p6_z0 followed by p0_z0.")
+        _correct_sequencing_region_zoom_p0_z1(regions_file, args.img_path, args.img_ext, args.deployment)
 
         if args.overwrite:
             logging.warning("Overwriting the regions_file: %s" % regions_file.mov)
