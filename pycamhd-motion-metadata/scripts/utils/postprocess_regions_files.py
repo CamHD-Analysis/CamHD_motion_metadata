@@ -258,7 +258,7 @@ def _correct_sequencing_region_zoom_p0_z1(regions_file, img_path, img_ext, deplo
     num_static_regions = len(regions_file.static_regions())
 
     prev_scene_tag = None
-    for i in range(num_static_regions):
+    for i in range(num_static_regions - 1):
         cur_scene_tag = regions_file.static_at(i).scene_tag
 
         if prev_scene_tag != context_scene_1_tag:
