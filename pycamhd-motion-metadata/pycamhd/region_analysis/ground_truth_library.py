@@ -19,7 +19,7 @@ import pycamhd.motionmetadata as mdd
 from .image_comparer import *
 
 root_name_pattern = re.compile("CAMHDA301-[0-9T]*")
-img_pattern = re.compile("(d\d*_p\d*_z\d*)/(CAMHDA301-[0-9T]*[Z]?)_(\d*)\.")
+img_pattern = re.compile("(d\d*[A-Z]?_p\d*_z\d*)/(CAMHDA301-[0-9T]*[Z]?)_(\d*)\.")
 
 class GTImage:
 

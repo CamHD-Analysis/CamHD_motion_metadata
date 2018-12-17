@@ -6,7 +6,6 @@ import logging
 import argparse
 import os.path as path
 import os
-import json
 import random
 import re
 
@@ -163,7 +162,7 @@ for pathin in args.input:
 
         # Iterate again
         if path.isdir(infile):
-            infile += "*_regions.json"
+            infile = os.path.join(infile, "*_regions.json")
             for f in glob.iglob(infile):
                 process(f)
         else:
