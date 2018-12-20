@@ -1,0 +1,141 @@
+{
+    "movie": {
+        "Duration": 892.0911865234375,
+        "NumFrames": 26736,
+        "URL": "/RS03ASHS/PN03B/06-CAMHDA301/2018/09/04/CAMHDA301-20180904T000000.mov",
+        "cacheURL": "http://lazycache:8080/v1/org/oceanobservatories/rawdata/files//RS03ASHS/PN03B/06-CAMHDA301/2018/09/04/CAMHDA301-20180904T000000.mov"
+    },
+    "contents": {
+        "regions": "1.1"
+    },
+    "versions": {
+        "findRegions": "1.0",
+        "classifyRegions": "1.1"
+    },
+    "regions": [
+        {
+            "startFrame": 9,
+            "endFrame": 18159,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.999977507030636,
+                "txMean": -0.17757147313592667,
+                "tyMean": -0.05190240003559477,
+                "size": 3471
+            },
+            "sceneTag": "d5A_p8_z1",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p8_z1": 0.011442749145228118
+                }
+            }
+        },
+        {
+            "startFrame": 18169,
+            "endFrame": 18329,
+            "type": "zoom_out",
+            "stats": {
+                "scaleMean": 0.93605043705937,
+                "txMean": -1.1261983081761473,
+                "tyMean": 0.3193889645007911,
+                "size": 208
+            }
+        },
+        {
+            "startFrame": 18329,
+            "endFrame": 18669,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9999988209548601,
+                "txMean": -0.002158477034123136,
+                "tyMean": -0.00803478317632265,
+                "size": 442
+            },
+            "sceneTag": "d5A_p8_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p8_z0": 0.0023611154011824592
+                }
+            }
+        },
+        {
+            "startFrame": 18679,
+            "endFrame": 18909,
+            "type": "short",
+            "stats": {
+                "scaleMean": NaN,
+                "txMean": NaN,
+                "tyMean": NaN,
+                "size": 0
+            }
+        },
+        {
+            "startFrame": 18909,
+            "endFrame": 19149,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9999877135978427,
+                "txMean": -0.9647318097707168,
+                "tyMean": -1.6506673025471035,
+                "size": 312
+            },
+            "sceneTag": "d5A_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p0_z0": 0.011431071886866071
+                }
+            }
+        },
+        {
+            "startFrame": 19159,
+            "endFrame": 19329,
+            "type": "S",
+            "stats": {
+                "scaleMean": 1.001482090972417,
+                "txMean": 0.8717529024745647,
+                "tyMean": -37.923922804244185,
+                "size": 208
+            }
+        },
+        {
+            "startFrame": 19329,
+            "endFrame": 19729,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9998911025296475,
+                "txMean": -0.02314268699213532,
+                "tyMean": -0.46865513439132345,
+                "size": 520
+            },
+            "sceneTag": "d5A_p1_z0",
+            "sceneTagMeta": {
+                "inferredBy": "matchToGroundTruth",
+                "topTenPct": {
+                    "d5A_p1_z0": 0.004846600878208726
+                }
+            }
+        }
+    ],
+    "depends": {
+        "opticalFlow": {
+            "RS03ASHS/PN03B/06-CAMHDA301/2018/09/04/CAMHDA301-20180904T000000_optical_flow.json": "f83e023b743e82668d60a8d17590f35cfe4def3d"
+        },
+        "classifyRegions": {
+            "groundTruth": {
+                "CAMHDA301-20180827T151500": "",
+                "CAMHDA301-20180827T001500": "",
+                "CAMHDA301-20180826T211500": ""
+            }
+        }
+    },
+    "performance": {
+        "timing": {
+            "regionAnalysis": 0.06460599999999994,
+            "classification": 106.601229,
+            "elapsedSeconds": 107.102334
+        }
+    }
+}
