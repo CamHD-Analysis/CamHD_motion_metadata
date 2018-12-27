@@ -222,7 +222,6 @@ class RegionClassifier:
             for i, pred_class in enumerate(pred_classes):
                 class_probas.append(pred_probas[i][pred_class])
 
-            # TODO: Change these to debug logs:
             logging.info("Unique pred_classes: %s" % len(set(pred_classes)))
             logging.info("pred_classes: %s, pred_probas: %s" % (str(pred_classes), str(class_probas)))
 
@@ -239,6 +238,9 @@ class RegionClassifier:
                                                                                              cur_pred_scene_tag)
 
             if majority_class_avg_proba < CNN_PROBABILITY_THRESH:
+                logging.info("The predicted scene_tag %s has lower average predicted probability: %s (threshold: %s). "
+                             "Therefore, marking this region as 'unknown'."
+                             % (cur_pred_scene_tag, majority_class_avg_proba, CNN_PROBABILITY_THRESH))
                 majority_class_label = "unknown"
             else:
                 majority_class_label = cur_pred_scene_tag_sequence_corrected
