@@ -253,6 +253,8 @@ class RegionClassifier:
 
             r.set_scene_tag(majority_class_label, inferred_by=inferred_by)
 
+        # TODO: Do we need to include any information in the depends section of the regions_file json?
+
         return regions
 
 
