@@ -33,7 +33,7 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
 
 
 # TODO: The probability thresholds could be taken from model_config.
-CNN_PROBABILITY_THRESH = 0.90
+CNN_PROBABILITY_THRESH = 0.20
 
 DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH = os.path.join("trained_classification_models",
                                                        "scene_classification_vgg16_8.json")
@@ -146,6 +146,8 @@ class RegionClassifier:
                                       classifier files from the modules train_classification_models will be used.
         :param first: The number of regions to process. Default: None, which implies all static regions.
         :param ref_samples: The frames of the region as a pct of region length to be considered for classification.
+                            Default: Three frames at (0.4, 0.5, 0.6) will be chosen.
+                            TODO: Change this to a single frame at 0.5, to reduce time taken for processing.
         :return: The updated regions (RegionFile object) with the scene_tag predictions.
 
         """
@@ -211,9 +213,6 @@ class RegionClassifier:
                 majority_class_label = model_config["classes"][majority_class]
 
             r.set_scene_tag(majority_class_label, inferred_by="cnn-%s" % model_config["model_name"])
-
-        # Try to free up the classifier allocated resources.
-        del classifier
 
         return regions
 
