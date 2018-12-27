@@ -151,6 +151,32 @@ class RegionClassifier:
         :return: The updated regions (RegionFile object) with the scene_tag predictions.
 
         """
+        def _sequence_based_correction(prev_scene_tag, cur_pred_scene_tag):
+            """
+            The regions p2_z1 and p4_z2 look very similar (plain water), hence they are corrected based on sequence.
+
+            """
+            is_corrected = False
+            if prev_scene_tag is None:
+                return cur_pred_scene_tag, is_corrected
+
+            deployment = prev_scene_tag.split("_")[0]
+            p2_z0_tag = "%s_p2_z0" % deployment
+            p2_z1_tag = "%s_p2_z1" % deployment
+            p4_z1_tag = "%s_p4_z1" % deployment
+            p4_z2_tag = "%s_p4_z2" % deployment
+
+            if cur_pred_scene_tag == p2_z1_tag and prev_scene_tag in (p4_z1_tag, p4_z2_tag):
+                is_corrected = True
+                return p4_z2_tag, is_corrected
+
+            if cur_pred_scene_tag == p4_z2_tag and prev_scene_tag in (p2_z0_tag, p2_z1_tag):
+                is_corrected = True
+                return p2_z1_tag, is_corrected
+
+            return cur_pred_scene_tag, is_corrected
+
+
         if cnn_model_config_path is None:
             logging.info("Using the default scene_tag classifier at: %s" % DEFAULT_CNN_MODEL_CONFIG_PATH)
             model_config = DEFAULT_MODEL_CONFIG
@@ -166,6 +192,7 @@ class RegionClassifier:
         if first:
             num_to_process = min(first, num_to_process)
 
+        prev_scene_tag = None
         for i in range(num_to_process):
 
             r = regions.static_at(i)
@@ -207,12 +234,22 @@ class RegionClassifier:
 
             majority_class_avg_proba = majority_class_avg_proba / len(ref_samples)
 
+            cur_pred_scene_tag = model_config["classes"][majority_class]
+            cur_pred_scene_tag_sequence_corrected, is_corrected = _sequence_based_correction(prev_scene_tag,
+                                                                                             cur_pred_scene_tag)
+
             if majority_class_avg_proba < CNN_PROBABILITY_THRESH:
                 majority_class_label = "unknown"
             else:
-                majority_class_label = model_config["classes"][majority_class]
+                majority_class_label = cur_pred_scene_tag_sequence_corrected
 
-            r.set_scene_tag(majority_class_label, inferred_by="cnn-%s" % model_config["model_name"])
+            prev_scene_tag = cur_pred_scene_tag_sequence_corrected
+
+            inferred_by =  "cnn-%s" % model_config["model_name"]
+            if is_corrected:
+                inferred_by = "%s-sequence_corrected" % inferred_by
+
+            r.set_scene_tag(majority_class_label, inferred_by=inferred_by)
 
         return regions
 
