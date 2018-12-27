@@ -61,7 +61,8 @@ class RegionFileMaker:
                 with Timer() as t:
                     classifier = self.gt_library.select(regions)
 
-                    regions = RegionClassifier( classifier, self.lazycache ).classify_regions(regions, first=self.first)
+                    regions = RegionClassifier( classifier, self.lazycache ).classify_regions_cnn(regions, first=self.first)
+                    logging.info("Classified url: %s" % regions.mov)
 
 
                 timing['classification'] = t.interval

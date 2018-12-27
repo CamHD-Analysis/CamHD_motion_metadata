@@ -1,8 +1,12 @@
 
+from keras.models import load_model
+from scipy.stats import mode
+from skimage.transform import resize
 
 import logging
 import random
 import json
+import os
 
 import numpy as np
 
@@ -27,6 +31,21 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
                       "d2_p0_z0", "d2_p8_z0", "d2_p8_z1",
                       "d2_p8_z0", "d2_p0_z0", "d2_p1_z0"]
 
+
+# TODO: The probability thresholds could be taken from model_config.
+CNN_PROBABILITY_THRESH = 0.90
+
+DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH = os.path.join("trained_classification_models",
+                                                       "scene_classification_vgg16_8.json")
+DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH   = os.path.join("trained_classification_models",
+                                                       "scene_classification_vgg16_8.hdf5")
+
+DEFAULT_CNN_MODEL_CONFIG_PATH = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH)
+with open(DEFAULT_CNN_MODEL_CONFIG_PATH) as fp:
+    DEFAULT_MODEL_CONFIG = json.load(fp)
+
+DEFAULT_MODEL_CONFIG["model_path"] = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH)
+DEFAULT_CLASSIFIER = load_model(DEFAULT_MODEL_CONFIG["model_path"])
 
 
 class RegionClassifier:
@@ -114,6 +133,87 @@ class RegionClassifier:
             gt_file_revs[gt_file] = git_revision(gt_file)
 
         regions.json['depends']['classifyRegions'] = {'groundTruth': gt_file_revs}
+
+        return regions
+
+
+    def classify_regions_cnn(self, regions, cnn_model_config_path=None, first=None, ref_samples=(0.4, 0.5, 0.6)):
+        """
+        Classify the regions of the given RegionFile and assign the scene_tags.
+
+        :param regions: The RegionFile object created from the video regions_file.
+        :param cnn_model_config_path: The path to the trained CNN model config file (JSON). Default: None, the default
+                                      classifier files from the modules train_classification_models will be used.
+        :param first: The number of regions to process. Default: None, which implies all static regions.
+        :param ref_samples: The frames of the region as a pct of region length to be considered for classification.
+        :return: The updated regions (RegionFile object) with the scene_tag predictions.
+
+        """
+        if cnn_model_config_path is None:
+            logging.info("Using the default scene_tag classifier at: %s" % DEFAULT_CNN_MODEL_CONFIG_PATH)
+            model_config = DEFAULT_MODEL_CONFIG
+            classifier = DEFAULT_CLASSIFIER
+        else:
+            with open(cnn_model_config_path) as fp:
+                model_config = json.load(fp)
+
+            classifier = load_model(model_config["model_path"])
+
+        num_to_process = len(regions.static_regions())
+
+        if first:
+            num_to_process = min(first, num_to_process)
+
+        for i in range(num_to_process):
+
+            r = regions.static_at(i)
+
+            logging.info("Attempting to classify region from %d to %d" % (r.start_frame, r.end_frame))
+
+            ref_images = []
+
+            for sample_pct in ref_samples:
+                frame = r.frame_at(sample_pct)
+                logging.info("Retrieving test frame %d" % frame)
+
+                ref_img = self.lazycache.get_frame(regions.mov, frame, format='np')
+                resized_image = resize(ref_img, model_config["input_shape"]) * 255
+                resized_image = resized_image.astype(np.uint8)
+                if model_config["rescale"] is True:
+                    resized_image = resized_image * (1.0 / 255)
+
+                ref_images.append(resized_image)
+
+            self.images[i] = ref_images
+            input_tensor = np.asarray(ref_images)
+            pred_probas = classifier.predict(input_tensor)
+            pred_classes = np.argmax(pred_probas, axis=1)
+
+            class_probas = []
+            for i, pred_class in enumerate(pred_classes):
+                class_probas.append(pred_probas[i][pred_class])
+
+            # TODO: Change these to debug logs:
+            logging.info("Unique pred_classes: %s" % len(set(pred_classes)))
+            logging.info("pred_classes: %s, pred_probas: %s" % (str(pred_classes), str(class_probas)))
+
+            majority_class = mode(pred_classes)[0][0]
+            majority_class_avg_proba = 0
+            for pred_class, class_proba in zip(pred_classes, class_probas):
+                if pred_class == majority_class:
+                    majority_class_avg_proba += class_proba
+
+            majority_class_avg_proba = majority_class_avg_proba / len(ref_samples)
+
+            if majority_class_avg_proba < CNN_PROBABILITY_THRESH:
+                majority_class_label = "unknown"
+            else:
+                majority_class_label = model_config["classes"][majority_class]
+
+            r.set_scene_tag(majority_class_label, inferred_by="cnn-%s" % model_config["model_name"])
+
+        # Try to free up the classifier allocated resources.
+        del classifier
 
         return regions
 
