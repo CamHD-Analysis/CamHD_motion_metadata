@@ -93,6 +93,12 @@ def scene_tag_match( a, b ):
     return astem == bstem
 
 
+def _format_url(name):
+    date, time = os.path.splitext(os.path.basename(name))[0].split('-')[1].split('T')
+    res = "%s%s| %s T %s" % (date[:4], date[4:6], date[6:], time[:2])
+    return res
+
+
 def process( infile ):
     logging.info("Processing %s" % infile)
 
@@ -185,9 +191,9 @@ with open(html_file, 'w') as html:
     html.write("<table>\n<tr><th>Scene Tag</th>")
     for name in urls:
         if name in gt_urls:
-            html.write("<th>GROUND TRUTH<br>%s</th>" % path.basename(name))
+            html.write("<th>GROUND TRUTH<br>%s</th>" % _format_url(name))
         else:
-            html.write("<th>%s</th>" % path.basename(name))
+            html.write("<th>%s</th>" % _format_url(name))
 
 
     html.write("</tr>\n")
@@ -226,7 +232,7 @@ with open(html_file, 'w') as html:
             relathumb = path.relpath( thumb_file, path.dirname(html_file) )
 
             caption = ', '.join(["%d -- %d" % (r.start_frame,r.end_frame) for r in regions])
-
+            caption = "%s (%s | %s)" % (caption, _format_url(url).split('|')[1], '_'.join(tags[row].split('_')[1:]))
             html.write("<td><a href=\"%s\"><img src=\"%s\"/></a><br>%s</td>" % (relapath,relathumb,caption) )
 
 
@@ -240,7 +246,7 @@ with open(html_file, 'w') as html:
 
     html.write("<tr><th>Scene Tag</th>")
     for name in urls:
-        html.write("<th>%s</th>" % path.basename(name))
+        html.write("<th>%s</th>" % _format_url(name))
     html.write("</tr>\n")
 
     html.write("<tr>")
