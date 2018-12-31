@@ -40,9 +40,10 @@ parser.add_argument("--ground-truth", dest="groundtruth",
 parser.add_argument("--use-cnn",
                     dest="use_cnn",
                     action="store_true",
-                    help="Flag to use the trained CNN model for region classification instead of matchByGroundTruth. "
-                         "If this flag is not set, the matchByGroundTruth algorithm will be used for "
-                         "region classification. If this flag is set, then the --ground-truth argument is ignored.")
+                    help="Flag to use the trained CNN model for region classification. "
+                         "If this flag is set, then the --ground-truth argument is ignored."
+                         "If this flag is not set, the 'matchByGroundTruth' algorithm will be used for "
+                         "region classification.")
 
 parser.add_argument('--git-add', dest='gitadd', action='store_true',
                     help='Run "git add" on resulting file')
