@@ -54,11 +54,22 @@ def _get_pred_true_labels(regions_file_path):
         if region["type"] != "static":
             continue
 
+        scene_tag_meta = region["sceneTagMeta"]
         true_label = region["sceneTag"]
 
-        # These are the errors mapped to each of the labels predicted (includes only top labels).
-        meta_pred_dict = region["sceneTagMeta"]["topTenPct"]
-        pred_label = min(meta_pred_dict.items(), key=lambda x: x[1])[0]
+        if "topTenPct" in scene_tag_meta:
+            # Correlation based classification:
+            # These are the errors mapped to each of the labels predicted (includes only top labels).
+            meta_pred_dict = scene_tag_meta["topTenPct"]
+            pred_label = min(meta_pred_dict.items(), key=lambda x: x[1])[0]
+        elif "predProbas" in scene_tag_meta:
+            # CNN based classification: these contain predicted probabilities.
+            meta_pred_dict = scene_tag_meta["predProbas"]
+            pred_label = max(meta_pred_dict.items(), key=lambda x: x[1])[0]
+        else:
+            logging.info("Predicted label couldn't be found for region from %s to %s for region URL: %s"
+                         % (region.start_frame, region.end_frame, region.mov))
+            continue
 
         pred_true_labels.append((pred_label, true_label))
 

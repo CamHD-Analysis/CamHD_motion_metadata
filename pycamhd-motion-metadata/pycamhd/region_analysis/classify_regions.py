@@ -225,22 +225,22 @@ class RegionClassifier:
             logging.info("Unique pred_classes: %s" % len(set(pred_classes)))
             logging.info("pred_classes: %s, pred_probas: %s" % (str(pred_classes), str(class_probas)))
 
-            majority_class = mode(pred_classes)[0][0]
-            majority_class_avg_proba = 0
+            majority_class_by_cnn = mode(pred_classes)[0][0]
+            majority_class_avg_proba_by_cnn = 0
             for pred_class, class_proba in zip(pred_classes, class_probas):
-                if pred_class == majority_class:
-                    majority_class_avg_proba += class_proba
+                if pred_class == majority_class_by_cnn:
+                    majority_class_avg_proba_by_cnn += class_proba
 
-            majority_class_avg_proba = majority_class_avg_proba / len(ref_samples)
+            majority_class_avg_proba_by_cnn = majority_class_avg_proba_by_cnn / len(ref_samples)
 
-            cur_pred_scene_tag = model_config["classes"][majority_class]
+            cur_pred_scene_tag_by_cnn = model_config["classes"][majority_class_by_cnn]
             cur_pred_scene_tag_sequence_corrected, is_corrected = _sequence_based_correction(prev_scene_tag,
-                                                                                             cur_pred_scene_tag)
+                                                                                             cur_pred_scene_tag_by_cnn)
 
-            if majority_class_avg_proba < CNN_PROBABILITY_THRESH:
+            if majority_class_avg_proba_by_cnn < CNN_PROBABILITY_THRESH:
                 logging.info("The predicted scene_tag %s has lower average predicted probability: %s (threshold: %s). "
                              "Therefore, marking this region as 'unknown'."
-                             % (cur_pred_scene_tag, majority_class_avg_proba, CNN_PROBABILITY_THRESH))
+                             % (cur_pred_scene_tag_by_cnn, majority_class_avg_proba_by_cnn, CNN_PROBABILITY_THRESH))
                 majority_class_label = "unknown"
             else:
                 majority_class_label = cur_pred_scene_tag_sequence_corrected
@@ -251,7 +251,13 @@ class RegionClassifier:
             if is_corrected:
                 inferred_by = "%s-sequence_corrected" % inferred_by
 
+            # Set the scene tag for the region.
             r.set_scene_tag(majority_class_label, inferred_by=inferred_by)
+
+            # Set the Predicted probabilities in sceneTagMeta.
+            # TODO: Should we keep pred_probas of all the class_labels?
+            # TODO: Should we keep the corrected scene_tag or the original scene_tag predicted by CNN?
+            r.json['sceneTagMeta']["predProbas"] = {cur_pred_scene_tag_by_cnn: majority_class_avg_proba_by_cnn}
 
         # TODO: Do we need to include any information in the depends section of the regions_file json?
 
