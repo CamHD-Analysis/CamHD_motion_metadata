@@ -47,6 +47,16 @@ with open(DEFAULT_CNN_MODEL_CONFIG_PATH) as fp:
 
 DEFAULT_MODEL_CONFIG["model_path"] = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH)
 
+DEFAULT_CLASSIFIER = None
+
+# A Singleton-like loading of DEFAULT_CLASSIFIER to ensure that is loaded only when regions are being classified.
+def get_default_classifier():
+    global DEFAULT_CLASSIFIER
+    if DEFAULT_CLASSIFIER is None:
+        DEFAULT_CLASSIFIER = load_model(DEFAULT_MODEL_CONFIG["model_path"])
+
+    return DEFAULT_CLASSIFIER
+
 
 class RegionClassifier:
 
@@ -180,7 +190,7 @@ class RegionClassifier:
         if cnn_model_config_path is None:
             logging.info("Using the default scene_tag classifier at: %s" % DEFAULT_CNN_MODEL_CONFIG_PATH)
             model_config = DEFAULT_MODEL_CONFIG
-            classifier = load_model(DEFAULT_MODEL_CONFIG["model_path"])
+            classifier = get_default_classifier()
         else:
             with open(cnn_model_config_path) as fp:
                 model_config = json.load(fp)
