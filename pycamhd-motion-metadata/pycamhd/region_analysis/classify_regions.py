@@ -35,6 +35,7 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
 # TODO: The probability thresholds could be taken from model_config.
 CNN_PROBABILITY_THRESH = 0.20
 
+# TODO: A better way to manage models and model_configs?
 DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH = os.path.join("trained_classification_models",
                                                        "scene_classification_vgg16_8.json")
 DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH   = os.path.join("trained_classification_models",
@@ -45,7 +46,6 @@ with open(DEFAULT_CNN_MODEL_CONFIG_PATH) as fp:
     DEFAULT_MODEL_CONFIG = json.load(fp)
 
 DEFAULT_MODEL_CONFIG["model_path"] = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH)
-DEFAULT_CLASSIFIER = load_model(DEFAULT_MODEL_CONFIG["model_path"])
 
 
 class RegionClassifier:
@@ -180,7 +180,7 @@ class RegionClassifier:
         if cnn_model_config_path is None:
             logging.info("Using the default scene_tag classifier at: %s" % DEFAULT_CNN_MODEL_CONFIG_PATH)
             model_config = DEFAULT_MODEL_CONFIG
-            classifier = DEFAULT_CLASSIFIER
+            classifier = load_model(DEFAULT_MODEL_CONFIG["model_path"])
         else:
             with open(cnn_model_config_path) as fp:
                 model_config = json.load(fp)
