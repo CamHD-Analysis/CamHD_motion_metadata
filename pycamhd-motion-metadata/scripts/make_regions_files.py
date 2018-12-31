@@ -41,7 +41,7 @@ parser.add_argument("--use-cnn",
                     dest="use_cnn",
                     action="store_true",
                     help="Flag to use the trained CNN model for region classification. "
-                         "If this flag is set, then the --ground-truth argument is ignored."
+                         "If this flag is set, then the --ground-truth argument is ignored. "
                          "If this flag is not set, the 'matchByGroundTruth' algorithm will be used for "
                          "region classification.")
 
