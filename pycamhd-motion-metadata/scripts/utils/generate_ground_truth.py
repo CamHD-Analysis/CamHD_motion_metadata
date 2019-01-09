@@ -3,6 +3,11 @@
 """
 Note: Run this from the project root directory to have the file_paths as required by the next modules.
 
+Usage: (Running from the root directory of the repository.)
+python pycamhd-motion-metadata/scripts/utils/generate_ground_truth.py --root RS03ASHS --from-date 20180724 --to-date 20180731 --count 10 --outfile ./classification/ground_truth_archive/ground_truth_20180724_20180731.json
+
+# Note: Please copy the newly generated file to ./classification/ground_truth.json to be picked up the make_regions_files.py script.
+
 """
 
 from datetime import datetime

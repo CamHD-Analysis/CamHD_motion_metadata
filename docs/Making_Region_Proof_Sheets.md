@@ -57,6 +57,18 @@ The name of the HTML file can be set with the `--output` options, for example:
 
 The images are always stored in an `images/` subdirectory next to the HTML output.
 
+#### Postprocessing (_Optional_):
+In order to automatically correct few common mis-classifications, the `postprocess_regions_files.py` script can be run
+after generating the proof_sheets as given below. After post-processing, generate an updated proof_sheet for manual validation. <br>
+The below is an example of how the post-processing script can be used.
+Please check the documentation of `postprocess_regions_files.py` by using the `--help` option.
+_Note:_ The `--overwrite` option used in the below example overwrites the respective regions_files.
+
+    python scripts/make_regions_proof_sheet.py RS03ASHS/PN03B/06-CAMHDA301/2018/09/0[456789] --output classification/proofsheets/20180904_20180909/raw.html
+
+    python scripts/utils/postprocess_regions_files.py RS03ASHS/PN03B/06-CAMHDA301/2018/09/0[456789] --image-path classification/proofsheets/20180904_20180909/images/ --overwrite
+
+    python scripts/make_regions_proof_sheet.py RS03ASHS/PN03B/06-CAMHDA301/2018/09/0[456789] --output classification/proofsheets/20180904_20180909/postprocessed.html
 
 ## Dependencies
 

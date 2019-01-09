@@ -1,8 +1,12 @@
 
+from keras.models import load_model
+from scipy.stats import mode
+from skimage.transform import resize
 
 import logging
 import random
 import json
+import os
 
 import numpy as np
 
@@ -27,6 +31,31 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
                       "d2_p0_z0", "d2_p8_z0", "d2_p8_z1",
                       "d2_p8_z0", "d2_p0_z0", "d2_p1_z0"]
 
+
+# TODO: The probability thresholds could be taken from model_config.
+CNN_PROBABILITY_THRESH = 0.20
+
+# TODO: A better way to manage models and model_configs?
+DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH = os.path.join("trained_classification_models",
+                                                       "scene_classification_vgg16_8.json")
+DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH   = os.path.join("trained_classification_models",
+                                                       "scene_classification_vgg16_8.hdf5")
+
+DEFAULT_CNN_MODEL_CONFIG_PATH = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH)
+with open(DEFAULT_CNN_MODEL_CONFIG_PATH) as fp:
+    DEFAULT_MODEL_CONFIG = json.load(fp)
+
+DEFAULT_MODEL_CONFIG["model_path"] = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH)
+
+DEFAULT_CLASSIFIER = None
+
+# A Singleton-like loading of DEFAULT_CLASSIFIER to ensure that is loaded only when regions are being classified.
+def get_default_classifier():
+    global DEFAULT_CLASSIFIER
+    if DEFAULT_CLASSIFIER is None:
+        DEFAULT_CLASSIFIER = load_model(DEFAULT_MODEL_CONFIG["model_path"])
+
+    return DEFAULT_CLASSIFIER
 
 
 class RegionClassifier:
@@ -114,6 +143,133 @@ class RegionClassifier:
             gt_file_revs[gt_file] = git_revision(gt_file)
 
         regions.json['depends']['classifyRegions'] = {'groundTruth': gt_file_revs}
+
+        return regions
+
+
+    def classify_regions_cnn(self, regions, cnn_model_config_path=None, first=None, ref_samples=(0.4, 0.5, 0.6)):
+        """
+        Classify the regions of the given RegionFile and assign the scene_tags.
+
+        :param regions: The RegionFile object created from the video regions_file.
+        :param cnn_model_config_path: The path to the trained CNN model config file (JSON). Default: None, the default
+                                      classifier files from the modules train_classification_models will be used.
+        :param first: The number of regions to process. Default: None, which implies all static regions.
+        :param ref_samples: The frames of the region as a pct of region length to be considered for classification.
+                            Default: Three frames at (0.4, 0.5, 0.6) will be chosen.
+                            TODO: Change this to a single frame at 0.5, to reduce time taken for processing.
+        :return: The updated regions (RegionFile object) with the scene_tag predictions.
+
+        """
+        def _sequence_based_correction(prev_scene_tag, cur_pred_scene_tag):
+            """
+            The regions p2_z1 and p4_z2 look very similar (plain water), hence they are corrected based on sequence.
+
+            """
+            is_corrected = False
+            if prev_scene_tag is None:
+                return cur_pred_scene_tag, is_corrected
+
+            deployment = prev_scene_tag.split("_")[0]
+            p2_z0_tag = "%s_p2_z0" % deployment
+            p2_z1_tag = "%s_p2_z1" % deployment
+            p4_z1_tag = "%s_p4_z1" % deployment
+            p4_z2_tag = "%s_p4_z2" % deployment
+
+            if cur_pred_scene_tag == p2_z1_tag and prev_scene_tag in (p4_z1_tag, p4_z2_tag):
+                is_corrected = True
+                return p4_z2_tag, is_corrected
+
+            if cur_pred_scene_tag == p4_z2_tag and prev_scene_tag in (p2_z0_tag, p2_z1_tag):
+                is_corrected = True
+                return p2_z1_tag, is_corrected
+
+            return cur_pred_scene_tag, is_corrected
+
+
+        if cnn_model_config_path is None:
+            logging.info("Using the default scene_tag classifier at: %s" % DEFAULT_CNN_MODEL_CONFIG_PATH)
+            model_config = DEFAULT_MODEL_CONFIG
+            classifier = get_default_classifier()
+        else:
+            with open(cnn_model_config_path) as fp:
+                model_config = json.load(fp)
+
+            classifier = load_model(model_config["model_path"])
+
+        num_to_process = len(regions.static_regions())
+
+        if first:
+            num_to_process = min(first, num_to_process)
+
+        prev_scene_tag = None
+        for i in range(num_to_process):
+
+            r = regions.static_at(i)
+
+            logging.info("Attempting to classify region from %d to %d" % (r.start_frame, r.end_frame))
+
+            ref_images = []
+
+            for sample_pct in ref_samples:
+                frame = r.frame_at(sample_pct)
+                logging.info("Retrieving test frame %d" % frame)
+
+                ref_img = self.lazycache.get_frame(regions.mov, frame, format='np')
+                resized_image = resize(ref_img, model_config["input_shape"]) * 255
+                resized_image = resized_image.astype(np.uint8)
+                if model_config["rescale"] is True:
+                    resized_image = resized_image * (1.0 / 255)
+
+                ref_images.append(resized_image)
+
+            self.images[i] = ref_images
+            input_tensor = np.asarray(ref_images)
+            pred_probas = classifier.predict(input_tensor)
+            pred_classes = np.argmax(pred_probas, axis=1)
+
+            class_probas = []
+            for i, pred_class in enumerate(pred_classes):
+                class_probas.append(pred_probas[i][pred_class])
+
+            logging.info("Unique pred_classes: %s" % len(set(pred_classes)))
+            logging.info("pred_classes: %s, pred_probas: %s" % (str(pred_classes), str(class_probas)))
+
+            majority_class_by_cnn = mode(pred_classes)[0][0]
+            majority_class_avg_proba_by_cnn = 0
+            for pred_class, class_proba in zip(pred_classes, class_probas):
+                if pred_class == majority_class_by_cnn:
+                    majority_class_avg_proba_by_cnn += class_proba
+
+            majority_class_avg_proba_by_cnn = majority_class_avg_proba_by_cnn / len(ref_samples)
+
+            cur_pred_scene_tag_by_cnn = model_config["classes"][majority_class_by_cnn]
+            cur_pred_scene_tag_sequence_corrected, is_corrected = _sequence_based_correction(prev_scene_tag,
+                                                                                             cur_pred_scene_tag_by_cnn)
+
+            if majority_class_avg_proba_by_cnn < CNN_PROBABILITY_THRESH:
+                logging.info("The predicted scene_tag %s has lower average predicted probability: %s (threshold: %s). "
+                             "Therefore, marking this region as 'unknown'."
+                             % (cur_pred_scene_tag_by_cnn, majority_class_avg_proba_by_cnn, CNN_PROBABILITY_THRESH))
+                majority_class_label = "unknown"
+            else:
+                majority_class_label = cur_pred_scene_tag_sequence_corrected
+
+            prev_scene_tag = cur_pred_scene_tag_sequence_corrected
+
+            inferred_by =  "cnn-%s" % model_config["model_name"]
+            if is_corrected:
+                inferred_by = "%s-sequence_corrected" % inferred_by
+
+            # Set the scene tag for the region.
+            r.set_scene_tag(majority_class_label, inferred_by=inferred_by)
+
+            # Set the Predicted probabilities in sceneTagMeta.
+            # TODO: Should we keep pred_probas of all the class_labels?
+            # TODO: Should we keep the corrected scene_tag or the original scene_tag predicted by CNN?
+            r.json['sceneTagMeta']["predProbas"] = {cur_pred_scene_tag_by_cnn: majority_class_avg_proba_by_cnn}
+
+        # TODO: Do we need to include any information in the depends section of the regions_file json?
 
         return regions
 
