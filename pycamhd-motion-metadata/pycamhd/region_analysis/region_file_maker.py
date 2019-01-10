@@ -19,13 +19,14 @@ class RegionFileMaker:
 
     def __init__(self, force=False, dryrun=False,
                  noclassify=False, first=None,
-                 gt_library=None, lazycache=None):
+                 gt_library=None, use_cnn=False, lazycache=None):
 
         self.force = force
         self.dryrun = dryrun
         self.noclassify = noclassify
         self.first = first
         self.gt_library = gt_library
+        self.use_cnn = use_cnn
         self.lazycache = lazycache
 
 
@@ -55,18 +56,36 @@ class RegionFileMaker:
 
             # Write results as a checkpoint
             if not self.dryrun:
+                logging.info("Created the regions_file (unclassified): %s" % outfile)
                 regions.save_json(outfile)
 
             if not self.noclassify:
-                with Timer() as t:
-                    classifier = self.gt_library.select(regions)
+                try:
+                    if self.use_cnn:
+                        with Timer() as t:
+                            # TODO: By default the RegionClassifier uses a trained CNN model,
+                            # TODO: therefore, we send None for comparer. A better way of defaulting this behaviour and
+                            # TODO: providing custom CNN models can be allowed.
+                            regions = RegionClassifier(None, self.lazycache).classify_regions_cnn(regions,
+                                                                                                  first=self.first)
+                            logging.info("Classified url: %s" % regions.mov)
+                    else:
+                        with Timer() as t:
+                            classifier = self.gt_library.select(regions)
+                            regions = RegionClassifier(classifier, self.lazycache).classify_regions(regions,
+                                                                                                    first=self.first)
+                            logging.info("Classified url: %s" % regions.mov)
 
-                    regions = RegionClassifier( classifier, self.lazycache ).classify_regions(regions, first=self.first)
+                    timing['classification'] = t.interval
 
+                    regions.json['versions']['classifyRegions'] = classify_regions_version
+                except:
+                    if not self.dryrun:
+                        os.remove(outfile)
 
-                timing['classification'] = t.interval
-
-                regions.json['versions']['classifyRegions'] = classify_regions_version
+                    logging.error("Encountered an error while classifying regions. "
+                                  "Deleted the regions_file to maintain consistency: %s" % outfile)
+                    raise
 
         timing['elapsedSeconds'] = full_time.interval
 
@@ -76,4 +95,5 @@ class RegionFileMaker:
 
         # Write results
         if not self.dryrun:
+            logging.info("Created the regions_file (classified): %s" % outfile)
             regions.save_json(outfile)

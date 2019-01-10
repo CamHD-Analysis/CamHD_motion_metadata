@@ -97,7 +97,7 @@ def _correct_sequencing_region_zoom_p4(regions_file, img_path, img_ext, deployme
         Applies OTSU threshold on the image followed by an erosion, then takes the proportion of positive pixels.
 
         """
-        img = imread(sample_frame_img_path, as_gray=True)
+        img = imread(sample_frame_img_path, as_grey=True)
         thresh = threshold_yen(img)
         img_binary = img > thresh
         eroded_img = erosion(img_binary, square(3))
@@ -326,12 +326,12 @@ def postprocess(args):
         _correct_sequencing_region_zoom_p4(regions_file, args.img_path, args.img_ext, args.deployment)
 
         # Postprocess2:
-        logging.info("Postprocess2: Correcting scene_tags for p8_z0 to p5_z0 for scenes followed by p5_z2.")
-        _correct_sequencing_region_zoom_p5_z0(regions_file, args.img_path, args.img_ext, args.deployment)
+        # logging.info("Postprocess2: Correcting scene_tags for p8_z0 to p5_z0 for scenes followed by p5_z2.")
+        # _correct_sequencing_region_zoom_p5_z0(regions_file, args.img_path, args.img_ext, args.deployment)
 
         # Postprocess3:
-        logging.info("Postprocess3: Correcting scene_tags for p6_z0 to p0_z1 for scenes having p6_z0 followed by p0_z0.")
-        _correct_sequencing_region_zoom_p0_z1(regions_file, args.img_path, args.img_ext, args.deployment)
+        # logging.info("Postprocess3: Correcting scene_tags for p6_z0 to p0_z1 for scenes having p6_z0 followed by p0_z0.")
+        # _correct_sequencing_region_zoom_p0_z1(regions_file, args.img_path, args.img_ext, args.deployment)
 
         if args.overwrite:
             logging.warning("Overwriting the regions_file: %s" % regions_file.mov)

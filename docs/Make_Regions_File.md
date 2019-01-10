@@ -59,6 +59,11 @@ It __will not__ overwrite existing files, unless given the `--force` flag.
   * `--ground-truth` specifies the location of the `ground_truth.json` file used
   to specify the set of ground truthfiles.   This defaults to [`classification/ground_truth.json`](../classification/ground_truth.json).
 
+
+  * `--use-cnn` Flag to use the trained CNN model for region classification. If this flag is set, then the --ground-truth argument is ignored.
+  If this flag is not set, the 'matchByGroundTruth' algorithm will be used for region classification. <br>
+  _NOTE:_ The default trained CNN - [scene_classification_vgg16_8.hdf5](https://drive.google.com/file/d/1medRydF8ccjSQbzU_jSPu-D7OrBN2cB2/view?usp=sharing) (_download from the link_) needs to be present in the 'pycamhd-motion-metadata/pycamhd/region_analysis/trained_classification_models/' directory.
+
   * The `--git-add` argument causes the script to `git add` any new regions files
   it may create (including when overwriting an existing file).
 

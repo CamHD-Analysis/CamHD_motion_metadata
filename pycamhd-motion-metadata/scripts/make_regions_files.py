@@ -37,6 +37,14 @@ parser.add_argument('--first', metavar='first', nargs='?', type=int,
 parser.add_argument("--ground-truth", dest="groundtruth",
                     default="classification/ground_truth.json")
 
+parser.add_argument("--use-cnn",
+                    dest="use_cnn",
+                    action="store_true",
+                    help="Flag to use the trained CNN model for region classification. "
+                         "If this flag is set, then the --ground-truth argument is ignored. "
+                         "If this flag is not set, the 'matchByGroundTruth' algorithm will be used for "
+                         "region classification.")
+
 parser.add_argument('--git-add', dest='gitadd', action='store_true',
                     help='Run "git add" on resulting file')
 
@@ -55,8 +63,9 @@ if not args.noclassify:
     import pycamhd.lazycache as camhd
     qt = camhd.lazycache(args.lazycache, verbose=True)
 
-    gt_library = ra.GroundTruthLibrary(qt)
-    gt_library.load_ground_truth(args.groundtruth)
+    if not args.use_cnn:
+        gt_library = ra.GroundTruthLibrary(qt)
+        gt_library.load_ground_truth(args.groundtruth)
 
 for inpath in args.input:
     if path.isdir(inpath):
@@ -80,8 +89,8 @@ for inpath in args.input:
                 continue
 
         ra.RegionFileMaker(first=args.first, dryrun=args.dryrun,
-                          force=args.force, noclassify=args.noclassify,
-                          gt_library=gt_library, lazycache=qt).make_region_file( infile, outfile )
+                           force=args.force, noclassify=args.noclassify,
+                           gt_library=gt_library, use_cnn=args.use_cnn, lazycache=qt).make_region_file(infile, outfile)
 
         if os.path.isfile(outfile) and args.gitadd:
             subprocess.run(["git", "add", outfile])
