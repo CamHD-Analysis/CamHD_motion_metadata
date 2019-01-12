@@ -166,7 +166,7 @@ def get_performance_metrics(args):
 
     # The pred_true_labels from all the target validated regions files have been collected.
     total_num_static_regions = len(all_pred_true_labels)
-    overall_algo_accuracy = float(sum(all_num_match_by_hand_list)) / total_num_static_regions
+    overall_algo_accuracy = 1 - float(sum(all_num_match_by_hand_list)) / total_num_static_regions
 
     labels_file = args.labels
     with open(labels_file) as fp:
