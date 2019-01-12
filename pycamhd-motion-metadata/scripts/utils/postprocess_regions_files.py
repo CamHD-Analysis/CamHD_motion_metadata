@@ -154,12 +154,14 @@ def _correct_sequencing_region_zoom_p4(regions_file, img_path, img_ext, deployme
                 logging.warning("p4_z1 was found after finding p4_z2, but marking as p4_z2. It could be an anomaly.")
                 if region.scene_tag != z2_scene_tag:
                     region.set_scene_tag(z2_scene_tag, inferred_by=inferred_by)
+                    region.json['sceneTagMeta']["algoFinalLabel"] = z2_scene_tag
                     logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
                                                                               region.end_frame,
                                                                               z2_scene_tag))
             else:
                 if region.scene_tag != z1_scene_tag:
                     region.set_scene_tag(z1_scene_tag, inferred_by=inferred_by)
+                    region.json['sceneTagMeta']["algoFinalLabel"] = z1_scene_tag
                     logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
                                                                               region.end_frame,
                                                                               z1_scene_tag))
@@ -167,6 +169,7 @@ def _correct_sequencing_region_zoom_p4(regions_file, img_path, img_ext, deployme
         else:
             if region.scene_tag != z2_scene_tag:
                 region.set_scene_tag(z2_scene_tag, inferred_by=inferred_by)
+                region.json['sceneTagMeta']["algoFinalLabel"] = z2_scene_tag
                 logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
                                                                           region.end_frame,
                                                                           z2_scene_tag))
@@ -215,6 +218,7 @@ def _correct_sequencing_region_zoom_p5_z0(regions_file, img_path, img_ext, deplo
     region = regions_file.static_at(i)
     if region.scene_tag == incorrect_scene_tag:
         region.set_scene_tag(correct_scene_tag, inferred_by=inferred_by)
+        region.json['sceneTagMeta']["algoFinalLabel"] = correct_scene_tag
         logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
                                                                   region.end_frame,
                                                                   correct_scene_tag))
@@ -232,6 +236,7 @@ def _correct_sequencing_region_zoom_p5_z0(regions_file, img_path, img_ext, deplo
     region = regions_file.static_at(i - 1)
     if region.scene_tag == incorrect_scene_tag:
         region.set_scene_tag(correct_scene_tag, inferred_by=inferred_by)
+        region.json['sceneTagMeta']["algoFinalLabel"] = correct_scene_tag
         logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
                                                                   region.end_frame,
                                                                   correct_scene_tag))
@@ -279,6 +284,7 @@ def _correct_sequencing_region_zoom_p0_z1(regions_file, img_path, img_ext, deplo
     region = regions_file.static_at(i)
     if region.scene_tag == incorrect_scene_tag:
         region.set_scene_tag(correct_scene_tag, inferred_by=inferred_by)
+        region.json['sceneTagMeta']["algoFinalLabel"] = correct_scene_tag
         logging.info("Setting region (%s-%s) to scene_tag: %s" % (region.start_frame,
                                                                   region.end_frame,
                                                                   correct_scene_tag))

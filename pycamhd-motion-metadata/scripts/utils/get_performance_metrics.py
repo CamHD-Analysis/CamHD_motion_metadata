@@ -62,6 +62,8 @@ def _get_pred_true_labels(regions_file_path):
             # These are the errors mapped to each of the labels predicted (includes only top labels).
             meta_pred_dict = scene_tag_meta["topTenPct"]
             pred_label = min(meta_pred_dict.items(), key=lambda x: x[1])[0]
+        elif "algoFinalLabel" in scene_tag_meta:
+            pred_label = scene_tag_meta["algoFinalLabel"]
         elif "predProbas" in scene_tag_meta:
             # CNN based classification: these contain predicted probabilities.
             meta_pred_dict = scene_tag_meta["predProbas"]
@@ -74,6 +76,24 @@ def _get_pred_true_labels(regions_file_path):
         pred_true_labels.append((pred_label, true_label))
 
     return pred_true_labels
+
+
+def _get_num_match_by_hand(regions_file_path):
+    cur_num_match_by_hand = 0
+
+    with open(regions_file_path) as fp:
+        regions_doc = json.load(fp)
+
+    regions = regions_doc["regions"]
+    for region in regions:
+        if region["type"] != "static":
+            continue
+
+        scene_tag_meta = region["sceneTagMeta"]
+        if scene_tag_meta["inferredBy"] == "matchByHand":
+            cur_num_match_by_hand += 1
+
+    return cur_num_match_by_hand
 
 
 def _format_write_conf_mat(conf_mat, labels, fp):
@@ -125,11 +145,14 @@ def plot_confusion_matrix(cm, classes,
 
 def get_performance_metrics(args):
     all_pred_true_labels = []
+    all_num_match_by_hand_list = []
 
     def _process(infile):
         logging.info("Reading from {}".format(infile))
         cur_pred_true_labels = _get_pred_true_labels(infile)
         all_pred_true_labels.extend(cur_pred_true_labels)
+        cur_num_match_by_hand = _get_num_match_by_hand(infile)
+        all_num_match_by_hand_list.append(cur_num_match_by_hand)
         logging.info("The length of current pred_true_labels is: {}".format(len(cur_pred_true_labels)))
 
     for pathin in args.input:
@@ -142,6 +165,9 @@ def get_performance_metrics(args):
                 _process(infile)
 
     # The pred_true_labels from all the target validated regions files have been collected.
+    total_num_static_regions = len(all_pred_true_labels)
+    overall_algo_accuracy = float(sum(all_num_match_by_hand_list)) / total_num_static_regions
+
     labels_file = args.labels
     with open(labels_file) as fp:
         labels = json.load(fp)
@@ -154,8 +180,11 @@ def get_performance_metrics(args):
 
     # Format and output the confusion matrix.
     fp = open(args.outfile, "w") if args.outfile else sys.stdout
-    header_lines = ["Total Accuracy,{}".format(accuracy),
-                    "Total scenes,{}".format(len(y_pred))]
+    header_lines = [
+        "Overall Algorithm Accuracy,{}".format(overall_algo_accuracy),
+        "Total Accuracy,{}".format(accuracy),
+        "Total scenes,{}".format(total_num_static_regions)
+    ]
     fp.write("\n".join(header_lines) + "\n\n")
     _format_write_conf_mat(conf_mat, labels, fp)
     fp.close()
