@@ -269,6 +269,11 @@ class RegionClassifier:
             # TODO: Should we keep the corrected scene_tag or the original scene_tag predicted by CNN?
             r.json['sceneTagMeta']["predProbas"] = {cur_pred_scene_tag_by_cnn: majority_class_avg_proba_by_cnn}
 
+            # Set the 'algoFinalLabel' in the sceneTagMeta, which would contain the final scene_tag inferred
+            # automatically through algorithmic postprocessing.
+            # This helps to evaluate the overall algorithmic performance.
+            r.json['sceneTagMeta']["algoFinalLabel"] = majority_class_label
+
         # TODO: Do we need to include any information in the depends section of the regions_file json?
 
         return regions
