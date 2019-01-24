@@ -1,0 +1,138 @@
+{
+    "movie": {
+        "Duration": 897.6635131835938,
+        "NumFrames": 26903,
+        "URL": "/RS03ASHS/PN03B/06-CAMHDA301/2018/10/21/CAMHDA301-20181021T000000.mov",
+        "cacheURL": "http://lazycache:8080/v1/org/oceanobservatories/rawdata/files//RS03ASHS/PN03B/06-CAMHDA301/2018/10/21/CAMHDA301-20181021T000000.mov"
+    },
+    "contents": {
+        "regions": "1.1"
+    },
+    "versions": {
+        "findRegions": "1.0",
+        "classifyRegions": "1.1"
+    },
+    "regions": [
+        {
+            "startFrame": 9,
+            "endFrame": 18369,
+            "type": "static",
+            "stats": {
+                "scaleMean": 1.0000064823588195,
+                "txMean": -0.0012318272538267114,
+                "tyMean": -0.004378057044356424,
+                "size": 2145
+            },
+            "sceneTag": "d5A_p8_z1",
+            "sceneTagMeta": {
+                "inferredBy": "cnn-scene_classification_vgg16_8",
+                "predProbas": {
+                    "d5A_p8_z1": 0.9969820380210876
+                },
+                "algoFinalLabel": "d5A_p8_z1"
+            }
+        },
+        {
+            "startFrame": 18379,
+            "endFrame": 18539,
+            "type": "zoom_out",
+            "stats": {
+                "scaleMean": 0.9362166854748517,
+                "txMean": -0.8667873369598114,
+                "tyMean": 0.5715699855866815,
+                "size": 208
+            }
+        },
+        {
+            "startFrame": 18539,
+            "endFrame": 18879,
+            "type": "static",
+            "stats": {
+                "scaleMean": 1.0000063786705384,
+                "txMean": 0.010663356156384989,
+                "tyMean": -0.009448295172256121,
+                "size": 442
+            },
+            "sceneTag": "d5A_p8_z0",
+            "sceneTagMeta": {
+                "inferredBy": "cnn-scene_classification_vgg16_8",
+                "predProbas": {
+                    "d5A_p8_z0": 0.9454776644706726
+                },
+                "algoFinalLabel": "d5A_p8_z0"
+            }
+        },
+        {
+            "startFrame": 18889,
+            "endFrame": 19099,
+            "type": "NW",
+            "stats": {
+                "scaleMean": 0.9990302278209953,
+                "txMean": 38.80513047795519,
+                "tyMean": 30.462458583504265,
+                "size": 273
+            }
+        },
+        {
+            "startFrame": 19099,
+            "endFrame": 19399,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9999966262684203,
+                "txMean": -0.24043963153255168,
+                "tyMean": -0.7490524513757524,
+                "size": 390
+            },
+            "sceneTag": "d5A_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "cnn-scene_classification_vgg16_8",
+                "predProbas": {
+                    "d5A_p0_z0": 0.9997083147366842
+                },
+                "algoFinalLabel": "d5A_p0_z0"
+            }
+        },
+        {
+            "startFrame": 19409,
+            "endFrame": 19579,
+            "type": "S",
+            "stats": {
+                "scaleMean": 1.0017377812636625,
+                "txMean": 0.6311982364407737,
+                "tyMean": -39.96854522062134,
+                "size": 221
+            }
+        },
+        {
+            "startFrame": 19579,
+            "endFrame": 19979,
+            "type": "static",
+            "stats": {
+                "scaleMean": 1.0,
+                "txMean": 0.0,
+                "tyMean": 0.0,
+                "size": 13
+            },
+            "sceneTag": "d5A_p1_z0",
+            "sceneTagMeta": {
+                "inferredBy": "cnn-scene_classification_vgg16_8",
+                "predProbas": {
+                    "d5A_p1_z0": 0.9908629854520162
+                },
+                "algoFinalLabel": "d5A_p1_z0"
+            }
+        }
+    ],
+    "depends": {
+        "opticalFlow": {
+            "RS03ASHS/PN03B/06-CAMHDA301/2018/10/21/CAMHDA301-20181021T000000_optical_flow.json": "53698d2ea0938ee143ef69c54ce3e0a7f092ffe2"
+        }
+    },
+    "performance": {
+        "timing": {
+            "regionAnalysis": 0.12561600000000794,
+            "classification": 0.1428420000000017,
+            "elapsedSeconds": 0.7453359999999805
+        }
+    }
+}
