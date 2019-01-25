@@ -42,6 +42,8 @@ parser.add_argument('--lazycache-url', dest='lazycache', default=os.environ.get(
 
 args = parser.parse_args()
 
+IMAGE_RESOLUTION = (426, 240) # Preserves the 16:9 aspect ratio from the original 1920x1080 images.
+
 logging.basicConfig( level=args.log.upper() )
 
 logging.info("Outfile is %s" % args.outfile)
@@ -222,7 +224,8 @@ with open(html_file, 'w') as html:
 
             if args.force or not path.exists( img_file ) or not path.exists( thumb_file ):
                 logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, path.basename(url)))
-                img = qt.get_frame(url, sample_frame, format=args.imageext, width=img_size[0], height=img_size[1])
+                img = qt.get_frame(url, sample_frame, format=args.imageext,
+                                   width=IMAGE_RESOLUTION[0], height=IMAGE_RESOLUTION[1])
                 img.save( img_file )
                 img.thumbnail( img_size )  # PIL.thumbnail preserves aspect ratio
 
@@ -269,7 +272,8 @@ with open(html_file, 'w') as html:
 
             if args.force or not path.exists( img_file ) or not path.exists( thumb_file ):
                 logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, path.basename(url)))
-                img = qt.get_frame(url, sample_frame, format='jpg', width=img_size[0], height=img_size[1])
+                img = qt.get_frame(url, sample_frame, format='jpg',
+                                   width=IMAGE_RESOLUTION[0], height=IMAGE_RESOLUTION[1])
                 img.save( img_file )
                 img.thumbnail( img_size )  # PIL.thumbnail preserves aspect ratio
 
