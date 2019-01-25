@@ -37,9 +37,9 @@ CNN_PROBABILITY_THRESH = 0.20
 
 # TODO: A better way to manage models and model_configs?
 DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH = os.path.join("trained_classification_models",
-                                                       "scene_classification_vgg16_8.json")
+                                                       "scene_classifier_cnn_d5A-v0.4.json")
 DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH   = os.path.join("trained_classification_models",
-                                                       "scene_classification_vgg16_8.hdf5")
+                                                       "scene_classifier_cnn_d5A-v0.4.hdf5")
 
 DEFAULT_CNN_MODEL_CONFIG_PATH = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH)
 with open(DEFAULT_CNN_MODEL_CONFIG_PATH) as fp:
