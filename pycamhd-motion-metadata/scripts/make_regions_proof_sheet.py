@@ -222,7 +222,7 @@ with open(html_file, 'w') as html:
 
             if args.force or not path.exists( img_file ) or not path.exists( thumb_file ):
                 logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, path.basename(url)))
-                img = qt.get_frame( url, sample_frame, format=args.imageext )
+                img = qt.get_frame(url, sample_frame, format=args.imageext, width=img_size[0], height=img_size[1])
                 img.save( img_file )
                 img.thumbnail( img_size )  # PIL.thumbnail preserves aspect ratio
 
@@ -269,7 +269,7 @@ with open(html_file, 'w') as html:
 
             if args.force or not path.exists( img_file ) or not path.exists( thumb_file ):
                 logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, path.basename(url)))
-                img = qt.get_frame( url, sample_frame, format='jpg' )
+                img = qt.get_frame(url, sample_frame, format='jpg', width=img_size[0], height=img_size[1])
                 img.save( img_file )
                 img.thumbnail( img_size )  # PIL.thumbnail preserves aspect ratio
 
