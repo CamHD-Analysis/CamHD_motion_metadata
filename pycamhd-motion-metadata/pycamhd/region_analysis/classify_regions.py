@@ -37,9 +37,9 @@ CNN_PROBABILITY_THRESH = 0.20
 
 # TODO: A better way to manage models and model_configs?
 DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH = os.path.join("trained_classification_models",
-                                                       "scene_classification_vgg16_8.json")
+                                                       "scene_classifier_cnn_d5A-v0.4.json")
 DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH   = os.path.join("trained_classification_models",
-                                                       "scene_classification_vgg16_8.hdf5")
+                                                       "scene_classifier_cnn_d5A-v0.4.hdf5")
 
 DEFAULT_CNN_MODEL_CONFIG_PATH = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH)
 with open(DEFAULT_CNN_MODEL_CONFIG_PATH) as fp:
@@ -175,12 +175,13 @@ class RegionClassifier:
             p2_z1_tag = "%s_p2_z1" % deployment
             p4_z1_tag = "%s_p4_z1" % deployment
             p4_z2_tag = "%s_p4_z2" % deployment
+            plain_water_tag = "%s_plain_water" % deployment
 
-            if cur_pred_scene_tag == p2_z1_tag and prev_scene_tag in (p4_z1_tag, p4_z2_tag):
+            if cur_pred_scene_tag in (p2_z1_tag, plain_water_tag) and prev_scene_tag in (p4_z1_tag, p4_z2_tag):
                 is_corrected = True
                 return p4_z2_tag, is_corrected
 
-            if cur_pred_scene_tag == p4_z2_tag and prev_scene_tag in (p2_z0_tag, p2_z1_tag):
+            if cur_pred_scene_tag in (p4_z2_tag, plain_water_tag) and prev_scene_tag in (p2_z0_tag, p2_z1_tag):
                 is_corrected = True
                 return p2_z1_tag, is_corrected
 
@@ -215,13 +216,18 @@ class RegionClassifier:
                 frame = r.frame_at(sample_pct)
                 logging.info("Retrieving test frame %d" % frame)
 
-                ref_img = self.lazycache.get_frame(regions.mov, frame, format='np')
-                resized_image = resize(ref_img, model_config["input_shape"]) * 255
-                resized_image = resized_image.astype(np.uint8)
-                if model_config["rescale"] is True:
-                    resized_image = resized_image * (1.0 / 255)
+                width, height = model_config["input_shape"][:2]
+                ref_img = self.lazycache.get_frame(regions.mov, frame, format='png', width=width, height=height)
+                ref_img = np.array(ref_img)
 
-                ref_images.append(resized_image)
+                if ref_img.shape != tuple(model_config["input_shape"]):
+                    raise RuntimeError("The retrieved frame shape doesn't conform with model's input_shape: %s"
+                                       % str(ref_img.shape))
+
+                if model_config["rescale"] is True:
+                    rescaled_image = ref_img * (1.0 / 255)
+
+                ref_images.append(rescaled_image)
 
             self.images[i] = ref_images
             input_tensor = np.asarray(ref_images)
