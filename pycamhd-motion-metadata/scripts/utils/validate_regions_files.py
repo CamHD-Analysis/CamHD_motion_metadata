@@ -29,7 +29,7 @@ def get_args():
     parser.add_argument('--outfile',
                         help='The output file path.')
     parser.add_argument("--log",
-                        default="WARN",
+                        default="INFO",
                         help="Specify the log level. Default: WARN.")
 
     return parser.parse_args()
@@ -42,10 +42,15 @@ def validate_regions_files(args):
         out_fp.write("Optimal Num Regions in a video: %s\n" % OPTIMAL_NUM_REGIONS)
 
     not_found_list = []
-    less_regions_list = []
-    more_regions_list = []
+    less_regions_dict = {}
+    more_regions_dict = {}
 
     def _process(infile):
+        # Check if it is from T000000 and ignore those files:
+        if "T000000" in os.path.basename(infile):
+            logging.info("Ignoring the T000000 regions file: %s" % infile)
+            return
+
         logging.debug("Checking for optical flow file: {}".format(infile))
         regions_file_path = "%s_regions%s" % os.path.splitext(infile)
         if not os.path.exists(regions_file_path):
@@ -60,9 +65,9 @@ def validate_regions_files(args):
             out_fp.write("Num Regions for %s: %d\n" % (regions_file_path, num_static_regions))
 
         if num_static_regions <= NUM_REGIONS_LOWER_THRESH:
-            less_regions_list.append(regions_file_path)
+            less_regions_dict[regions_file_path] = num_static_regions
         elif num_static_regions >= NUM_REGIONS_UPPER_THRESH:
-            more_regions_list.append(regions_file_path)
+            more_regions_dict[regions_file_path] = num_static_regions
 
 
     for pathin in args.input:
@@ -76,19 +81,18 @@ def validate_regions_files(args):
 
     if out_fp:
         out_fp.write("\n\n### SUMMARY ###")
-        out_fp.write("\n\nNo Regions File found for: %d\n" % len(not_found_list))
+        out_fp.write("\nNo Regions File found for: %d\n" % len(not_found_list))
         out_fp.write("\n".join(not_found_list))
-        out_fp.write("\n\nLess than %s Regions File found for: %d\n" % (NUM_REGIONS_LOWER_THRESH, len(less_regions_list)))
-        out_fp.write("\n".join(less_regions_list))
-        out_fp.write("\n\nMore than %s Regions File found for: %d\n" % (NUM_REGIONS_UPPER_THRESH, len(more_regions_list)))
-        out_fp.write("\n".join(more_regions_list))
+        out_fp.write("\n\nLess than %s Regions File found for: %d\n" % (NUM_REGIONS_LOWER_THRESH, len(less_regions_dict)))
+        out_fp.write("\n".join(["%s: %d" % x for x in less_regions_dict.items()]))
+        out_fp.write("\n\nMore than %s Regions File found for: %d\n" % (NUM_REGIONS_UPPER_THRESH, len(more_regions_dict)))
+        out_fp.write("\n".join(["%s: %d" % x for x in more_regions_dict.items()]))
         out_fp.close()
 
-    return not_found_list, less_regions_list, more_regions_list
+    return not_found_list, less_regions_dict, more_regions_dict
 
 
 if __name__ == "__main__":
     args = get_args()
     logging.basicConfig(level=args.log.upper())
-    not_found_list, less_regions_list, more_regions_list = validate_regions_files(args)
-
+    validate_regions_files(args)
