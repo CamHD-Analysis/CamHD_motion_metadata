@@ -81,7 +81,7 @@ def validate_regions_files(args):
 
     if out_fp:
         out_fp.write("\n\n### SUMMARY ###")
-        out_fp.write("\nNo Regions File found for: %d\n" % len(not_found_list))
+        out_fp.write("\nNo Regions File found (but Optical Flow file exists) for: %d\n" % len(not_found_list))
         out_fp.write("\n".join(not_found_list))
         out_fp.write("\n\nLess than %s Regions File found for: %d\n" % (NUM_REGIONS_LOWER_THRESH, len(less_regions_dict)))
         out_fp.write("\n".join(["%s: %d" % x for x in less_regions_dict.items()]))
