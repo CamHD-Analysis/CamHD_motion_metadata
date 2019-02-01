@@ -41,16 +41,21 @@ def validate_regions_files(args):
         out_fp = open(args.outfile, "w")
         out_fp.write("Optimal Num Regions in a video: %s\n" % OPTIMAL_NUM_REGIONS)
 
+    num_optical_flow_files = 0
+    num_regions_files = 0
     not_found_list = []
     less_regions_dict = {}
     more_regions_dict = {}
 
     def _process(infile):
+        nonlocal num_optical_flow_files
+        nonlocal num_regions_files
         # Check if it is from T000000 and ignore those files:
         if "T000000" in os.path.basename(infile):
             logging.info("Ignoring the T000000 regions file: %s" % infile)
             return
 
+        num_optical_flow_files += 1
         logging.debug("Checking for optical flow file: {}".format(infile))
         regions_file_path = "%s_regions%s" % os.path.splitext(infile)
         if not os.path.exists(regions_file_path):
@@ -59,6 +64,7 @@ def validate_regions_files(args):
                 out_fp.write("Num Regions for %s: N/A\n" % regions_file_path)
             return
 
+        num_regions_files += 1
         regions = mmd.RegionFile.load(regions_file_path)
         num_static_regions = len(regions.static_regions())
         if out_fp:
@@ -81,7 +87,9 @@ def validate_regions_files(args):
 
     if out_fp:
         out_fp.write("\n\n### SUMMARY ###")
-        out_fp.write("\nNo Regions File found (but Optical Flow file exists) for: %d\n" % len(not_found_list))
+        out_fp.write("\nNumber of Optical Flow Files found (ignoring T000000 files): %d" % num_optical_flow_files)
+        out_fp.write("\nNumber of Regions Files found: %d" % num_regions_files)
+        out_fp.write("\n\nNo Regions File found (but Optical Flow file exists) for: %d\n" % len(not_found_list))
         out_fp.write("\n".join(not_found_list))
         out_fp.write("\n\nLess than %s Regions File found for: %d\n" % (NUM_REGIONS_LOWER_THRESH, len(less_regions_dict)))
         out_fp.write("\n".join(["%s: %d" % x for x in less_regions_dict.items()]))
