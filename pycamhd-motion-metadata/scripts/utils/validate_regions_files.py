@@ -79,7 +79,7 @@ def validate_regions_files(args):
         print_or_write(out_fp, "Optimal Num Regions in a video: %s\n" % OPTIMAL_NUM_REGIONS)
 
     if args.scene_val:
-        scene_to_img_file_dict = defaultdict(list)
+        scene_to_img_file_modified_name_dict = defaultdict(list)
         os.makedirs(args.scene_val_dir)
         os.makedirs(args.frame_cache_dir, exist_ok=True)
 
@@ -118,7 +118,7 @@ def validate_regions_files(args):
         if not args.scene_val:
             return
 
-        # Updating scene_to_img_file_dict for creating scene_val_dir.
+        # Updating scene_to_img_file_modified_name_dict for creating scene_val_dir.
         url = regions.mov
         for region in regions.static_regions():
             sample_frame = region.start_frame + 0.5 * (region.end_frame - region.start_frame)
@@ -129,7 +129,9 @@ def validate_regions_files(args):
                                         width=IMAGE_RESOLUTION[0], height=IMAGE_RESOLUTION[1])
                 img.save(img_file_path)
 
-            scene_to_img_file_dict[region.scene_tag].append(img_file_path)
+            toks = os.path.splitext(os.path.basename(img_file_path))
+            modified_name = "%s_%d-%d%s" % (toks[0], region.start_frame, region.end_frame, toks[1])
+            scene_to_img_file_modified_name_dict[region.scene_tag].append((img_file_path, modified_name))
 
 
     for pathin in args.input:
@@ -161,11 +163,11 @@ def validate_regions_files(args):
         out_fp.close()
 
     if args.scene_val:
-        for scene_tag, img_file_list in scene_to_img_file_dict.items():
+        for scene_tag, img_file_modified_name_list in scene_to_img_file_modified_name_dict.items():
             cur_scene_dir = os.path.join(args.scene_val_dir, scene_tag)
             os.makedirs(cur_scene_dir)
-            for img_file in img_file_list:
-                shutil.copy(img_file, os.path.join(cur_scene_dir, os.path.basename(img_file)))
+            for img_file, modified_name in img_file_modified_name_list:
+                shutil.copy(img_file, os.path.join(cur_scene_dir, modified_name))
 
         logging.info("The scene-val-dir has been created: %s" % args.scene_val_dir)
 
