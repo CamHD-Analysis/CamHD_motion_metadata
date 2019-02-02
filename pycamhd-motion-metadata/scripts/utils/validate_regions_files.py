@@ -39,7 +39,8 @@ def get_args():
     parser.add_argument('--scene-val-dir',
                         help='The output directory to which the classified regions need to be written.')
     parser.add_argument('--frame-cache-dir',
-                        help='Path to the directory where the frames (at 0.5) for the regions have been stored.')
+                        help='Path to the directory where the frames (at 0.5) for the regions have been stored. '
+                             'If the frame images are not present, they will downloaded to this directory.')
     parser.add_argument("--image-format",
                         dest="imageext",
                         default='jpg',
