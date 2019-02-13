@@ -21,9 +21,11 @@ html_to_google_drive:
 
 ## Note:   this will take a long time...
 ci_scrape:
-	${PYTHON} scripts/ci_meta_scrape.py --output ci_scrape_2015.json RS03ASHS/PN03B/06-CAMHDA301/2015/
-	${PYTHON} scripts/ci_meta_scrape.py --output ci_scrape_2016.json RS03ASHS/PN03B/06-CAMHDA301/2016/
-	${PYTHON} scripts/ci_meta_scrape.py --output ci_scrape_2017.json RS03ASHS/PN03B/06-CAMHDA301/2017/
+	${PYTHON} pycamhd-motion-metadata/scripts/ci_meta_scrape.py --lazycache-url http://lazycache.san.apl.washington.edu/v1/org/oceanobservatories/rawdata/files/ --output ci_scrape_2015.json RS03ASHS/PN03B/06-CAMHDA301/2015/
+	${PYTHON} pycamhd-motion-metadata/scripts/ci_meta_scrape.py --lazycache-url http://lazycache.san.apl.washington.edu/v1/org/oceanobservatories/rawdata/files/ --output ci_scrape_2016.json RS03ASHS/PN03B/06-CAMHDA301/2016/
+	#${PYTHON} pycamhd-motion-metadata/scripts/ci_meta_scrape.py --lazycache-url http://lazycache.san.apl.washington.edu/v1/org/oceanobservatories/rawdata/files/ --output ci_scrape_2017.json RS03ASHS/PN03B/06-CAMHDA301/2017/
+	#${PYTHON} pycamhd-motion-metadata/scripts/ci_meta_scrape.py --lazycache-url http://lazycache.san.apl.washington.edu/v1/org/oceanobservatories/rawdata/files/ --output ci_scrape_2018.json RS03ASHS/PN03B/06-CAMHDA301/2018/
+	#${PYTHON} pycamhd-motion-metadata/scripts/ci_meta_scrape.py --lazycache-url http://lazycache.san.apl.washington.edu/v1/org/oceanobservatories/rawdata/files/ --output ci_scrape_2019.json RS03ASHS/PN03B/06-CAMHDA301/2019/
 
 datapackage/movie_metadata.csv:
 	${PYTHON} scripts/ci_scrape_to_csv.py --output $@ ci_scrape_*.json
