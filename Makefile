@@ -25,8 +25,8 @@ ci_scrape:
 	${PYTHON} scripts/ci_meta_scrape.py --output ci_scrape_2016.json RS03ASHS/PN03B/06-CAMHDA301/2016/
 	${PYTHON} scripts/ci_meta_scrape.py --output ci_scrape_2017.json RS03ASHS/PN03B/06-CAMHDA301/2017/
 
-datapackage/movie_metadata.csv:
-	${PYTHON} scripts/ci_scrape_to_csv.py --output $@ ci_scrape_*.json
+datapackage/movie_metadata.csv: ci_scrape_2015.json ci_scrape_2016.json ci_scrape_2017.json ci_scrape_2018.json ci_scrape_2019.json
+	${PYTHON} pycamhd-motion-metadata/scripts/ci_scrape_to_csv.py --output $@ $^
 
 
 
