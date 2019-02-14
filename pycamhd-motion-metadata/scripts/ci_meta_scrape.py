@@ -45,8 +45,6 @@ def iterate_path(path):
 
     dir_info = repo.get_dir(path)
 
-    print(dir_info)
-
     outfiles = []
 
     if 'Files' in dir_info:
@@ -71,14 +69,25 @@ if len(mov_paths) == 0:
 
 def get_metadata( mov ):
     logging.info("Retrieving %s" % mov )
-    return repo.get_metadata(mov, timeout=600)
+
+    md = {}
+    for i in range(5):
+        md = repo.get_metadata(mov, timeout=600)
+        
+        if not md:
+            continue
+
+        if 'NumFrames' in md:
+            return md
+
+    return md
 
 
 jobs = [delayed(get_metadata)(mov) for mov in mov_paths]
 
 logging.info("Performing %d fetches" % len(jobs))
 
-results = compute(*jobs, scheduler='threads',num_workers=4)
+results = compute(*jobs, scheduler='threads',num_workers=1)
 
 if args.outfile:
   with open(args.outfile, 'w') as f:

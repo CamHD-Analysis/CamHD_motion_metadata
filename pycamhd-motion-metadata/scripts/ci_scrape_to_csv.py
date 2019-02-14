@@ -40,12 +40,17 @@ with open(args.outfile, 'w') as f:
         with open(json_file) as f:
             j = json.load(f)
 
-            for url,data in j.items():
-                mov = path.splitext(path.basename(url))[0]
-
-                if 'NumFrames' not in data:
-                    logging.warning("Error with movie %s" % mov)
+            for entry in j:
+                if not entry:
                     continue
+
+                if 'NumFrames' not in entry:
+                    logging.warning("Error with movie %s" % entry['URL'])
+                    continue
+
+
+                mov = path.splitext(path.basename(entry['URL']))[0]
+
 
                 match = re.match(datetimere, mov)
 
@@ -57,4 +62,4 @@ with open(args.outfile, 'w') as f:
                 else:
                     logging.warning("Error parsing date from %s" % mov )
 
-                csv_file.writerow( [mov, dt, data['NumFrames'], data['Duration'], data['FileSize']] )
+                csv_file.writerow( [mov, dt, entry['NumFrames'], entry['Duration'], entry['FileSize']] )
