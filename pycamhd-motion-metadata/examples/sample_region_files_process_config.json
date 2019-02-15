@@ -1,17 +1,16 @@
 {
     "version": 0.1,
+    "deployment": "d5A",
 
-    "new_validated_reg_files": "RS03ASHS/PN03B/06-CAMHDA301/2018/11/*",
+    "new_validated_reg_files": "RS03ASHS/PN03B/06-CAMHDA301/2018/12/*",
     "new_reg_train_data_dir": "set_201812",
     "new_reg_sampling_prob": 0.5,
     "base_train_data_dir": "set_201811_train_data",
-    "base_train_data_split": 0.5,
+    "base_train_data_prob": 0.5,
     "merged_train_data_dir": "set_201812_train_data",
+    "val_split": 0.25,
+    "epochs": 100,
+    "batch_size": 8,
 
-    "input_optical_flow_files": ,
+    "input_optical_flow_files": ""
 }
-# TODO:
-use timestamp format: time.strftime("%Y%m%d %H:%M:%S", time.gmtime()) # 20190215 04:39:18 # TODO: Should we use localtime or UTC?
-1. Add documentation for this file (and the automated script) on Git.
-2. Check and update the requirements.yml.
-3. Delete the Conda envs. Create new conda env and verify dependencies from new requirements.yml file.

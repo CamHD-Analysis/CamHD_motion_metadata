@@ -36,27 +36,7 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
 CNN_PROBABILITY_THRESH = 0.20
 
 # TODO: A better way to manage models and model_configs?
-DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH = os.path.join("trained_classification_models",
-                                                       "scene_classifier_cnn_d5A-v0.6.json")
-DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH   = os.path.join("trained_classification_models",
-                                                       "scene_classifier_cnn_d5A-v0.6.hdf5")
-
-DEFAULT_CNN_MODEL_CONFIG_PATH = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_CONFIG_RELATIVE_PATH)
-with open(DEFAULT_CNN_MODEL_CONFIG_PATH) as fp:
-    DEFAULT_MODEL_CONFIG = json.load(fp)
-
-DEFAULT_MODEL_CONFIG["model_path"] = os.path.join(os.path.dirname(__file__), DEFAULT_CLASSIFIER_HDF5_RELATIVE_PATH)
-
-DEFAULT_CLASSIFIER = None
-
-# A Singleton-like loading of DEFAULT_CLASSIFIER to ensure that is loaded only when regions are being classified.
-def get_default_classifier():
-    global DEFAULT_CLASSIFIER
-    if DEFAULT_CLASSIFIER is None:
-        DEFAULT_CLASSIFIER = load_model(DEFAULT_MODEL_CONFIG["model_path"])
-
-    return DEFAULT_CLASSIFIER
-
+CLASSIFIERS_META_FILE = "scene_tag_classifiers_meta.json"
 
 class RegionClassifier:
 
@@ -187,16 +167,18 @@ class RegionClassifier:
 
             return cur_pred_scene_tag, is_corrected
 
+        CAMHD_SCENETAG_DATA_DIR = os.environ.get("CAMHD_SCENETAG_DATA_DIR", None)
+        if not CAMHD_SCENETAG_DATA_DIR:
+            raise ValueError("The %s needs to be set in the environment while using CNN." % CAMHD_SCENETAG_DATA_DIR)
+        if not os.path.exists(CAMHD_SCENETAG_DATA_DIR):
+            raise ValueError("The $CAMHD_SCENETAG_DATA_DIR does not exist: %s" % CAMHD_SCENETAG_DATA_DIR)
 
-        if cnn_model_config_path is None:
-            logging.info("Using the default scene_tag classifier at: %s" % DEFAULT_CNN_MODEL_CONFIG_PATH)
-            model_config = DEFAULT_MODEL_CONFIG
-            classifier = get_default_classifier()
-        else:
-            with open(cnn_model_config_path) as fp:
-                model_config = json.load(fp)
+        with open(CLASSIFIERS_META_FILE) as fp:
+            classifiers_meta_dict = json.load(fp)
 
-            classifier = load_model(model_config["model_path"])
+        latest_model = classifiers_meta_dict["latest_model"]
+        model_config = classifiers_meta_dict["trained_models"][latest_model]
+        classifier = load_model(os.path.expandvars(model_config["model_path"]))
 
         num_to_process = len(regions.static_regions())
 
