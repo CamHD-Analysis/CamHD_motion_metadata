@@ -2,6 +2,7 @@
 
 """
 The runner script to automate the process of creating region files for new set of videos.
+
 1. Samples random frames (prob 0.5) from recent month's validated regions files.
 2. Retrains the scene_tag_classification CNN models on the recent data.
 # TODO: Complete the description.
@@ -26,7 +27,12 @@ import os
 import shutil
 import subprocess
 
+CAMHD_MOTION_METADATA_DIR = os.environ.get("CAMHD_MOTION_METADATA_DIR", None)
 CAMHD_SCENETAG_DATA_DIR = os.environ.get("CAMHD_SCENETAG_DATA_DIR", None)
+CAMHD_PYTHON_EXEC_PATH = os.environ.get("CAMHD_PYTHON_EXEC_PATH", None)
+
+SCENE_TAG_TRAIN_DATA_DIR = os.path.join(CAMHD_SCENETAG_DATA_DIR, "scene_classification_data")
+SCENE_TAG_MODEL_DIR = os.path.join(CAMHD_SCENETAG_DATA_DIR, "trained_classification_models")
 
 # TODO: This is sample code to running another python script using subprocess.
 # Use a list of args instead of a string
@@ -38,7 +44,8 @@ with open('myfile', "w") as outfile:
 
 def get_args():
     parser = argparse.ArgumentParser(description="The runner script to automate the process of creating region files "
-                                                 "for new set of videos.")
+                                                 "for new set of videos. "
+                                                 "Note: Ensure to run this on a new branch taken from updated master.")
     parser.add_argument('--config',
                         required=True,
                         help="The path to regions file process config json file")
@@ -80,12 +87,15 @@ if __name__ == "__main__":
     args = get_args()
     logging.basicConfig(level=args.log.upper())
 
-    if not CAMHD_SCENETAG_DATA_DIR:
-        raise ValueError("The CAMHD_SCENETAG_DATA_DIR needs to be set in the environment.")
+    for env_var in [CAMHD_MOTION_METADATA_DIR, CAMHD_SCENETAG_DATA_DIR, CAMHD_PYTHON_EXEC_PATH]:
+        if not env_var:
+            raise ValueError("The %s needs to be set in the environment." % env_var)
+
     if not os.path.exists(CAMHD_SCENETAG_DATA_DIR):
         logging.warning("The CAMHD_SCENETAG_DATA_DIR was not found. Creating a new directory: %s"
                         % CAMHD_SCENETAG_DATA_DIR)
         os.makedirs(CAMHD_SCENETAG_DATA_DIR)
 
     # Call scripts in order and log messages.
+    # 1. Sample data from new_data month
     # TODO
