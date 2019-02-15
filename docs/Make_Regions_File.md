@@ -166,3 +166,9 @@ compared to the reference sequence.   If matched to a portion of the reference
 sequence, the intervening unlabelled region adopts the middle label.
 
 If a region is successfully labeled, the tag `sceneTag` is added to the region file.   If a region cannot be labelled, a region is labelled `unknown`.  The `sceneTagMeta` tag is used to store meta information about the matching process.
+
+# process_regions_files.py
+The runner script to automate the process of creating region files for new set of videos.
+Note: Ensure to run this on a new branch taken from updated master.
+
+# TODO: Add documentation about the script and the sample config.
