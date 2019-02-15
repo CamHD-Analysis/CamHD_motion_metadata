@@ -2,6 +2,7 @@
 
 """
 The runner script to automate the process of creating region files for new set of videos.
+Note: Ensure to run this on a new branch taken from updated master.
 
 1. Samples random frames (prob 0.5) from recent month's validated regions files.
 2. Retrains the scene_tag_classification CNN models on the recent data.
@@ -13,7 +14,9 @@ python scripts/utils/process_regions_files.py --config <path to regions_file_pro
 # TODO: Add the sample config after creating.
 # Sample Config is available at: <REPOSITORY_ROOT>/
 
-# Set CAMHD_SCENETAG_DATA_DIR environment variable to the directory as a root data directory.
+# Set following environments variables:
+1. CAMHD_MOTION_METADATA_DIR: The path to the local clone of the repository.
+2. CAMHD_SCENETAG_DATA_DIR: The data directory to store train data and trained models.
 
 """
 import pycamhd.lazycache as camhd
@@ -22,25 +25,20 @@ import pycamhd.motionmetadata as mmd
 from collections import defaultdict
 
 import argparse
+import json
 import logging
 import os
 import shutil
 import subprocess
+import sys
+import time
 
 CAMHD_MOTION_METADATA_DIR = os.environ.get("CAMHD_MOTION_METADATA_DIR", None)
 CAMHD_SCENETAG_DATA_DIR = os.environ.get("CAMHD_SCENETAG_DATA_DIR", None)
-CAMHD_PYTHON_EXEC_PATH = os.environ.get("CAMHD_PYTHON_EXEC_PATH", None)
+CAMHD_PYTHON_EXEC_PATH = sys.executable
 
 SCENE_TAG_TRAIN_DATA_DIR = os.path.join(CAMHD_SCENETAG_DATA_DIR, "scene_classification_data")
 SCENE_TAG_MODEL_DIR = os.path.join(CAMHD_SCENETAG_DATA_DIR, "trained_classification_models")
-
-# TODO: This is sample code to running another python script using subprocess.
-# Use a list of args instead of a string
-input_files = ['file1', 'file2', 'file3']
-my_cmd = ['cat'] + input_files
-with open('myfile', "w") as outfile:
-    subprocess.call(my_cmd, stdout=outfile)
-
 
 def get_args():
     parser = argparse.ArgumentParser(description="The runner script to automate the process of creating region files "
@@ -49,6 +47,9 @@ def get_args():
     parser.add_argument('--config',
                         required=True,
                         help="The path to regions file process config json file")
+    parser.add_argument("--logfile",
+                        required=True,
+                        help="Specify the path to the logfile.")
     parser.add_argument('--lazycache-url',
                         dest='lazycache',
                         default=os.environ.get("LAZYCACHE_URL", None),
@@ -56,6 +57,9 @@ def get_args():
     parser.add_argument("--log",
                         default="INFO",
                         help="Specify the log level. Default: INFO.")
+    parser.add_argument("--no-write",
+                        action="store_true",
+                        help="Specify this flag to not executive any commands.")
 
     args = parser.parse_args()
 
@@ -63,6 +67,13 @@ def get_args():
     args.qt = camhd.lazycache(args.lazycache)
 
     return args
+
+
+def _run(cmd_list, logfile):
+    cmd = "%s %s" % (sys.executable, " ".join(cmd_list))
+    with open(logfile, "a") as outfile:
+        logging.info("Executing command: %s" % cmd)
+        subprocess.call(cmd, stdout=outfile)
 
 
 def merge_dataset_dirs(dataset_dirs, output_dir):
@@ -85,9 +96,22 @@ def merge_dataset_dirs(dataset_dirs, output_dir):
 
 if __name__ == "__main__":
     args = get_args()
-    logging.basicConfig(level=args.log.upper())
+    logging.basicConfig(filename=args.logfile,
+                        filemode='a',
+                        format='[%(asctime)s - [%(levelname)s]: %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=args.log)
 
-    for env_var in [CAMHD_MOTION_METADATA_DIR, CAMHD_SCENETAG_DATA_DIR, CAMHD_PYTHON_EXEC_PATH]:
+    start_time = time.time()
+    logging.info("Started Process Regions files.")
+
+    if not os.path.exists(args.config):
+        raise ValueError("The regions file process config does not exists: %s" % args.config)
+
+    with open(args.config) as fp:
+        config = json.load(fp)
+
+    for env_var in [CAMHD_MOTION_METADATA_DIR, CAMHD_SCENETAG_DATA_DIR]:
         if not env_var:
             raise ValueError("The %s needs to be set in the environment." % env_var)
 
