@@ -217,8 +217,10 @@ def process_config(config, args):
         str(config["new_reg_sampling_prob"]),
         "--output",
         new_reg_train_data_dir,
-        "--width 256",
-        "--height 256"
+        "--width",
+        "256",
+        "--height",
+        "256"
     ]
     _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
 
@@ -267,7 +269,8 @@ def process_config(config, args):
         "--func train_cnn",
         "--data-dir",
         merged_train_data_dir,
-        "--classes SCENE_TAGS",
+        "--classes",
+        "SCENE_TAGS",
         "--deployment",
         deployment,
         "--val-split",
