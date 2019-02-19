@@ -1,16 +1,12 @@
 
 from keras.models import load_model
 from scipy.stats import mode
-from skimage.transform import resize
 
 import logging
-import random
 import json
 import os
 
 import numpy as np
-
-from operator import attrgetter
 
 from .git_utils import *
 
@@ -208,8 +204,9 @@ class RegionClassifier:
 
                 if model_config["rescale"] is True:
                     rescaled_image = ref_img * (1.0 / 255)
-
-                ref_images.append(rescaled_image)
+                    ref_images.append(rescaled_image)
+                else:
+                    ref_images.append(ref_img)
 
             self.images[i] = ref_images
             input_tensor = np.asarray(ref_images)
