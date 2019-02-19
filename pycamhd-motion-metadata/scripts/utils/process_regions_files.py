@@ -20,7 +20,6 @@ python scripts/utils/process_regions_files.py --config <path to regions_file_pro
 
 """
 import pycamhd.lazycache as camhd
-import pycamhd.motionmetadata as mmd
 
 from collections import defaultdict
 
@@ -76,6 +75,7 @@ DEFAULT_CNN_MODEL_CONFIG = {
     ]
 }
 
+
 def get_args():
     parser = argparse.ArgumentParser(description="The runner script to automate the process of creating region files "
                                                  "for new set of videos. "
@@ -105,18 +105,31 @@ def get_args():
     return args
 
 
-def _run(cmd_list, logfile, no_write=False):
-    cmd = "%s %s" % (sys.executable, " ".join(cmd_list))
+def _run(cmd_list, logfile, py_script=False, restrict_gpu=None, no_write=False, allow_error=False):
+    cmd = []
+    if restrict_gpu:
+        cmd.append("CUDA_VISIBLE_DEVICES=%s" % restrict_gpu)
+
+    if py_script:
+        cmd.append(sys.executable)
+
+    cmd.extend(cmd_list)
+    cmd_str = " ".join(cmd)
+
     with open(logfile, "a") as outfile:
-        logging.info("Executing command: %s" % cmd)
+        logging.info("Executing command: %s" % cmd_str)
         if not no_write:
-            subprocess.call(cmd, stdout=outfile)
+            error_code = subprocess.call(cmd, stdout=outfile, stderr=outfile)
+            if error_code != 0 and not allow_error:
+                raise RuntimeError("The cmd failed at runtime with error_code %s: %s" % (error_code, cmd_str))
+
+            return error_code
 
 
 def merge_dataset_dirs(base_train_data_dir, new_reg_train_data_dir, output_dir, base_train_data_prob=1):
     def _sample_prob(prob):
         """
-        Returns True or False based on the given probability. Bernoille trial with given probability.
+        Returns True or False based on the given probability. Bernoulli trial with given probability.
 
         """
         r = random.uniform(0, 1)
@@ -160,10 +173,28 @@ def process_config(config, args):
 
         return new_model_name
 
+    def _get_monthly_input_optical_flow_files_wild_card(year, month, deployment):
+        if deployment == "d5A":
+            rel_path_wild_cards = ["RS03ASHS/PN03B/06-CAMHDA301/%s/%s/0[456789]" % (year, month),
+                                   "RS03ASHS/PN03B/06-CAMHDA301/%s/%s/1[123456789]" % (year, month),
+                                   "RS03ASHS/PN03B/06-CAMHDA301/%s/%s/2[123456789]" % (year, month),
+                                   "RS03ASHS/PN03B/06-CAMHDA301/%s/%s/3[01]" % (year, month)]
+
+            rel_path_long_regions_wild_card = ("RS03ASHS/PN03B/06-CAMHDA301/%s/%s/*/*T000000_optical_flow_regions.json"
+                                               % (year, month))
+        else:
+            raise ValueError("Deployment not supported: %s" % deployment)
+
+        optical_flow_files_wild_cards = [os.path.join(CAMHD_MOTION_METADATA_DIR, x) for x in rel_path_wild_cards]
+        long_regions_wild_card = os.path.join(CAMHD_MOTION_METADATA_DIR, rel_path_long_regions_wild_card)
+        return " ".join(optical_flow_files_wild_cards), long_regions_wild_card
+
     scene_tag_train_data_dir = os.path.join(CAMHD_SCENETAG_DATA_DIR, RELATIVE_TRAIN_DATA_DIR)
     scene_tag_model_dir = os.path.join(CAMHD_SCENETAG_DATA_DIR, RELATIVE_MODEL_DIR)
 
-    start_time = time.time()
+    deployment = config["deployment"]
+
+    prev_start_time = time.time()
     logging.info("Started Process Regions files from config: \n%s" % str(config))
 
     # Call scripts in order and log messages.
@@ -174,9 +205,10 @@ def process_config(config, args):
                            "scripts",
                            "utils",
                            "sample_random_data.py")
+    new_reg_train_data_dir = os.path.join(scene_tag_train_data_dir, config["new_reg_train_data_dirname"])
     cmd_list = [
         py_file,
-        os.path.join(CAMHD_MOTION_METADATA_DIR, config["new_validated_reg_files"]),
+        os.path.expandvars(config["new_validated_reg_files"]),
         "--scenes",
         "d5A_p0_z0,d5A_p0_z1,d5A_p0_z2,d5A_p1_z0,d5A_p1_z1,d5A_p2_z0,d5A_p2_z1,d5A_p3_z0,d5A_p3_z1,d5A_p3_z2,"
         "d5A_p4_z0,d5A_p4_z1,d5A_p4_z2,d5A_p5_z0,d5A_p5_z1,d5A_p5_z2,d5A_p6_z0,d5A_p6_z1,d5A_p6_z2,d5A_p7_z0,"
@@ -184,17 +216,20 @@ def process_config(config, args):
         "--prob",
         str(config["new_reg_sampling_prob"]),
         "--output",
-        os.path.join(scene_tag_train_data_dir, config["new_reg_train_data_dir"]),
+        new_reg_train_data_dir,
         "--width 256",
         "--height 256"
     ]
-    _run(cmd_list, args.logfile, args.no_write)
+    _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
+
+    cur_time = time.time()
+    logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
+    prev_start_time = cur_time
 
     # 2. Merge data with base data.
     logging.info("STEP: Merge the train datasets.")
-    base_train_data_dir = os.path.join(scene_tag_train_data_dir, config["base_train_data_dir"])
-    new_reg_train_data_dir = os.path.join(scene_tag_train_data_dir, config["new_reg_train_data_dir"])
-    merged_train_data_dir = os.path.join(scene_tag_train_data_dir, config["merged_train_data_dir"])
+    base_train_data_dir = os.path.join(scene_tag_train_data_dir, config["base_train_data_dirname"])
+    merged_train_data_dir = os.path.join(scene_tag_train_data_dir, config["merged_train_data_dirname"])
     base_train_data_prob = config["base_train_data_prob"]
     if not args.no_write:
         merge_dataset_dirs(base_train_data_dir,
@@ -204,6 +239,10 @@ def process_config(config, args):
     else:
         logging.info("The base_train_data_dir %s and new_reg_train_data_dir %s will be merged to output_dir: %s"
                      % (base_train_data_dir, new_reg_train_data_dir, merged_train_data_dir))
+
+    cur_time = time.time()
+    logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
+    prev_start_time = cur_time
 
     # 3. Train the CNN on the new train data.
     # TODO: Add Transfer learning support.
@@ -216,7 +255,7 @@ def process_config(config, args):
     with open(classifiers_meta_file) as fp:
         classifiers_meta_dict = json.load(fp)
 
-    new_model_name = _get_next_model_version(classifiers_meta_dict["latest_model"], config["deployment"])
+    new_model_name = _get_next_model_version(classifiers_meta_dict["latest_model"], deployment)
     py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
                            "pycamhd-motion-metadata",
                            "pycamhd",
@@ -230,7 +269,7 @@ def process_config(config, args):
         merged_train_data_dir,
         "--classes SCENE_TAGS",
         "--deployment",
-        config["deployment"],
+        deployment,
         "--val-split",
         str(config.get("val_split", 0.25)),
         "--epochs",
@@ -240,7 +279,7 @@ def process_config(config, args):
         "--model-outfile",
         model_outfile
     ]
-    _run(cmd_list, args.logfile, args.no_write)
+    _run(cmd_list, args.logfile, py_script=True, restrict_gpu="0", no_write=args.no_write)
 
     model_config = copy.copy(DEFAULT_CNN_MODEL_CONFIG)
     model_config["model_name"] = new_model_name
@@ -252,11 +291,114 @@ def process_config(config, args):
         with open(classifiers_meta_file, "w") as fp:
             json.dump(classifiers_meta_dict, fp, indent=4, sort_keys=True)
 
+    # XXX: Using 'warning' to highlight important informational log.
+    logging.info("The Model re-training has completed, and the new model is saved at %s. "
+                 "And the classifier_meta_file is updated: %s."
+                 % (model_outfile, classifiers_meta_file))
+    logging.warning("The new trained model can be shared by uploading to the Google Drive.")
+    logging.warning("The train and validation split of the current train data can be deleted.")
+
+    cur_time = time.time()
+    logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
+    prev_start_time = cur_time
+
     # 4. Make region files for input_optical_flow_files.
     logging.info("STEP: Make region files for input_optical_flow_files.")
-    input_optical_flow_files_wild_card = config["input_optical_flow_files"]
-    # TODO: Determine the short-video optical flow files and invoke make_regions_files.py.
-    return
+    long_regions_files = None
+    if "monthly" in config:
+        year, month = config["monthly"].split("-")
+        input_optical_flow_files_wild_card, long_regions_files = \
+            _get_monthly_input_optical_flow_files_wild_card(year, month, deployment)
+    else:
+        input_optical_flow_files_wild_card = os.path.expandvars(config["input_optical_flow_files"])
+
+    py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
+                           "pycamhd-motion-metadata",
+                           "scripts",
+                           "make_regions_files.py")
+    cmd_list = [
+        py_file,
+        input_optical_flow_files_wild_card,
+        "--use-cnn"
+    ]
+    _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
+
+    if long_regions_files:
+        cmd_list = ["rm", long_regions_files]
+        _run(cmd_list, args.logfile, py_script=False, no_write=args.no_write)
+
+    cur_time = time.time()
+    logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
+    prev_start_time = cur_time
+
+    # 5. Create Validation Report.
+    logging.info("STEP: Create Validation Report.")
+    py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
+                           "pycamhd-motion-metadata",
+                           "scripts",
+                           "utils",
+                           "validate_regions_files.py")
+    cmd_list = [
+        py_file,
+        input_optical_flow_files_wild_card,
+        "--outfile",
+        os.path.expandvars(config["validation_report_path"])
+    ]
+    _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
+
+    cur_time = time.time()
+    logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
+    prev_start_time = cur_time
+
+    # 6. Create Proofsheet.
+    logging.info("STEP: Create Proofsheet.")
+    py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
+                           "pycamhd-motion-metadata",
+                           "scripts",
+                           "make_regions_proof_sheet.py")
+    cmd_list = [
+        py_file,
+        input_optical_flow_files_wild_card,
+        "--output",
+        os.path.expandvars(config["proofsheet_path"])
+    ]
+    _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
+
+    cur_time = time.time()
+    logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
+    prev_start_time = cur_time
+
+    logging.info("Completed Processing Regions files and the proofsheets have been generated.")
+    logging.warning("The proofsheets can be used to manually validate and correct the region files scene_tags.")
+    logging.warning("The corrected and validated regions files need to be pushed to the Git Repository.")
+
+    # 7. Generate Performance Evaluation Report.
+    py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
+                           "pycamhd-motion-metadata",
+                           "scripts",
+                           "utils",
+                           "get_performance_metrics.py")
+    cmd_list = [
+        "python",
+        py_file,
+        input_optical_flow_files_wild_card,
+        "--labels",
+        os.path.join(CAMHD_MOTION_METADATA_DIR,
+                     "classification",
+                     "labels",
+                     "%s_labels.json" % deployment),
+        "--outfile",
+        os.path.join(CAMHD_MOTION_METADATA_DIR,
+                     "classification",
+                     "performance_evaluation",
+                     "model_eval-%s.csv" % config["name"])
+    ]
+    logging.warning("Use the following command to get generate the Performance Evaluation Report: \n%s"
+                    % " ".join(cmd_list))
+    logging.warning("The Performance Evaluation Report need to be generated and pushed to the Git Repository.")
+
+    cur_time = time.time()
+    logging.info("Time taken for complete processing (sec): %s" % (cur_time - prev_start_time))
 
 
 if __name__ == "__main__":
@@ -273,11 +415,16 @@ if __name__ == "__main__":
     with open(args.config) as fp:
         config = json.load(fp)
 
-    for env_var in [CAMHD_MOTION_METADATA_DIR, CAMHD_SCENETAG_DATA_DIR]:
-        if not env_var:
-            raise ValueError("The %s needs to be set in the environment." % env_var)
+    # Checking the environment variables.
+    if not CAMHD_MOTION_METADATA_DIR:
+        raise ValueError("The CAMHD_MOTION_METADATA_DIR variable needs to be set in the environment.")
+
+    if not CAMHD_SCENETAG_DATA_DIR:
+        raise ValueError("The CAMHD_SCENETAG_DATA_DIR variable needs to be set in the environment.")
 
     if not os.path.exists(CAMHD_SCENETAG_DATA_DIR):
         raise ValueError("The $CAMHD_SCENETAG_DATA_DIR does not exist: %s" % CAMHD_SCENETAG_DATA_DIR)
 
+    # TODO: Add mailing support.
     process_config(config, args)
+

@@ -1,16 +1,20 @@
 {
     "version": 0.1,
     "deployment": "d5A",
+    "name": "201901",
 
-    "new_validated_reg_files": "RS03ASHS/PN03B/06-CAMHDA301/2018/12/*",
-    "new_reg_train_data_dir": "set_201812",
+    "new_validated_reg_files": "$CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2018/12/*",
+    "new_reg_train_data_dirname": "set_201812",
     "new_reg_sampling_prob": 0.5,
-    "base_train_data_dir": "set_201811_train_data",
+    "base_train_data_dirname": "set_201811_train_data",
     "base_train_data_prob": 0.5,
-    "merged_train_data_dir": "set_201812_train_data",
+    "merged_train_data_dirname": "set_201812_train_data",
     "val_split": 0.25,
     "epochs": 100,
     "batch_size": 8,
 
-    "input_optical_flow_files": ""
+    "input_optical_flow_files": "$CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2019/01/0[456789] $CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2019/01/1[123456789] $CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2019/01/2[123456789] $CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2019/01/3[01]",
+    "monthly": "2019-01",
+    "validation_report_path": "$CAMHD_MOTION_METADATA_DIR/regions_files_validation_reports/201901.txt",
+    "proofsheet_path": "$CAMHD_SCENETAG_DATA_DIR/proofsheets/201901/raw.html"
 }
