@@ -113,6 +113,7 @@ def _run(cmd_list, logfile, py_script=False, restrict_gpu=None, no_write=False, 
     cmd = []
     custom_env = os.environ.copy()
     if restrict_gpu:
+        logging.info("Setting CUDA_VISIBLE_DEVICES=%s" % str(restrict_gpu))
         custom_env["CUDA_VISIBLE_DEVICES"] = str(restrict_gpu)
 
     if py_script:
@@ -299,7 +300,7 @@ def process_config(config, args):
         model_outfile
     ]
     no_write = args.no_write or (cur_step_num < args.start_step)
-    _run(cmd_list, args.logfile, py_script=True, restrict_gpu="0", no_write=no_write)
+    _run(cmd_list, args.logfile, py_script=True, restrict_gpu=config.get("restrict_gpu"), no_write=no_write)
 
     model_config = copy.copy(DEFAULT_CNN_MODEL_CONFIG)
     model_config["model_name"] = new_model_name
