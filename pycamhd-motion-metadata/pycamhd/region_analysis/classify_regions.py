@@ -32,7 +32,7 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
 CNN_PROBABILITY_THRESH = 0.20
 
 # TODO: A better way to manage models and model_configs?
-CLASSIFIERS_META_FILE = "scene_tag_classifiers_meta.json"
+CLASSIFIERS_META_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scene_tag_classifiers_meta.json")
 
 class RegionClassifier:
 

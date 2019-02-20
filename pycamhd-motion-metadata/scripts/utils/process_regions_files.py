@@ -93,6 +93,7 @@ from collections import defaultdict
 import argparse
 import copy
 import json
+import glob
 import logging
 import os
 import random
@@ -263,10 +264,10 @@ def process_config(config, args):
 
     def _get_monthly_input_optical_flow_files_wild_card(year, month, deployment):
         if deployment == "d5A":
-            rel_path_wild_cards = ["RS03ASHS/PN03B/06-CAMHDA301/%s/%s/0[456789]" % (year, month),
-                                   "RS03ASHS/PN03B/06-CAMHDA301/%s/%s/1[123456789]" % (year, month),
-                                   "RS03ASHS/PN03B/06-CAMHDA301/%s/%s/2[123456789]" % (year, month),
-                                   "RS03ASHS/PN03B/06-CAMHDA301/%s/%s/3[01]" % (year, month)]
+            rel_path_wild_cards = (glob.glob("RS03ASHS/PN03B/06-CAMHDA301/%s/%s/0[456789]" % (year, month)) +
+                                   glob.glob("RS03ASHS/PN03B/06-CAMHDA301/%s/%s/1[123456789]" % (year, month)) +
+                                   glob.glob("RS03ASHS/PN03B/06-CAMHDA301/%s/%s/2[123456789]" % (year, month)) +
+                                   glob.glob("RS03ASHS/PN03B/06-CAMHDA301/%s/%s/3[01]" % (year, month)))
 
             rel_path_long_regions_wild_card = ("RS03ASHS/PN03B/06-CAMHDA301/%s/%s/*/*T000000_optical_flow_regions.json"
                                                % (year, month))
@@ -274,8 +275,9 @@ def process_config(config, args):
             raise ValueError("Deployment not supported: %s" % deployment)
 
         optical_flow_files_wild_cards = [os.path.join(CAMHD_MOTION_METADATA_DIR, x) for x in rel_path_wild_cards]
+        sorted_optical_flow_files_wild_cards = sorted(optical_flow_files_wild_cards)
         long_regions_wild_card = os.path.join(CAMHD_MOTION_METADATA_DIR, rel_path_long_regions_wild_card)
-        return " ".join(optical_flow_files_wild_cards), long_regions_wild_card
+        return sorted_optical_flow_files_wild_cards, long_regions_wild_card
 
     scene_tag_train_data_dir = os.path.join(CAMHD_SCENETAG_DATA_DIR, RELATIVE_TRAIN_DATA_DIR)
     scene_tag_model_dir = os.path.join(CAMHD_SCENETAG_DATA_DIR, RELATIVE_MODEL_DIR)
@@ -388,7 +390,11 @@ def process_config(config, args):
                                               RELATIVE_MODEL_DIR,
                                               os.path.basename(model_outfile))
     classifiers_meta_dict["trained_models"][new_model_name] = model_config
-    if not args.no_write:
+    classifiers_meta_dict["latest_model"] = new_model_name
+    logging.info("The latest model in the classifiers_meta_file (%s) is updated to %s"
+                 % (classifiers_meta_file, new_model_name))
+
+    if not no_write:
         with open(classifiers_meta_file, "w") as fp:
             json.dump(classifiers_meta_dict, fp, indent=4, sort_keys=True)
 
@@ -418,11 +424,9 @@ def process_config(config, args):
                            "pycamhd-motion-metadata",
                            "scripts",
                            "make_regions_files.py")
-    cmd_list = [
-        py_file,
-        input_optical_flow_files_wild_card,
-        "--use-cnn"
-    ]
+
+    cmd_list = [py_file] + input_optical_flow_files_wild_card + ["--use-cnn"]
+
     no_write = args.no_write or (cur_step_num < args.start_step)
     _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
 
