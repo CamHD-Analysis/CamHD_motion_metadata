@@ -86,6 +86,10 @@ def get_args():
     parser.add_argument("--logfile",
                         required=True,
                         help="Specify the path to the logfile.")
+    parser.add_argument("--start-step",
+                        type=int,
+                        default=1,
+                        help="Specify the step number from which the execution should start. Default: 1.")
     parser.add_argument('--lazycache-url',
                         dest='lazycache',
                         default=os.environ.get("LAZYCACHE_URL", None),
@@ -107,8 +111,9 @@ def get_args():
 
 def _run(cmd_list, logfile, py_script=False, restrict_gpu=None, no_write=False, allow_error=False):
     cmd = []
+    custom_env = os.environ.copy()
     if restrict_gpu:
-        cmd.append("CUDA_VISIBLE_DEVICES=%s" % restrict_gpu)
+        custom_env["CUDA_VISIBLE_DEVICES"] = str(restrict_gpu)
 
     if py_script:
         cmd.append(sys.executable)
@@ -117,13 +122,15 @@ def _run(cmd_list, logfile, py_script=False, restrict_gpu=None, no_write=False, 
     cmd_str = " ".join(cmd)
 
     with open(logfile, "a") as outfile:
-        logging.info("Executing command: %s" % cmd_str)
         if not no_write:
-            error_code = subprocess.call(cmd, stdout=outfile, stderr=outfile)
+            logging.info("Executing command: %s" % cmd_str)
+            error_code = subprocess.call(cmd, stdout=outfile, stderr=outfile, env=custom_env)
             if error_code != 0 and not allow_error:
                 raise RuntimeError("The cmd failed at runtime with error_code %s: %s" % (error_code, cmd_str))
 
             return error_code
+        else:
+            logging.info("Executing command (no-write): %s" % cmd_str)
 
 
 def merge_dataset_dirs(base_train_data_dir, new_reg_train_data_dir, output_dir, base_train_data_prob=1):
@@ -199,7 +206,8 @@ def process_config(config, args):
 
     # Call scripts in order and log messages.
     # 1. Sample data from new_data month
-    logging.info("STEP: Sample data from new validated region files.")
+    cur_step_num = 1
+    logging.info("STEP %s: Sample data from new validated region files." % cur_step_num)
     py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
                            "pycamhd-motion-metadata",
                            "scripts",
@@ -222,24 +230,30 @@ def process_config(config, args):
         "--height",
         "256"
     ]
-    _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
+    no_write = args.no_write or (cur_step_num < args.start_step)
+    _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
 
     cur_time = time.time()
     logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
     prev_start_time = cur_time
 
     # 2. Merge data with base data.
-    logging.info("STEP: Merge the train datasets.")
+    cur_step_num = 2
+    logging.info("STEP %s: Merge the train datasets." % cur_step_num)
     base_train_data_dir = os.path.join(scene_tag_train_data_dir, config["base_train_data_dirname"])
     merged_train_data_dir = os.path.join(scene_tag_train_data_dir, config["merged_train_data_dirname"])
     base_train_data_prob = config["base_train_data_prob"]
-    if not args.no_write:
+
+    no_write = args.no_write or (cur_step_num < args.start_step)
+    if not no_write:
         merge_dataset_dirs(base_train_data_dir,
                            new_reg_train_data_dir,
                            merged_train_data_dir,
                            base_train_data_prob=base_train_data_prob)
+        logging.info("The base_train_data_dir %s and new_reg_train_data_dir %s are merged to output_dir: %s"
+                     % (base_train_data_dir, new_reg_train_data_dir, merged_train_data_dir))
     else:
-        logging.info("The base_train_data_dir %s and new_reg_train_data_dir %s will be merged to output_dir: %s"
+        logging.info("The base_train_data_dir %s and new_reg_train_data_dir %s would be merged to output_dir: %s"
                      % (base_train_data_dir, new_reg_train_data_dir, merged_train_data_dir))
 
     cur_time = time.time()
@@ -247,8 +261,9 @@ def process_config(config, args):
     prev_start_time = cur_time
 
     # 3. Train the CNN on the new train data.
+    cur_step_num = 3
     # TODO: Add Transfer learning support.
-    logging.info("STEP: Train the CNN on the new train data.")
+    logging.info("STEP %s: Train the CNN on the new train data." % cur_step_num)
     classifiers_meta_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
                                          "pycamhd-motion-metadata",
                                          "pycamhd",
@@ -266,7 +281,8 @@ def process_config(config, args):
     model_outfile = os.path.join(scene_tag_model_dir, "%s.hdf5" % new_model_name)
     cmd_list = [
         py_file,
-        "--func train_cnn",
+        "--func",
+        "train_cnn",
         "--data-dir",
         merged_train_data_dir,
         "--classes",
@@ -282,7 +298,8 @@ def process_config(config, args):
         "--model-outfile",
         model_outfile
     ]
-    _run(cmd_list, args.logfile, py_script=True, restrict_gpu="0", no_write=args.no_write)
+    no_write = args.no_write or (cur_step_num < args.start_step)
+    _run(cmd_list, args.logfile, py_script=True, restrict_gpu="0", no_write=no_write)
 
     model_config = copy.copy(DEFAULT_CNN_MODEL_CONFIG)
     model_config["model_name"] = new_model_name
@@ -306,7 +323,8 @@ def process_config(config, args):
     prev_start_time = cur_time
 
     # 4. Make region files for input_optical_flow_files.
-    logging.info("STEP: Make region files for input_optical_flow_files.")
+    cur_step_num = 4
+    logging.info("STEP %s: Make region files for input_optical_flow_files." % cur_step_num)
     long_regions_files = None
     if "monthly" in config:
         year, month = config["monthly"].split("-")
@@ -324,18 +342,20 @@ def process_config(config, args):
         input_optical_flow_files_wild_card,
         "--use-cnn"
     ]
-    _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
+    no_write = args.no_write or (cur_step_num < args.start_step)
+    _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
 
     if long_regions_files:
         cmd_list = ["rm", long_regions_files]
-        _run(cmd_list, args.logfile, py_script=False, no_write=args.no_write)
+        _run(cmd_list, args.logfile, py_script=False, no_write=no_write)
 
     cur_time = time.time()
     logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
     prev_start_time = cur_time
 
     # 5. Create Validation Report.
-    logging.info("STEP: Create Validation Report.")
+    cur_step_num = 5
+    logging.info("STEP %s: Create Validation Report." % cur_step_num)
     py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
                            "pycamhd-motion-metadata",
                            "scripts",
@@ -347,14 +367,16 @@ def process_config(config, args):
         "--outfile",
         os.path.expandvars(config["validation_report_path"])
     ]
-    _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
+    no_write = args.no_write or (cur_step_num < args.start_step)
+    _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
 
     cur_time = time.time()
     logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
     prev_start_time = cur_time
 
     # 6. Create Proofsheet.
-    logging.info("STEP: Create Proofsheet.")
+    cur_step_num = 6
+    logging.info("STEP %s: Create Proofsheet." % cur_step_num)
     py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
                            "pycamhd-motion-metadata",
                            "scripts",
@@ -365,7 +387,8 @@ def process_config(config, args):
         "--output",
         os.path.expandvars(config["proofsheet_path"])
     ]
-    _run(cmd_list, args.logfile, py_script=True, no_write=args.no_write)
+    no_write = args.no_write or (cur_step_num < args.start_step)
+    _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
 
     cur_time = time.time()
     logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
