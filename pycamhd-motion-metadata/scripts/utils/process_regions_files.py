@@ -210,8 +210,12 @@ def _run(cmd_list, logfile, py_script=False, restrict_gpu=None, no_write=False, 
         if not no_write:
             logging.info("Executing command: %s" % cmd_str)
             error_code = subprocess.call(cmd, stdout=outfile, stderr=outfile, env=custom_env)
-            if error_code != 0 and not allow_error:
-                raise RuntimeError("The cmd failed at runtime with error_code %s: %s" % (error_code, cmd_str))
+            if error_code != 0:
+                error_msg = "The cmd failed at runtime with error_code %s: %s" % (error_code, cmd_str)
+                if not allow_error:
+                    raise RuntimeError(error_msg)
+                else:
+                    logging.error(error_msg)
 
             return error_code
         else:
@@ -432,7 +436,7 @@ def process_config(config, args):
 
     if long_regions_files:
         cmd_list = ["rm", long_regions_files]
-        _run(cmd_list, args.logfile, py_script=False, no_write=no_write)
+        _run(cmd_list, args.logfile, py_script=False, no_write=no_write, allow_error=True)
 
     cur_time = time.time()
     logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
