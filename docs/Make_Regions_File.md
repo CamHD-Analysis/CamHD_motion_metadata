@@ -175,24 +175,24 @@ Note: Ensure to run this on a new branch taken from updated master.
 1. CAMHD_MOTION_METADATA_DIR: The path to the local clone of the repository.
 2. CAMHD_SCENETAG_DATA_DIR: The data directory to store train data and trained models.
 
-STEP 1: Sample data from new validated region files.
-STEP 2: Merge the train datasets.
-STEP 3: Train the CNN on the new train data.
-STEP 4: Make region files for input_optical_flow_files.
-STEP 5: Create Validation Report.
-STEP 6: Create Proofsheet.
+* *STEP 1*: Sample data from new validated region files.
+* *STEP 2*: Merge the train datasets.
+* *STEP 3*: Train the CNN on the new train data.
+* *STEP 4*: Make region files for input_optical_flow_files.
+* *STEP 5*: Create Validation Report.
+* *STEP 6*: Create Proofsheet.
 
 After completing these steps by running this script, the following tasks need to be done:
 MANUAL Steps (These steps appear as warnings in the logs):
-1.1 The classifier_meta_file (scene_tag_classifiers_meta.json) would be updated and need be pushed to Git Repository.
-1.2 The new trained model need be shared by uploading to the Google Drive.
-1.3 The train and validation split of the current train data can be deleted.
-
-2.1 The validation report would be created, and need to be pushed to Git Repository.
-
-3.1 The proofsheets can be used to manually validate and correct the region files scene_tags.
-3.2 The corrected and validated regions files need to be pushed to the Git Repository.
-3.3 The Performance Evaluation Report need to be generated and pushed to the Git Repository.
+1. Add newly trained model to GoogleDrive and classifiers meta to Git, and clear the train and validation splits.
+   * The classifier_meta_file (scene_tag_classifiers_meta.json) would be updated and need be pushed to Git Repository.
+   * The new trained model need be shared by uploading to the Google Drive.
+   * The train and validation split of the current train data can be deleted.
+2. The validation report would be created, and need to be pushed to Git Repository.
+3. Validation regions files and generate performance evaluation report.
+   * The proofsheets can be used to manually validate and correct the region files scene_tags.
+   * The corrected and validated regions files need to be pushed to the Git Repository.
+   * The Performance Evaluation Report need to be generated and pushed to the Git Repository. Refer the logs for the command to generate the Performance Evaluation Report.
 
 Usage: (Running from the root directory of the repository.)
     python process_regions_files.py --config <path to regions_file_process_config.json> --logfile <path_to_logfile>
@@ -252,4 +252,6 @@ Usage: (Running from the root directory of the repository.)
 ```
 
 ##### The sample Region Files Process Config is available at:
-    $CAMHD_MOTION_METADATA_DIR/pycamhd-motion-metadata/examples/sample_region_files_process_config.json
+```
+    <Repositry_Root>/pycamhd-motion-metadata/examples/sample_region_files_process_config.json
+```
