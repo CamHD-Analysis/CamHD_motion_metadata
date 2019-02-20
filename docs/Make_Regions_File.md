@@ -173,12 +173,12 @@ Note: Ensure to run this on a new branch taken from updated master.
 
 ##### Usage:
 ```
-    python process_regions_files.py --config <path to regions_file_process_config.json> --logfile <path_to_logfile>
+python process_regions_files.py --config <path to regions_file_process_config.json> --logfile <path_to_logfile>
 ```
 
 ##### Set following environments variables:
-* **CAMHD_MOTION_METADATA_DIR**: The path to the local clone of the repository.
-* **CAMHD_SCENETAG_DATA_DIR**: The data directory to store train data and trained models.
+* *CAMHD_MOTION_METADATA_DIR*: The path to the local clone of the repository.
+* *CAMHD_SCENETAG_DATA_DIR*: The data directory to store train data and trained models.
 
 ##### The STEPS involved in the script.
 * *STEP 1*: Sample data from new validated region files.
@@ -256,5 +256,5 @@ Note: Ensure to run this on a new branch taken from updated master.
 
 ##### The sample Region Files Process Config is available at:
 ```
-    <Repositry_Root>/pycamhd-motion-metadata/examples/sample_region_files_process_config.json
+<Repositry_Root>/pycamhd-motion-metadata/examples/sample_region_files_process_config.json
 ```
