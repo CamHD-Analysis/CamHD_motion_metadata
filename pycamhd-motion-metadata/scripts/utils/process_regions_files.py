@@ -4,19 +4,86 @@
 The runner script to automate the process of creating region files for new set of videos.
 Note: Ensure to run this on a new branch taken from updated master.
 
-1. Samples random frames (prob 0.5) from recent month's validated regions files.
-2. Retrains the scene_tag_classification CNN models on the recent data.
-# TODO: Complete the description.
-
-Usage: (Running from the root directory of the repository.)
-python scripts/utils/process_regions_files.py --config <path to regions_file_process_config.json>
-
-# TODO: Add the sample config after creating.
-# Sample Config is available at: <REPOSITORY_ROOT>/
-
 # Set following environments variables:
 1. CAMHD_MOTION_METADATA_DIR: The path to the local clone of the repository.
 2. CAMHD_SCENETAG_DATA_DIR: The data directory to store train data and trained models.
+
+STEP 1: Sample data from new validated region files.
+STEP 2: Merge the train datasets.
+STEP 3: Train the CNN on the new train data.
+STEP 4: Make region files for input_optical_flow_files.
+STEP 5: Create Validation Report.
+STEP 6: Create Proofsheet.
+
+After completing these steps by running this script, the following tasks need to be done:
+MANUAL Steps (These steps appear as warnings in the logs):
+1.1 The classifier_meta_file (scene_tag_classifiers_meta.json) would be updated and need be pushed to Git Repository.
+1.2 The new trained model need be shared by uploading to the Google Drive.
+1.3 The train and validation split of the current train data can be deleted.
+
+2.1 The validation report would be created, and need to be pushed to Git Repository.
+
+3.1 The proofsheets can be used to manually validate and correct the region files scene_tags.
+3.2 The corrected and validated regions files need to be pushed to the Git Repository.
+3.3 The Performance Evaluation Report need to be generated and pushed to the Git Repository.
+
+Usage: (Running from the root directory of the repository.)
+    python process_regions_files.py --config <path to regions_file_process_config.json> --logfile <path_to_logfile>
+
+# Region Files Process Config (JSON file) documentation:
+{
+    "version": 0.1,       # The version id for the process workflow.
+    "deployment": "d5A",  # The deployment tag.
+    "name": "201901",     # The name as an identifier for this config file.
+
+    # A bash wildcard referring to the regions files which have been recently validated, but not included in training.
+    "new_validated_reg_files": "$CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2018/12/*",
+
+    # Name of the directory for train data sampled from 'new_validated_reg_files'.
+    # It will be stored in $CAMHD_SCENETAG_DATA_DIR/scene_classification_data.
+    "new_reg_train_data_dirname": "set_201812",
+
+    # Probability to be used while sampling frames from 'new_validated_reg_files'.
+    "new_reg_sampling_prob": 0.5,
+
+    # Name of the directory containing the train data to which the data from 'new_reg_train_data_dirname'
+    # needs to be appended. It could be the train data from the previous model training.
+    # It will be taken from (prefixed with) $CAMHD_SCENETAG_DATA_DIR/scene_classification_data.
+    "base_train_data_dirname": "set_201811_train_data",
+
+    # Probability to be used while sampling train data from 'base_train_data_dirname'.
+    "base_train_data_prob": 0.5,
+
+    # Name of the directory for merged train data including train data
+    # from 'base_train_data_dirname' and 'new_reg_train_data_dirname'.
+    # It will be stored in $CAMHD_SCENETAG_DATA_DIR/scene_classification_data.
+    "merged_train_data_dirname": "set_201812_train_data",
+
+    "val_split": 0.25,    # Optional. The proportion of train data from 'merged_train_data_dirname' to be used as validation data. Defaulted to 100.
+    "epochs": 100,        # Optional. The number of epochs. Defaulted to 100.
+    "batch_size": 8,      # Optional. The batch-size for training. Defaulted to 8.
+    "restrict_gpu": "0",  # Optional. The GPU core id to be used. Defaulted to system's $CUDA_VISIBLE_DEVICES value. If not set, all GPU cores will be utilized.
+
+    # The new trained model will be stored at $CAMHD_SCENETAG_DATA_DIR/trained_classification_models.
+    # Corresponding model_config will be updated in the classifier_meta_file (scene_tag_classifiers_meta.json).
+    # The model version will be inferred by taking the next model version from the current 'latest_model' version.
+
+    # A bash wildcard referring to the optical flow files for which the regions files need to be generated.
+    "input_optical_flow_files": "$CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2019/01/0[456789] $CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2019/01/1[123456789] $CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2019/01/2[123456789] $CAMHD_MOTION_METADATA_DIR/RS03ASHS/PN03B/06-CAMHDA301/2019/01/3[01]",
+
+    # Optional. If 'monthly' key is provided, the 'input_optical_flow_files' will be automatically inferred
+    # with respect to the $CAMHD_MOTION_METADATA_DIR. The above example contains inferred value from 'monthly': '2019-01'.
+    "monthly": "2019-01",
+
+    # The output path for the validation report of the regions files.
+    "validation_report_path": "$CAMHD_MOTION_METADATA_DIR/regions_files_validation_reports/201901.txt",
+
+    # The output path for the proofsheets required for manual verification of the regions files.
+    "proofsheet_path": "$CAMHD_SCENETAG_DATA_DIR/proofsheets/201901/raw.html"
+}
+
+# The sample Region Files Process Config is available at:
+    $CAMHD_MOTION_METADATA_DIR/pycamhd-motion-metadata/examples/sample_region_files_process_config.json
 
 """
 import pycamhd.lazycache as camhd
@@ -109,7 +176,23 @@ def get_args():
     return args
 
 
+def bernoulli_trial(prob):
+    """
+    Conducts Bernoulli trial and returns True or False based on the given probability.
+
+    """
+    r = random.uniform(0, 1)
+    if r <= prob:
+        return True
+
+    return False
+
+
 def _run(cmd_list, logfile, py_script=False, restrict_gpu=None, no_write=False, allow_error=False):
+    """
+    Executes a command through python subprocess and logs the STDOUT and STDERR to the logfile provided.
+
+    """
     cmd = []
     custom_env = os.environ.copy()
     if restrict_gpu:
@@ -135,18 +218,10 @@ def _run(cmd_list, logfile, py_script=False, restrict_gpu=None, no_write=False, 
 
 
 def merge_dataset_dirs(base_train_data_dir, new_reg_train_data_dir, output_dir, base_train_data_prob=1):
-    def _sample_prob(prob):
-        """
-        Returns True or False based on the given probability. Bernoulli trial with given probability.
+    """
+    Merges the scene_tag classification train data sets.
 
-        """
-        r = random.uniform(0, 1)
-        # TODO: Check if this is correctly sampling.
-        if r <= prob:
-            return True
-
-        return False
-
+    """
     label_counts = defaultdict(int)
     os.makedirs(output_dir)
 
@@ -158,7 +233,7 @@ def merge_dataset_dirs(base_train_data_dir, new_reg_train_data_dir, output_dir, 
         for label in labels:
             for f in os.listdir(os.path.join(dataset_dir, label)):
                 # The i == 0 condition ensures that sampling probability is applied only to base_train_data_dir.
-                if i == 0 and not _sample_prob(base_train_data_prob):
+                if i == 0 and not bernoulli_trial(base_train_data_prob):
                     continue
 
                 label_counts[label] += 1
@@ -170,6 +245,11 @@ def merge_dataset_dirs(base_train_data_dir, new_reg_train_data_dir, output_dir, 
 
 
 def process_config(config, args):
+    """
+    Processes an automated series of tasks to process raw optical flow files to regions files
+    with scene_tag classification by reading parameters from the config file provided.
+
+    """
     def _get_next_model_version(current_model_name, deployment):
         # TODO: Define better model name versioning convention.
         if deployment not in current_model_name:
@@ -313,9 +393,9 @@ def process_config(config, args):
             json.dump(classifiers_meta_dict, fp, indent=4, sort_keys=True)
 
     # XXX: Using 'warning' to highlight important informational log.
-    logging.info("The Model re-training has completed, and the new model is saved at %s. "
-                 "And the classifier_meta_file is updated: %s."
-                 % (model_outfile, classifiers_meta_file))
+    logging.info("The Model re-training has completed, and the new model is saved at %s. " % model_outfile)
+    logging.warning("The classifier_meta_file is updated and can be pushed to Git Repository: %s."
+                    % classifiers_meta_file)
     logging.warning("The new trained model can be shared by uploading to the Google Drive.")
     logging.warning("The train and validation split of the current train data can be deleted.")
 
@@ -357,6 +437,7 @@ def process_config(config, args):
     # 5. Create Validation Report.
     cur_step_num = 5
     logging.info("STEP %s: Create Validation Report." % cur_step_num)
+    validation_report_path = os.path.expandvars(config["validation_report_path"])
     py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
                            "pycamhd-motion-metadata",
                            "scripts",
@@ -366,10 +447,12 @@ def process_config(config, args):
         py_file,
         input_optical_flow_files_wild_card,
         "--outfile",
-        os.path.expandvars(config["validation_report_path"])
+        validation_report_path
     ]
     no_write = args.no_write or (cur_step_num < args.start_step)
     _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
+    logging.warning("The validation report has been created, and can be pushed to Git Repository: %s."
+                    % validation_report_path)
 
     cur_time = time.time()
     logging.info("Time taken for the step (sec): %s" % (cur_time - prev_start_time))
