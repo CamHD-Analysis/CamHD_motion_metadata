@@ -10,10 +10,10 @@ If the env already exists, then `conda env update` should be used
     conda env update -f scripts/requirements.yml
 
 # Set following environments variables:
-* `CAMHD_MOTION_METADATA_DIR`: The path to the local clone of the repository. This is required if '--use-cnn' flag is set.
-* `CAMHD_SCENETAG_DATA_DIR`: The data directory to store train data and trained models. This is required if '--cnn-model-config' argument is provided. Previous train data (need to extracted) and the trained models (keras) can be downloaded from this [google drive folder](https://drive.google.com/drive/folders/1fbsL4FfJTWV4Vp2h17oS7gQi58Hz7meQ?usp=sharing).
+* `CAMHD_MOTION_METADATA_DIR`: The path to the local clone of the repository. This is required if `--use-cnn` flag is set.
+* `CAMHD_SCENETAG_DATA_DIR`: The data directory to store train data and trained models. This is required if `--cnn-model-config` argument is provided. Previous train data (need to extracted) and the trained models (keras) can be downloaded from this [google drive folder](https://drive.google.com/drive/folders/1fbsL4FfJTWV4Vp2h17oS7gQi58Hz7meQ?usp=sharing).
 
-_NOTE_: If process_regions_files.py is being used, then both the above environment variables need to be set.
+_NOTE_: If `process_regions_files.py` is being used, then both the above environment variables need to be set.
 
 # make_regions_file.py
 
@@ -69,7 +69,7 @@ It __will not__ overwrite existing files, unless given the `--force` flag.
   * `--use-cnn` Flag to use the trained CNN model for region classification. If this flag is set, then the --ground-truth argument is ignored. If this flag is not set, the 'matchByGroundTruth' algorithm will be used for region classification.
   
   * `--cnn-model-config` The path to the scene tag classifier CNN model config json file. Default: The config corresponding to the latest model in the classifiers_meta_file (scene_tag_classifiers_meta.json).<br>
-  _NOTE:_ The trained models referred by the cnn-model-config must be present in the '$CAMHD_SCENETAG_DATA_DIR/trained_classification_models' directory. The trained classification models can be downloaded from this [google drive folder] (https://drive.google.com/drive/folders/1MVaCIZ7XQfVPdjlsr0bspuiNS4PBRPdE?usp=sharing).
+  _NOTE:_ The trained models referred by the cnn-model-config must be present in the `$CAMHD_SCENETAG_DATA_DIR/trained_classification_models` directory. The trained classification models can be downloaded from this [google drive folder] (https://drive.google.com/drive/folders/1MVaCIZ7XQfVPdjlsr0bspuiNS4PBRPdE?usp=sharing).
 
   * The `--git-add` argument causes the script to `git add` any new regions files
   it may create (including when overwriting an existing file).
@@ -176,7 +176,7 @@ If a region is successfully labeled, the tag `sceneTag` is added to the region f
 
 # process_regions_files.py
 The runner script to automate the process of creating region files for new set of videos.
-Note: Ensure to run this on a new branch taken from updated master.
+_Note:_ This uses the latest data and creates new files. Therefore, run this on a new branch taken from updated master.
 
 ##### Usage:
 ```
