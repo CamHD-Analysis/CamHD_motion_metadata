@@ -10,8 +10,8 @@ If the env already exists, then `conda env update` should be used
     conda env update -f scripts/requirements.yml
 
 # Set following environments variables:
-* *CAMHD_MOTION_METADATA_DIR*: The path to the local clone of the repository. This is required if '--use-cnn' flag is set.
-* *CAMHD_SCENETAG_DATA_DIR*: The data directory to store train data and trained models. This is required if '--cnn-model-config' argument is provided. Previous train data (need to extracted) and the trained models (keras) can be downloaded from this [google drive folder](https://drive.google.com/drive/folders/1fbsL4FfJTWV4Vp2h17oS7gQi58Hz7meQ?usp=sharing).
+* `CAMHD_MOTION_METADATA_DIR`: The path to the local clone of the repository. This is required if '--use-cnn' flag is set.
+* `CAMHD_SCENETAG_DATA_DIR`: The data directory to store train data and trained models. This is required if '--cnn-model-config' argument is provided. Previous train data (need to extracted) and the trained models (keras) can be downloaded from this [google drive folder](https://drive.google.com/drive/folders/1fbsL4FfJTWV4Vp2h17oS7gQi58Hz7meQ?usp=sharing).
 
 _NOTE_: If process_regions_files.py is being used, then both the above environment variables need to be set.
 
