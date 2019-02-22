@@ -1,14 +1,8 @@
 {
+    "latest_model": "scene_classifier_cnn-d5A-v0.7",
     "title": "CamHD_SceneTag_Classifiers_Metadata",
-    "latest_model": "scene_classifier_cnn_d5A-v0.6",
-    "update_ts": "20190215 04:39:18",
     "trained_models": {
         "scene_classification_vgg16_8": {
-            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classification_vgg16_8.hdf5",
-            "model_name": "scene_classification_vgg16_8",
-            "type": "classification",
-            "input_shape": [128, 128, 3],
-            "rescale": true,
             "classes": [
                 "d5A_p0_z0",
                 "d5A_p0_z1",
@@ -33,14 +27,54 @@
                 "d5A_p7_z1",
                 "d5A_p8_z0",
                 "d5A_p8_z1"
-            ]
+            ],
+            "input_shape": [
+                128,
+                128,
+                3
+            ],
+            "model_name": "scene_classification_vgg16_8",
+            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classification_vgg16_8.hdf5",
+            "rescale": true,
+            "type": "classification"
+        },
+        "scene_classifier_cnn-d5A-v0.7": {
+            "classes": [
+                "d5A_p0_z0",
+                "d5A_p0_z1",
+                "d5A_p0_z2",
+                "d5A_p1_z0",
+                "d5A_p1_z1",
+                "d5A_p2_z0",
+                "d5A_p2_z1",
+                "d5A_p3_z0",
+                "d5A_p3_z1",
+                "d5A_p3_z2",
+                "d5A_p4_z0",
+                "d5A_p4_z1",
+                "d5A_p4_z2",
+                "d5A_p5_z0",
+                "d5A_p5_z1",
+                "d5A_p5_z2",
+                "d5A_p6_z0",
+                "d5A_p6_z1",
+                "d5A_p6_z2",
+                "d5A_p7_z0",
+                "d5A_p7_z1",
+                "d5A_p8_z0",
+                "d5A_p8_z1"
+            ],
+            "input_shape": [
+                256,
+                256,
+                3
+            ],
+            "model_name": "scene_classifier_cnn-d5A-v0.7",
+            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classifier_cnn-d5A-v0.7.hdf5",
+            "rescale": true,
+            "type": "classification"
         },
         "scene_classifier_cnn_d5A-v0.4": {
-            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classifier_cnn_d5A-v0.4.hdf5",
-            "model_name": "scene_classifier_cnn_d5A-v0.4",
-            "type": "classification",
-            "input_shape": [256, 256, 3],
-            "rescale": true,
             "classes": [
                 "d5A_p0_z0",
                 "d5A_p0_z1",
@@ -65,14 +99,18 @@
                 "d5A_p7_z1",
                 "d5A_p8_z0",
                 "d5A_p8_z1"
-            ]
+            ],
+            "input_shape": [
+                256,
+                256,
+                3
+            ],
+            "model_name": "scene_classifier_cnn_d5A-v0.4",
+            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classifier_cnn_d5A-v0.4.hdf5",
+            "rescale": true,
+            "type": "classification"
         },
         "scene_classifier_cnn_d5A-v0.5": {
-            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classifier_cnn_d5A-v0.5.hdf5",
-            "model_name": "scene_classifier_cnn_d5A-v0.5",
-            "type": "classification",
-            "input_shape": [256, 256, 3],
-            "rescale": true,
             "classes": [
                 "d5A_p0_z0",
                 "d5A_p0_z1",
@@ -97,14 +135,18 @@
                 "d5A_p7_z1",
                 "d5A_p8_z0",
                 "d5A_p8_z1"
-            ]
+            ],
+            "input_shape": [
+                256,
+                256,
+                3
+            ],
+            "model_name": "scene_classifier_cnn_d5A-v0.5",
+            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classifier_cnn_d5A-v0.5.hdf5",
+            "rescale": true,
+            "type": "classification"
         },
         "scene_classifier_cnn_d5A-v0.6": {
-            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classifier_cnn_d5A-v0.6.hdf5",
-            "model_name": "scene_classifier_cnn_d5A-v0.6",
-            "type": "classification",
-            "input_shape": [256, 256, 3],
-            "rescale": true,
             "classes": [
                 "d5A_p0_z0",
                 "d5A_p0_z1",
@@ -129,7 +171,17 @@
                 "d5A_p7_z1",
                 "d5A_p8_z0",
                 "d5A_p8_z1"
-            ]
+            ],
+            "input_shape": [
+                256,
+                256,
+                3
+            ],
+            "model_name": "scene_classifier_cnn_d5A-v0.6",
+            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_classifier_cnn_d5A-v0.6.hdf5",
+            "rescale": true,
+            "type": "classification"
         }
-    }
+    },
+    "update_ts": "20190215 04:39:18"
 }
