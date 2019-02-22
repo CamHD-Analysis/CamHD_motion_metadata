@@ -1,13 +1,16 @@
 # Dependencies
+The script takes a whole raft of Python dependencies. I believe the conda-format
+file `pycamhd-motion-metadata/scripts/requirements.yml` is correct. With [conda](https://conda.io/docs/) installed, the command
 
-The script takes a whole raft of Python dependencies.   I believe the conda-format
-file `scripts/requirements.yml` is correct.  With [conda](https://conda.io/docs/) installed, the command
-
-    conda env create -f scripts/requirements.yml
+    conda env create -f pycamhd-motion-metadata/scripts/requirements.yml
 
 If the env already exists, then `conda env update` should be used
 
-    conda env update -f scripts/requirements.yml
+    conda env update -f pycamhd-motion-metadata/scripts/requirements.yml
+
+_NOTE_: The following packages needs to be installed from source using pip (after activating the conda env):
+- pycamhd-lazycache: Get the clone of the [pycamhd-lazycache repository](https://github.com/CamHD-Analysis/pycamhd-lazycache) and install froum source using pip.
+- pycamhd: Use pip to install from the `pycamhd-motion-metadata` folder in the repository. Optionally, use `pip install -e` for an editable installation of this package. The pycamhd-lazycache is a prerequisite for this package.
 
 # Set following environments variables:
 * `CAMHD_MOTION_METADATA_DIR`: The path to the local clone of the repository. This is required if `--use-cnn` flag is set.
@@ -16,7 +19,6 @@ If the env already exists, then `conda env update` should be used
 _NOTE_: If `process_regions_files.py` is being used, then both the above environment variables need to be set.
 
 # make_regions_file.py
-
 The [make_regions_file.py](../scripts/make_regions_file.py) script is the
 command-line interface into the Python modules which convert [optical flow](OpticalFlowJson.md)
 metadata files into [regions](OpticalFlowRegionsJson).   It runs in two stages:
@@ -41,7 +43,6 @@ in the same directory as the optical flow file unless otherwise configured.
 It __will not__ overwrite existing files, unless given the `--force` flag.
 
 ## Flags
-
   * `--dry-run` will cause the script to perform all processing but does not write to the output file.
 
   * If given the `--force` option, the script will overwrite any existing `_optical_flow_regions.json` files.
@@ -86,11 +87,9 @@ It __will not__ overwrite existing files, unless given the `--force` flag.
     http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files
 
 # Algorithms
-
 The two phases of region extraction are relatively independent.
 
 ## Finding regions
-
 The first step is dividing the time sequence for a movie into contiguous
 `regions` or segments which correspond to one step or stage in the camera's
 motion sequence.  It does this by examining the output from the
@@ -108,7 +107,6 @@ initiating region classification.
 (more here)
 
 ## Classifying regions
-
 The static regions in a file are labelled by comparison to the labelled regions
 in a  set of hand-annotated (or at least, hand-validated) ground truth files.
 Doing this requires retrieving representative images for both the ground truth
