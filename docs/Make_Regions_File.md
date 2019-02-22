@@ -179,6 +179,8 @@ The runner script to automate the process of creating region files for new set o
 _Note:_ This uses the latest data and creates new files. Therefore, run this on a new branch taken from updated master.
 
 ##### Usage:
+Please use the `--help` argument to check all the arguments for the script.
+
 ```
 python process_regions_files.py --config <path to regions_file_process_config.json> --logfile <path_to_logfile>
 ```
