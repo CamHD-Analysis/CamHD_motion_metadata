@@ -20,16 +20,9 @@ class RegionFileMaker:
         self.noclassify = noclassify
         self.first = first
         self.gt_library = gt_library
-
-        if use_cnn:
-            if not cnn_classifier or not cnn_model_config:
-                raise ValueError("If the 'use_cnn' argument is True, then the 'cnn_classifier' and 'cnn_model_config' "
-                                 "must be provided.")
-
         self.use_cnn = use_cnn
         self.cnn_classifier = cnn_classifier
         self.cnn_model_config = cnn_model_config
-
         self.lazycache = lazycache
 
     def make_region_file(self, infile, outfile):
