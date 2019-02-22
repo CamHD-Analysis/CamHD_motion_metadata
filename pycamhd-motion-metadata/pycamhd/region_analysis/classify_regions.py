@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 from keras.models import load_model
 from scipy.stats import mode
@@ -8,7 +9,7 @@ import os
 
 import numpy as np
 
-from .git_utils import *
+from .git_utils import git_revision
 
 classify_regions_version = "1.1"
 
@@ -28,10 +29,7 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
                       "d2_p8_z0", "d2_p0_z0", "d2_p1_z0"]
 
 
-# TODO: The probability thresholds could be taken from model_config.
-CNN_PROBABILITY_THRESH = 0.20
-
-# TODO: A better way to manage models and model_configs?
+DEFAULT_CNN_PROBABILITY_THRESH = 0.20
 CLASSIFIERS_META_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scene_tag_classifiers_meta.json")
 
 class RegionClassifier:
@@ -43,9 +41,6 @@ class RegionClassifier:
 
     def classify_regions(self, regions, first=None,
                          ref_samples=(0.4, 0.5, 0.6), test_count=3):
-
-        count = 0
-
         num_to_process = len(regions.static_regions())
 
         if first:
@@ -123,17 +118,21 @@ class RegionClassifier:
         return regions
 
 
-    def classify_regions_cnn(self, regions, cnn_model_config_path=None, first=None, ref_samples=(0.4, 0.5, 0.6)):
+    def classify_regions_cnn(self, regions, classifier=None, model_config=None, first=None, ref_samples=(0.4, 0.5, 0.6)):
         """
         Classify the regions of the given RegionFile and assign the scene_tags.
 
         :param regions: The RegionFile object created from the video regions_file.
-        :param cnn_model_config_path: The path to the trained CNN model config file (JSON). Default: None, the default
-                                      classifier files from the modules train_classification_models will be used.
+        :param classifier: The loaded Keras scene_tag classifier model.
+                           Default: The latest model from the classifiers_meta_file (scene_tag_classifiers_meta.json)
+                           will be loaded and used for inference.
+        :param model_config: The model_config corresponding to the provided classifier. It is required if classifier
+                             is provided.
+                             Default: The model_config corresponding to the latest model from the
+                             classifiers_meta_file (scene_tag_classifiers_meta.json).
         :param first: The number of regions to process. Default: None, which implies all static regions.
         :param ref_samples: The frames of the region as a pct of region length to be considered for classification.
                             Default: Three frames at (0.4, 0.5, 0.6) will be chosen.
-                            TODO: Change this to a single frame at 0.5, to reduce time taken for processing.
         :return: The updated regions (RegionFile object) with the scene_tag predictions.
 
         """
@@ -163,18 +162,25 @@ class RegionClassifier:
 
             return cur_pred_scene_tag, is_corrected
 
+        # This is needed because the paths to model files in the CLASSIFIERS_META_FILE (scene_tag_classifiers_meta.json)
+        # refer to the trained model files relative to the path set in the CAMHD_SCENETAG_DATA_DIR environment variable.
         CAMHD_SCENETAG_DATA_DIR = os.environ.get("CAMHD_SCENETAG_DATA_DIR", None)
         if not CAMHD_SCENETAG_DATA_DIR:
             raise ValueError("The %s needs to be set in the environment while using CNN." % CAMHD_SCENETAG_DATA_DIR)
         if not os.path.exists(CAMHD_SCENETAG_DATA_DIR):
             raise ValueError("The $CAMHD_SCENETAG_DATA_DIR does not exist: %s" % CAMHD_SCENETAG_DATA_DIR)
 
-        with open(CLASSIFIERS_META_FILE) as fp:
-            classifiers_meta_dict = json.load(fp)
+        if not classifier:
+            with open(CLASSIFIERS_META_FILE) as fp:
+                classifiers_meta_dict = json.load(fp)
 
-        latest_model = classifiers_meta_dict["latest_model"]
-        model_config = classifiers_meta_dict["trained_models"][latest_model]
-        classifier = load_model(os.path.expandvars(model_config["model_path"]))
+            latest_model = classifiers_meta_dict["latest_model"]
+            model_config = classifiers_meta_dict["trained_models"][latest_model]
+            classifier = load_model(os.path.expandvars(model_config["model_path"]))
+
+        if not model_config:
+            raise ValueError("The model is not found. If the classifier is provided, "
+                             "the corresponding model_config must also be provided.")
 
         num_to_process = len(regions.static_regions())
 
@@ -232,10 +238,11 @@ class RegionClassifier:
             cur_pred_scene_tag_sequence_corrected, is_corrected = _sequence_based_correction(prev_scene_tag,
                                                                                              cur_pred_scene_tag_by_cnn)
 
-            if majority_class_avg_proba_by_cnn < CNN_PROBABILITY_THRESH:
+            cnn_proba_thresh = model_config.get("probability_threshold", DEFAULT_CNN_PROBABILITY_THRESH)
+            if majority_class_avg_proba_by_cnn < cnn_proba_thresh:
                 logging.info("The predicted scene_tag %s has lower average predicted probability: %s (threshold: %s). "
                              "Therefore, marking this region as 'unknown'."
-                             % (cur_pred_scene_tag_by_cnn, majority_class_avg_proba_by_cnn, CNN_PROBABILITY_THRESH))
+                             % (cur_pred_scene_tag_by_cnn, majority_class_avg_proba_by_cnn, cnn_proba_thresh))
                 majority_class_label = "unknown"
             else:
                 majority_class_label = cur_pred_scene_tag_sequence_corrected

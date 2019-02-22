@@ -1,37 +1,38 @@
-
-
-import logging
-import json
-
-from .timer import *
-from .find_regions import *
-from .classify_regions import *
-#from .similarity_analysis import *
-
+#!/usr/bin/env python3
 
 import pycamhd.motionmetadata as mdd
+
+from .find_regions import find_regions, find_regions_version
+from .classify_regions import classify_regions_version, RegionClassifier
+#from .similarity_analysis import *
+
+from .timer import Timer
+import logging
+import os
 
 
 class RegionFileMaker:
     # RegionFileMaker is the top level class called by make_regions_file.
-    #
-
-
-    def __init__(self, force=False, dryrun=False,
-                 noclassify=False, first=None,
-                 gt_library=None, use_cnn=False, lazycache=None):
-
+    def __init__(self, force=False, dryrun=False, noclassify=False, first=None, gt_library=None,
+                 use_cnn=False, cnn_classifier=None, cnn_model_config=None, lazycache=None):
         self.force = force
         self.dryrun = dryrun
         self.noclassify = noclassify
         self.first = first
         self.gt_library = gt_library
+
+        if use_cnn:
+            if not cnn_classifier or not cnn_model_config:
+                raise ValueError("If the 'use_cnn' argument is True, then the 'cnn_classifier' and 'cnn_model_config' "
+                                 "must be provided.")
+
         self.use_cnn = use_cnn
+        self.cnn_classifier = cnn_classifier
+        self.cnn_model_config = cnn_model_config
+
         self.lazycache = lazycache
 
-
     def make_region_file(self, infile, outfile):
-
         logging.info("Processing %s, Saving results to %s" % (infile, outfile))
 
         timing = {}
@@ -51,7 +52,6 @@ class RegionFileMaker:
 
             regions.squash_gaps( delta=30 )
 
-
             regions.json['performance'] = {'timing': timing}
 
             # Write results as a checkpoint
@@ -66,8 +66,11 @@ class RegionFileMaker:
                             # TODO: By default the RegionClassifier uses a trained CNN model,
                             # TODO: therefore, we send None for comparer. A better way of defaulting this behaviour and
                             # TODO: providing custom CNN models can be allowed.
-                            regions = RegionClassifier(None, self.lazycache).classify_regions_cnn(regions,
-                                                                                                  first=self.first)
+                            region_classifier = RegionClassifier(None, self.lazycache)
+                            regions = region_classifier.classify_regions_cnn(regions,
+                                                                             classifier=self.cnn_classifier,
+                                                                             model_config=self.cnn_model_config,
+                                                                             first=self.first)
                             logging.info("Classified url: %s" % regions.mov)
                     else:
                         with Timer() as t:
@@ -89,7 +92,7 @@ class RegionFileMaker:
 
         timing['elapsedSeconds'] = full_time.interval
 
-        #regions.squash_scene_tag_sandwiches()
+        # regions.squash_scene_tag_sandwiches()
 
         regions.json['performance'] = {'timing': timing}
 
