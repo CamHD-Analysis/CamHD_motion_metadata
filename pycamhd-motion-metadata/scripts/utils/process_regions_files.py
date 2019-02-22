@@ -114,6 +114,7 @@ RELATIVE_MODEL_DIR = "trained_classification_models"
 DEFAULT_CNN_MODEL_CONFIG = {
     "model_name": "<>",
     "model_path": "<>",
+    "train_data_desc": "<>",
     "type": "classification",
     "input_shape": [256, 256, 3],
     "rescale": True,
@@ -256,14 +257,14 @@ def process_config(config, args):
     with scene_tag classification by reading parameters from the config file provided.
 
     """
-    def _get_next_model_version(current_model_name, deployment):
+    def _get_next_model_version(current_model_name, deployment, train_data_dirname):
         # TODO: Define better model name versioning convention.
         if deployment not in current_model_name:
-            new_model_name = "scene_classifier_cnn-%s-v0.1" % deployment
+            new_model_name = "scene_cnn-%s-%s-v0.1" % (train_data_dirname, deployment)
         else:
             cur_version_id = int(current_model_name.split(".")[1])
             next_version = cur_version_id + 1
-            new_model_name = "scene_classifier_cnn-%s-v0.%d" % (deployment, next_version)
+            new_model_name = "scene_cnn-%s-%s-v0.%d" % (train_data_dirname, deployment, next_version)
 
         return new_model_name
 
@@ -330,14 +331,13 @@ def process_config(config, args):
     logging.info("STEP %s: Merge the train datasets." % cur_step_num)
     base_train_data_dir = os.path.join(scene_tag_train_data_dir, config["base_train_data_dirname"])
     merged_train_data_dir = os.path.join(scene_tag_train_data_dir, config["merged_train_data_dirname"])
-    base_train_data_prob = config["base_train_data_prob"]
 
     no_write = args.no_write or (cur_step_num < args.start_step)
     if not no_write:
         merge_dataset_dirs(base_train_data_dir,
                            new_reg_train_data_dir,
                            merged_train_data_dir,
-                           base_train_data_prob=base_train_data_prob)
+                           base_train_data_prob=config["base_train_data_prob"])
         logging.info("The base_train_data_dir %s and new_reg_train_data_dir %s are merged to output_dir: %s"
                      % (base_train_data_dir, new_reg_train_data_dir, merged_train_data_dir))
     else:
@@ -360,7 +360,9 @@ def process_config(config, args):
     with open(classifiers_meta_file) as fp:
         classifiers_meta_dict = json.load(fp)
 
-    new_model_name = _get_next_model_version(classifiers_meta_dict["latest_model"], deployment)
+    new_model_name = _get_next_model_version(classifiers_meta_dict["latest_model"],
+                                             deployment,
+                                             config["merged_train_data_dirname"])
     py_file = os.path.join(CAMHD_MOTION_METADATA_DIR,
                            "pycamhd-motion-metadata",
                            "pycamhd",
@@ -396,6 +398,13 @@ def process_config(config, args):
                                               os.path.basename(model_outfile))
     classifiers_meta_dict["trained_models"][new_model_name] = model_config
     classifiers_meta_dict["latest_model"] = new_model_name
+    classifiers_meta_dict["train_data_desc"] = ("%s ~ %s (%.2f) + %s (sampled at: %.2f)"
+                                                % (config["merged_train_data_dirname"],
+                                                   config["base_train_data_dirname"],
+                                                   config["base_train_data_prob"],
+                                                   config["new_reg_train_data_dirname"],
+                                                   config["new_reg_sampling_prob"]))
+
     logging.info("The latest model in the classifiers_meta_file (%s) is updated to %s"
                  % (classifiers_meta_file, new_model_name))
 
@@ -546,4 +555,3 @@ if __name__ == "__main__":
 
     # TODO: Add mailing support.
     process_config(config, args)
-
