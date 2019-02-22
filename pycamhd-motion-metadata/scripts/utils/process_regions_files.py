@@ -2,7 +2,7 @@
 
 """
 The runner script to automate the process of creating region files for new set of videos.
-Note: Ensure to run this on a new branch taken from updated master.
+Note: This uses the latest data and creates new files. Therefore, run this on a new branch taken from updated master.
 
 # Set following environments variables:
 1. CAMHD_MOTION_METADATA_DIR: The path to the local clone of the repository.
