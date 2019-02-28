@@ -461,12 +461,7 @@ def process_config(config, args):
                            "scripts",
                            "utils",
                            "validate_regions_files.py")
-    cmd_list = [
-        py_file,
-        input_optical_flow_files_wild_card,
-        "--outfile",
-        validation_report_path
-    ]
+    cmd_list = [py_file] + input_optical_flow_files_wild_card + ["--outfile", validation_report_path]
     no_write = args.no_write or (cur_step_num < args.start_step)
     _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
     logging.warning("The validation report has been created, and can be pushed to Git Repository: %s."
@@ -483,12 +478,8 @@ def process_config(config, args):
                            "pycamhd-motion-metadata",
                            "scripts",
                            "make_regions_proof_sheet.py")
-    cmd_list = [
-        py_file,
-        input_optical_flow_files_wild_card,
-        "--output",
-        os.path.expandvars(config["proofsheet_path"])
-    ]
+    proofsheet_path = os.path.expandvars(config["proofsheet_path"])
+    cmd_list = [py_file] + input_optical_flow_files_wild_card + ["--output", proofsheet_path]
     no_write = args.no_write or (cur_step_num < args.start_step)
     _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
 
