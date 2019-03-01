@@ -426,10 +426,10 @@ def process_config(config, args):
     # 4. Make region files for input_optical_flow_files.
     cur_step_num = 4
     logging.info("STEP %s: Make region files for input_optical_flow_files." % cur_step_num)
-    long_regions_files = None
+    long_regions_files_wild_card = None
     if "monthly" in config:
         year, month = config["monthly"].split("-")
-        input_optical_flow_files_wild_card, long_regions_files = \
+        input_optical_flow_files_wild_card, long_regions_files_wild_card = \
             _get_monthly_input_optical_flow_files_wild_card(year, month, deployment)
     else:
         input_optical_flow_files_wild_card = os.path.expandvars(config["input_optical_flow_files"])
@@ -444,8 +444,8 @@ def process_config(config, args):
     no_write = args.no_write or (cur_step_num < args.start_step)
     _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
 
-    if long_regions_files:
-        cmd_list = ["rm", long_regions_files]
+    if long_regions_files_wild_card:
+        cmd_list = ["rm"] + glob.glob(long_regions_files_wild_card)
         _run(cmd_list, args.logfile, py_script=False, no_write=no_write, allow_error=True)
 
     cur_time = time.time()
