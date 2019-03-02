@@ -35,8 +35,8 @@ args = parser.parse_args()
 
 logging.basicConfig(level=args.log.upper())
 
-repo = camhd.lazycache(args.lazycache)
-
+logging.info("Using lazycache at %s" % args.lazycache)
+repo = camhd.lazycache(args.lazycache, verbose=True)
 
 def iterate_path(path):
 
@@ -47,12 +47,14 @@ def iterate_path(path):
 
     outfiles = []
 
-    for f in dir_info['Files']:
-        if re.search('\.mov$', f):
-            outfiles.append(path + f)
+    if 'Files' in dir_info:
+      for f in dir_info['Files']:
+          if re.search('\.mov$', f):
+              outfiles.append(path + f)
 
-    for d in dir_info['Directories']:
-        outfiles += iterate_path(path + d + "/")
+    if 'Directories' in dir_info:
+      for d in dir_info['Directories']:
+          outfiles += iterate_path(path + d + "/")
 
     return outfiles
 
@@ -67,30 +69,43 @@ if len(mov_paths) == 0:
 
 def get_metadata( mov ):
     logging.info("Retrieving %s" % mov )
-    return repo.get_metadata(mov, timeout=600)
+
+    md = {}
+    for i in range(5):
+        md = repo.get_metadata(mov, timeout=600)
+        
+        if not md:
+            continue
+
+        if 'NumFrames' in md:
+            return md
+
+    return md
 
 
 jobs = [delayed(get_metadata)(mov) for mov in mov_paths]
 
 logging.info("Performing %d fetches" % len(jobs))
 
-results = compute(*jobs, get=dask.threaded.get, num_workers=4)
-
-with open('map.json', 'w') as f:
-    json.dump(results, f, indent=4)
-
-# Convert to a map
-out = {}
-
-for res in results:
-    url = res['URL']
-    del res['URL']
-    out[url] = res
-
-
-logging.info("Processed %d paths" % len(out))
+results = compute(*jobs, scheduler='threads',num_workers=1)
 
 if args.outfile:
-    logging.info("Saving results to %s" % args.outfile)
-    with open(args.outfile, 'w') as f:
-        json.dump(out, f, indent=4)
+  with open(args.outfile, 'w') as f:
+    json.dump(results, f, indent=4)
+
+
+# Convert to a map
+#out = {}
+
+#for res in results:
+#    url = res['URL']
+#    del res['URL']
+#    out[url] = res
+
+
+#logging.info("Processed %d paths" % len(out))
+
+#if args.outfile:
+#    logging.info("Saving results to %s" % args.outfile)
+#    with open(args.outfile, 'w') as f:
+#        json.dump(out, f, indent=4)
