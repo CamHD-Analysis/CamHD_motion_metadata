@@ -497,10 +497,9 @@ def process_config(config, args):
                            "scripts",
                            "utils",
                            "get_performance_metrics.py")
-    cmd_list = [
-        "python",
-        py_file,
-        input_optical_flow_files_wild_card,
+    cmd_list = ["python", py_file]
+    cmd_list.extend(input_optical_flow_files_wild_card)
+    cmd_list.extend([
         "--labels",
         os.path.join(CAMHD_MOTION_METADATA_DIR,
                      "classification",
@@ -511,7 +510,7 @@ def process_config(config, args):
                      "classification",
                      "performance_evaluation",
                      "model_eval-%s.csv" % config["name"])
-    ]
+    ])
     logging.warning("Use the following command to get generate the Performance Evaluation Report: \n%s"
                     % " ".join(cmd_list))
     logging.warning("The Performance Evaluation Report need to be generated and pushed to the Git Repository.")
