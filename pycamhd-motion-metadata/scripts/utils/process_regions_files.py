@@ -442,7 +442,7 @@ def process_config(config, args):
     cmd_list = [py_file] + input_optical_flow_files_wild_card + ["--use-cnn"]
 
     no_write = args.no_write or (cur_step_num < args.start_step)
-    _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
+    _run(cmd_list, args.logfile, py_script=True, restrict_gpu=config.get("restrict_gpu"), no_write=no_write)
 
     if long_regions_files_wild_card:
         cmd_list = ["rm"] + glob.glob(long_regions_files_wild_card)
