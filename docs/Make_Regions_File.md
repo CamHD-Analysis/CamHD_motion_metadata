@@ -236,7 +236,7 @@ python process_regions_files.py --config <path to regions_file_process_config.js
     "val_split": 0.25,    # Optional. The proportion of train data from 'merged_train_data_dirname' to be used as validation data. Defaulted to 100.
     "epochs": 100,        # Optional. The number of epochs. Defaulted to 100.
     "batch_size": 8,      # Optional. The batch-size for training. Defaulted to 8.
-    "restrict_gpu": "0",  # Optional. The GPU core id to be used. Defaulted to system's $CUDA_VISIBLE_DEVICES value. If not set, all GPU cores will be utilized.
+    "restrict_gpu": "0",  # Optional. The GPU core id to be used. Defaulted to system's $CUDA_VISIBLE_DEVICES value. If not set, all GPU cores will be utilized. This is applicable to both training and inferencing.
 
     # The new trained model will be stored at $CAMHD_SCENETAG_DATA_DIR/trained_classification_models.
     # Corresponding model_config will be updated in the classifier_meta_file (scene_tag_classifiers_meta.json).
