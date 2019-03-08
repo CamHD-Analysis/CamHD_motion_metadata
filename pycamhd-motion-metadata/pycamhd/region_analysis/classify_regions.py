@@ -148,11 +148,12 @@ class RegionClassifier:
             deployment = prev_scene_tag.split("_")[0]
             p2_z0_tag = "%s_p2_z0" % deployment
             p2_z1_tag = "%s_p2_z1" % deployment
+            p4_z0_tag = "%s_p4_z0" % deployment
             p4_z1_tag = "%s_p4_z1" % deployment
             p4_z2_tag = "%s_p4_z2" % deployment
             plain_water_tag = "%s_plain_water" % deployment
 
-            if cur_pred_scene_tag in (p2_z1_tag, plain_water_tag) and prev_scene_tag in (p4_z1_tag, p4_z2_tag):
+            if cur_pred_scene_tag in (p2_z1_tag, plain_water_tag) and prev_scene_tag in (p4_z0_tag, p4_z1_tag, p4_z2_tag):
                 is_corrected = True
                 return p4_z2_tag, is_corrected
 
