@@ -170,6 +170,8 @@ def get_args():
     parser.add_argument("--no-write",
                         action="store_true",
                         help="Specify this flag to not executive any commands.")
+    parser.add_argument('--cache-dir',
+                        help="The path to the folder where the sampled frames have been cached locally.")
 
     args = parser.parse_args()
 
@@ -319,6 +321,10 @@ def process_config(config, args):
         "--height",
         "256"
     ]
+    if args.cache_dir and os.path.exists(args.cache_dir):
+        logging.info("Using the cache-dir: %s" % args.cache_dir)
+        cmd_list.extend(["--cache-dir", args.cache_dir])
+
     no_write = args.no_write or (cur_step_num < args.start_step)
     _run(cmd_list, args.logfile, py_script=True, no_write=no_write)
 
