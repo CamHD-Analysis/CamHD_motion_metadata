@@ -1,0 +1,138 @@
+{
+    "movie": {
+        "Duration": 891.0234375,
+        "NumFrames": 26704,
+        "URL": "/RS03ASHS/PN03B/06-CAMHDA301/2019/01/25/CAMHDA301-20190125T181500.mov",
+        "cacheURL": "http://lazycache:8080/v1/org/oceanobservatories/rawdata/files//RS03ASHS/PN03B/06-CAMHDA301/2019/01/25/CAMHDA301-20190125T181500.mov"
+    },
+    "contents": {
+        "regions": "1.1"
+    },
+    "versions": {
+        "findRegions": "1.0",
+        "classifyRegions": "1.1"
+    },
+    "regions": [
+        {
+            "startFrame": 199,
+            "endFrame": 679,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9998107081355778,
+                "txMean": -0.04871964579862115,
+                "tyMean": 0.011101812166820524,
+                "size": 624
+            },
+            "sceneTag": "d5A_p1_z0",
+            "sceneTagMeta": {
+                "inferredBy": "cnn-scene_classifier_cnn-d5A-v0.7",
+                "predProbas": {
+                    "d5A_p1_z0": 0.9998598098754883
+                },
+                "algoFinalLabel": "d5A_p1_z0"
+            }
+        },
+        {
+            "startFrame": 689,
+            "endFrame": 919,
+            "type": "zoom_in",
+            "stats": {
+                "scaleMean": 1.076089954617388,
+                "txMean": 2.5068149322625137,
+                "tyMean": -1.87734195266495,
+                "size": 299
+            }
+        },
+        {
+            "startFrame": 919,
+            "endFrame": 1059,
+            "type": "static",
+            "stats": {
+                "scaleMean": 1.00029378918173,
+                "txMean": 0.14138910117432205,
+                "tyMean": -0.03306769794745389,
+                "size": 182
+            },
+            "sceneTag": "d5A_p1_z1",
+            "sceneTagMeta": {
+                "inferredBy": "cnn-scene_classifier_cnn-d5A-v0.7",
+                "predProbas": {
+                    "d5A_p1_z1": 0.9958433310190836
+                },
+                "algoFinalLabel": "d5A_p1_z1"
+            }
+        },
+        {
+            "startFrame": 1069,
+            "endFrame": 1479,
+            "type": "N",
+            "stats": {
+                "scaleMean": 0.9989522176850844,
+                "txMean": -1.0005578545610023,
+                "tyMean": 41.94122826899198,
+                "size": 208
+            }
+        },
+        {
+            "startFrame": 1479,
+            "endFrame": 2349,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9999957342918795,
+                "txMean": -0.0022616106450429867,
+                "tyMean": 0.1524115294851001,
+                "size": 1131
+            },
+            "sceneTag": "d5A_p0_z0",
+            "sceneTagMeta": {
+                "inferredBy": "cnn-scene_classifier_cnn-d5A-v0.7",
+                "predProbas": {
+                    "d5A_p0_z0": 0.9767310818036398
+                },
+                "algoFinalLabel": "d5A_p0_z0"
+            }
+        },
+        {
+            "startFrame": 2359,
+            "endFrame": 2439,
+            "type": "NW",
+            "stats": {
+                "scaleMean": 1.001095248787752,
+                "txMean": 37.47605424315657,
+                "tyMean": 34.5479993294845,
+                "size": 104
+            }
+        },
+        {
+            "startFrame": 2439,
+            "endFrame": 26699,
+            "type": "static",
+            "stats": {
+                "scaleMean": 0.9999748024178144,
+                "txMean": 0.023893571941328715,
+                "tyMean": 0.00036159713578406147,
+                "size": 20397
+            },
+            "sceneTag": "d5A_p2_z0",
+            "sceneTagMeta": {
+                "inferredBy": "cnn-scene_classifier_cnn-d5A-v0.7",
+                "predProbas": {
+                    "d5A_p2_z0": 0.9999552170435587
+                },
+                "algoFinalLabel": "d5A_p2_z0"
+            }
+        }
+    ],
+    "depends": {
+        "opticalFlow": {
+            "/home/bhuvan/Projects/CamHD_motion_metadata/RS03ASHS/PN03B/06-CAMHDA301/2019/01/25/CAMHDA301-20190125T181500_optical_flow.json": "ebdf36121bfb6f7f9297be5ac8f68ccbaa8632d0"
+        }
+    },
+    "performance": {
+        "timing": {
+            "regionAnalysis": 0.14040799999999365,
+            "classification": 0.1572400000000016,
+            "elapsedSeconds": 1.2132989999999992
+        }
+    }
+}
