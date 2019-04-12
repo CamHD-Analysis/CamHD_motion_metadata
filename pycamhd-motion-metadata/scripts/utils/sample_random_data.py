@@ -18,6 +18,7 @@ import glob
 import logging
 import os
 import random
+import shutil
 
 
 def get_args():
@@ -35,6 +36,8 @@ def get_args():
     parser.add_argument('--output',
                         required=True,
                         help="The path to the folder where the sampled frames need to be written.")
+    parser.add_argument('--cache-dir',
+                        help="The path to the folder where the sampled frames have been cached locally.")
     parser.add_argument('--width',
                         type=int,
                         default=1920,
@@ -94,7 +97,7 @@ def _get_all_frames(regions_file, img_path, qt, img_ext, width, height, include_
             img.save(thumb_file_path)
 
 
-def _get_random_frames(regions_file, img_path, qt, img_ext, scene_tag, prob, width, height):
+def _get_random_frames(regions_file, img_dir, qt, img_ext, scene_tag, prob, width, height, cache_dir=None):
     def _sample_prob(prob):
         """
         Returns True or False based on the given probability. Bernoille trial with given probability.
@@ -119,8 +122,17 @@ def _get_random_frames(regions_file, img_path, qt, img_ext, scene_tag, prob, wid
 
         sample_frame = region.start_frame + 0.5 * (region.end_frame - region.start_frame)
 
-        sample_frame_path = os.path.join(img_path, "%s_%d.%s"
-                                         % (os.path.splitext(os.path.basename(url))[0], sample_frame, img_ext))
+        sample_frame_name = "%s_%d.%s" % (os.path.splitext(os.path.basename(url))[0], sample_frame, img_ext)
+        sample_frame_path = os.path.join(img_dir, sample_frame_name)
+
+        if cache_dir:
+            cache_frame_path = os.path.join(cache_dir, sample_frame_name)
+            if os.path.exists(cache_frame_path):
+                logging.info("Fetching frame %d from %s for contact sheet from cached dir: %s"
+                             % (sample_frame, os.path.basename(url), cache_dir))
+                shutil.copy(cache_frame_path, sample_frame_path)
+                continue
+
         logging.info("Fetching frame %d from %s for contact sheet" % (sample_frame, os.path.basename(url)))
         img = qt.get_frame(url, sample_frame, format=img_ext, width=width, height=height)
         img.save(sample_frame_path)
@@ -146,6 +158,12 @@ def sample_random_frames(args):
 
         for scene in args.scenes:
             output_path = os.path.join(args.output, scene)
+
+            if args.cache_dir:
+                cur_cache_dir = os.path.join(args.cache_dir, scene)
+            else:
+                cur_cache_dir = None
+
             os.makedirs(output_path, exist_ok=True)
             _get_random_frames(regions_file,
                                output_path,
@@ -154,7 +172,8 @@ def sample_random_frames(args):
                                scene,
                                args.prob,
                                args.width,
-                               args.height)
+                               args.height,
+                               cache_dir=cur_cache_dir)
 
 
     for pathin in args.input:

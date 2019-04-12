@@ -13,3 +13,10 @@ format: `start_frame -- end_frame ( dd T HH | scene_tag): description`
 - 25479 -- 25889 ( 17 T 15 | p1_z0): fish
 - 14629 -- 14949 ( 27 T 18 | p6_z0): fish
 - 27 T 21 and 28 ALL: scene p8_z1 major difference.
+
+Notes:
+
+##### Feb
+14619 -- 14949 ( 28 T 00 | p6_z0): some kind of dust from flowers
+
+Notes: from 19T18, p8_z1 seems to be more zoomed in.
