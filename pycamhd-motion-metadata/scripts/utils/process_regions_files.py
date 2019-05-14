@@ -200,7 +200,7 @@ def _run(cmd_list, logfile, py_script=False, restrict_gpu=None, no_write=False, 
     """
     cmd = []
     custom_env = os.environ.copy()
-    if restrict_gpu:
+    if restrict_gpu is not None:
         logging.info("Setting CUDA_VISIBLE_DEVICES=%s" % str(restrict_gpu))
         custom_env["CUDA_VISIBLE_DEVICES"] = str(restrict_gpu)
 
