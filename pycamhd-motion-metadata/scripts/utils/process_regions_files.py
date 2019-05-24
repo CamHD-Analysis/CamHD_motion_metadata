@@ -21,12 +21,30 @@ STEP 6: Create Proofsheet.
    * The classifier_meta_file (scene_tag_classifiers_meta.json) would be updated and need be pushed to Git Repository.
    * The new trained model need be shared by uploading to the Google Drive.
    * The train and validation split of the current train data can be deleted.
-2. The validation report would be created, and need to be pushed to Git Repository.
+2. The validation report would be created, and need to be pushed to Git Repository. Identify the missing regions files
+   and update issue which tracks the missing regions files.
 3. Validation regions files and generate performance evaluation report.
    * The proofsheets can be used to manually validate and correct the region files scene_tags.
    * The corrected and validated regions files need to be pushed to the Git Repository.
    * The Performance Evaluation Report need to be generated and pushed to the Git Repository.
      Refer the logs for the command to generate the Performance Evaluation Report.
+
+Generic notes for manual validation for the created proofsheets:
+    * Fix unknowns.
+    * Check if any of the scene have to be changed to unknowns.
+    * Identify multiple regions which have been misclassified in same pattern and use 'batch_manual_correct.py'
+      to correct such regions.
+    * Fix wide gaps in the proofsheet by observing the primary cause. Generally, it could a be certain type of
+      misclassification, or it could be regions files with very less static regions (refer to validation report to
+      identify such regions files).
+    * Validate row-by-row to catch misclassifications. If there is a gap in a row, identify previous/next region
+      has been identified as previous/next scene_tag (usually, if previous scene contains multiple regions, then
+      visually verifying them would help in identifying). Visually verify multi-region scene classifications, if you
+      think that some of them could be misclassified. Proofsheets can be upgraded to loop over multi-region scene
+      classifications to make this more easy for manual verification.
+    * Identify Anomalies observed in the images and update in the anomalies.md in docs folder of the repository.
+    * Iterate if need.
+
 
 Usage: (Running from the root directory of the repository.)
     python process_regions_files.py --config <path to regions_file_process_config.json> --logfile <path_to_logfile>
