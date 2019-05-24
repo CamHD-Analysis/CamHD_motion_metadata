@@ -29,21 +29,66 @@ STEP 6: Create Proofsheet.
    * The Performance Evaluation Report need to be generated and pushed to the Git Repository.
      Refer the logs for the command to generate the Performance Evaluation Report.
 
-Generic notes for manual validation for the created proofsheets:
+Generic notes (protocol) for manual validation for the created proofsheets:
     * Fix unknowns.
     * Check if any of the scene have to be changed to unknowns.
     * Identify multiple regions which have been misclassified in same pattern and use 'batch_manual_correct.py'
       to correct such regions.
-    * Fix wide gaps in the proofsheet by observing the primary cause. Generally, it could a be certain type of
-      misclassification, or it could be regions files with very less static regions (refer to validation report to
-      identify such regions files).
-    * Validate row-by-row to catch misclassifications. If there is a gap in a row, identify previous/next region
-      has been identified as previous/next scene_tag (usually, if previous scene contains multiple regions, then
-      visually verifying them would help in identifying). Visually verify multi-region scene classifications, if you
-      think that some of them could be misclassified. Proofsheets can be upgraded to loop over multi-region scene
-      classifications to make this more easy for manual verification.
-    * Identify Anomalies observed in the images and update in the anomalies.md in docs folder of the repository.
+    * Fix wide gaps in the proofsheet by observing the primary cause to make the proofsheet matrix complete (dense).
+      Generally, it could a be certain type of misclassification, or it could be regions files
+      with very less static regions (refer to validation report to identify such regions files).
+    * Validate row-by-row to catch misclassifications. If there is a gap in a row (missing region),
+      identify if previous/next region has been identified as previous/next scene_tag.
+      Visually verify multi-region scene classifications (squashed), if you think that they may have been misclassified.
+      Generally, if a region is missing, then if the previous region is squashed, visually verify the each of the
+      squashed regions to find the missing region which might have been misclassified as the previous region.
+      Proofsheets can be upgraded to loop (as a gif) over multi-region scene classifications (squashed) to make this
+      more easy for manual verification.
+    * Identify Anomalies observed in the images and update in the anomalies.md in the docs folder of the repository.
+    * Verify the sequence of the scene_tags once all corrections have been made. Refer to the below list of
+      scene_tag sequence for deployment 'd5A'.
     * Iterate if need.
+
+Here is the scene_tag sequence order for deployment 'd5A':
+['d5A_p1_z0',
+ 'd5A_p1_z1',
+ 'd5A_p0_z0',
+ 'd5A_p2_z0',
+ 'd5A_p2_z1',
+ 'd5A_p2_z0',
+ 'd5A_p0_z0',
+ 'd5A_p3_z0',
+ 'd5A_p3_z1',
+ 'd5A_p3_z2',
+ 'd5A_p3_z0',
+ 'd5A_p0_z0',
+ 'd5A_p4_z0',
+ 'd5A_p4_z1',
+ 'd5A_p4_z2',
+ 'd5A_p4_z0',
+ 'd5A_p0_z0',
+ 'd5A_p5_z0',
+ 'd5A_p5_z1',
+ 'd5A_p5_z2',
+ 'd5A_p5_z0',
+ 'd5A_p0_z0',
+ 'd5A_p6_z0',
+ 'd5A_p6_z1',
+ 'd5A_p6_z2',
+ 'd5A_p6_z0',
+ 'd5A_p0_z0',
+ 'd5A_p0_z1',
+ 'd5A_p0_z2',
+ 'd5A_p0_z0',
+ 'd5A_p7_z0',
+ 'd5A_p7_z1',
+ 'd5A_p7_z0',
+ 'd5A_p0_z0',
+ 'd5A_p8_z0',
+ 'd5A_p8_z1',
+ 'd5A_p8_z0',
+ 'd5A_p0_z0',
+ 'd5A_p1_z0']
 
 
 Usage: (Running from the root directory of the repository.)
