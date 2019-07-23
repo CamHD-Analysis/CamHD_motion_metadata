@@ -20,3 +20,14 @@ Notes:
 14619 -- 14949 ( 28 T 00 | p6_z0): some kind of dust from flowers
 
 Notes: from 19T18, p8_z1 seems to be more zoomed in.
+
+##### Mar
+CAMHDA301-20190305T061500_8344.jpg - fish
+CAMHDA301-20190305T061500_8849.jpg - fish
+CAMHDA301-20190317T151500_13834.jpg - fish
+CAMHDA301-20190318T031500_16799.jpg - fish
+CAMHDA301-20190321T001500_20639.jpg - shadow looks different (this is present for few days of data and then returns to normal)
+CAMHDA301-20190323T001500_949.jpg - fish (small, close-up)
+CAMHDA301-20190324T061500_4119.jpg - object on lens
+CAMHDA301-20190325T121500_11199.jpg - fish
+

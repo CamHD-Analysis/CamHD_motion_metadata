@@ -97,7 +97,7 @@ def scene_tag_match( a, b ):
 
 def _format_url(name):
     date, time = os.path.splitext(os.path.basename(name))[0].split('-')[1].split('T')
-    res = "%s%s| %s T %s" % (date[:4], date[4:6], date[6:], time[:2])
+    res = "%s%s | %s T %s" % (date[:4], date[4:6], date[6:], time[:2])
     return res
 
 
@@ -235,7 +235,7 @@ with open(html_file, 'w') as html:
             relathumb = path.relpath( thumb_file, path.dirname(html_file) )
 
             caption = ', '.join(["%d -- %d" % (r.start_frame,r.end_frame) for r in regions])
-            caption = "%s (%s | %s)" % (caption, _format_url(url).split('|')[1], '_'.join(tags[row].split('_')[1:]))
+            caption = "%s (%s | %s)" % (caption, _format_url(url).split('|')[1].strip(), '_'.join(tags[row].split('_')[1:]))
             html.write("<td><a href=\"%s\"><img src=\"%s\"/></a><br>%s</td>" % (relapath,relathumb,caption) )
 
 
@@ -282,7 +282,9 @@ with open(html_file, 'w') as html:
             relapath = path.relpath( img_file, path.dirname(html_file) )
             relathumb = path.relpath( thumb_file, path.dirname(html_file) )
 
-            html.write("<a href=\"%s\"><img src=\"%s\"/></a><br>%d -- %d<br>" % (relapath,relathumb,region.start_frame,region.end_frame) )
+            caption = "%d -- %d" % (region.start_frame, region.end_frame)
+            caption = "%s (%s | %s)" % (caption, _format_url(url).split('|')[1].strip(), "unknown")
+            html.write("<a href=\"%s\"><img src=\"%s\"/></a><br>%s<br>" % (relapath, relathumb, caption))
         html.write("</td>")
 
 
