@@ -27,7 +27,7 @@ def get_args():
                         help='Files or paths to process')
 
     parser.add_argument('--dry-run', dest='dryrun', action='store_true',
-                        help='Dry run, don\'t actually process')
+                        help='Dry run, don\'t actually store results')
 
     parser.add_argument('--force', dest='force', action='store_true', help='Remake existing files (will not overwrite ground truth files)')
 
@@ -36,13 +36,13 @@ def get_args():
                         help="Force rebuild of file only if it hasn't been classified")
 
     parser.add_argument('--no-classify', dest='noclassify', action='store_true',
-                        help="Don't attempt to classify static regions")
+                        help="Don't attempt to classify static regions, only separates optical flow files into regions.")
 
     parser.add_argument('--log', metavar='log', nargs='?', default='INFO',
                         help='Logging level')
 
     parser.add_argument('--first', metavar='first', nargs='?', type=int,
-                        help='')
+                        help='Processes first n items, useful for testing.')
 
     parser.add_argument("--ground-truth", dest="groundtruth",
                         default="classification/ground_truth.json")
@@ -73,6 +73,8 @@ def get_args():
 
 if __name__ == "__main__":
     args = get_args()
+    for handler in logging.root.handlers[:]: # added since the logging levels were not working properly - ax
+        logging.root.removeHandler(handler) 
     logging.basicConfig(level=args.log.upper())
 
     cnn_classifier = None
@@ -111,7 +113,6 @@ if __name__ == "__main__":
     for inpath in args.input:
         if os.path.isdir(inpath):
             inpath += "**/*_optical_flow.json"
-
         logging.info("Checking %s" % inpath)
         for infile in sorted(glob.iglob(inpath, recursive=True)):
             outfile = os.path.splitext(infile)[0] + "_regions.json"
@@ -120,7 +121,7 @@ if __name__ == "__main__":
                 if gt_library and outfile in gt_library.files.values():
                     logging.info("%s is a ground truth file, skipping..." % outfile)
                     continue
-                elif args.forceunclassified and not ra.is_classified(outfile):
+                elif args.forceunclassified and not ra.is_classified(outfile): # TODO is_classified does not exist, appears to be unifinshed - ax
                     logging.info("%s exists but isn't classified, overwriting" % outfile)
                 elif args.force is True:
                     logging.info("%s exists, overwriting" % outfile)

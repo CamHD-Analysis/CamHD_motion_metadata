@@ -1,5 +1,5 @@
 {
-    "latest_model": "scene_cnn-set_201902_train_data-d5A-v0.9",
+    "latest_model": "scene_cnn-set_201902_train_data-d5A-v0.95",
     "title": "CamHD_SceneTag_Classifiers_Metadata",
     "train_data_desc": "set_201902_train_data ~ set_201901_train_data (0.50) + set_201902 (sampled at: 0.50)",
     "trained_models": {
@@ -257,6 +257,45 @@
             "rescale": true,
             "train_data_desc": "<>",
             "type": "classification"
+        },
+        "scene_cnn-set_201902_train_data-d5A-v0.95": {
+            "classes": [
+                "d5A_p0_z0",
+                "d5A_p0_z1",
+                "d5A_p0_z2",
+                "d5A_p1_z0",
+                "d5A_p1_z1",
+                "d5A_p2_z0",
+                "d5A_p2_z1",
+                "d5A_p3_z0",
+                "d5A_p3_z1",
+                "d5A_p3_z2",
+                "d5A_p4_z0",
+                "d5A_p4_z1",
+                "d5A_p4_z2",
+                "d5A_p5_z0",
+                "d5A_p5_z1",
+                "d5A_p5_z2",
+                "d5A_p6_z0",
+                "d5A_p6_z1",
+                "d5A_p6_z2",
+                "d5A_p7_z0",
+                "d5A_p7_z1",
+                "d5A_p8_z0",
+                "d5A_p8_z1"
+            ],
+            "input_shape": [
+                256,
+                256,
+                3
+            ],
+            "model_name": "scene_cnn-set_201902_train_data-d5A-v0.95",
+            "model_path": "$CAMHD_SCENETAG_DATA_DIR/trained_classification_models/scene_cnn-set_201902_train_data-d5A-v0.9.hdf5",
+            "rescale": true,
+            "train_data_desc": "<>",
+            "type": "classification",
+            "probability_threshold":0.4,
+            "skip_threshold":0.65
         }
     },
     "update_ts": "20190215 04:39:18"

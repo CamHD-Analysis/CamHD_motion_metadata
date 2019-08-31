@@ -84,7 +84,7 @@ It __will not__ overwrite existing files, unless given the `--force` flag.
   specified with the `--lazycache-url` flag.   The URL should include the whole path to the root of the Rutgers CI
   mirror.   For example, the default is:
 
-    http://camhd-app-dev-nocache.appspot.com/v1/org/oceanobservatories/rawdata/files
+    https://cache.camhd.science/v1/org/oceanobservatories/rawdata/files
 
 # Algorithms
 The two phases of region extraction are relatively independent.
