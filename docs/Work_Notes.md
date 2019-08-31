@@ -2,6 +2,8 @@
 
 This file covers changes, suggestions, and observations while going over the region classification code.
 
+Written by Axel Li (github: inferee) on 30 Aug 2019.
+
 ## Changes
 
 ### pycamhd-motion-metadata/pycamhd/region_analysis/classify_regions.py
@@ -55,7 +57,7 @@ This file covers changes, suggestions, and observations while going over the reg
 
 * Wrote this document. :P
 
-### RS03ASHS/PN03B/06-CAMHDA301/2019/0[456]/*/*_regions.json
+### _region.json
 
 * Created _region.json files for April, May and June of 2019.
 * Excluded days 1, 2, 3, 10, 20, and the T000000 for following days.
