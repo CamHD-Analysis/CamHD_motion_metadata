@@ -12,6 +12,10 @@ find_regions_version = "1.0"
 
 
 def contiguous_region(series, delta = 10):
+    """
+    Finds all static regions in the series.
+    """
+
     series['dt'] = series.index.to_series().diff(1).fillna(0)
     series['block'] = (series.index.to_series().diff(1) > (delta*1.01)).cumsum()
     #print(series)
@@ -30,6 +34,9 @@ def contiguous_region(series, delta = 10):
 
 
 def analyze_regions( valid, static ):
+    """
+    Returns a list of regions, created with the specified static regions and filling in the gaps.
+    """
 
     regions = []
     for r in static:
@@ -41,7 +48,7 @@ def analyze_regions( valid, static ):
     ## Now fill in the regions between the static sections
     for i in range(0, len(static)-1):
         start = static[i][1]+10;    ## Hm, 10 is hard coded right now...
-        end = static[i+1][0];
+        end = static[i+1][0]
 
         bounds = [start,end]
 
@@ -63,6 +70,9 @@ def calc_stats( series, bounds ):
 
 
 def analyze_bounds( series, bounds ):
+    """
+    Classifies a non-static region. 
+    """
     ## heuristics for now
     #print(bounds)
 

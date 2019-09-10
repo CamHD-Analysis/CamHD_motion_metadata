@@ -6,6 +6,7 @@ from scipy.stats import mode
 import logging
 import json
 import os
+import time
 
 import numpy as np
 
@@ -29,7 +30,8 @@ REFERENCE_SEQUENCE = ["d2_p1_z0", "d2_p1_z1", "d2_p1_z0",
                       "d2_p8_z0", "d2_p0_z0", "d2_p1_z0"]
 
 
-DEFAULT_CNN_PROBABILITY_THRESH = 0.20
+DEFAULT_CNN_PROBABILITY_THRESH = 0.50
+DEFAULT_CNN_SKIP_PROBABILITY_THRESH = 0.75 
 CLASSIFIERS_META_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)), "scene_tag_classifiers_meta.json")
 
 class RegionClassifier:
@@ -118,7 +120,7 @@ class RegionClassifier:
         return regions
 
 
-    def classify_regions_cnn(self, regions, classifier=None, model_config=None, first=None, ref_samples=(0.4, 0.5, 0.6)):
+    def classify_regions_cnn(self, regions, classifier=None, model_config=None, first=None, ref_samples=(0.5,0.2,0.8)):
         """
         Classify the regions of the given RegionFile and assign the scene_tags.
 
@@ -132,10 +134,12 @@ class RegionClassifier:
                              classifiers_meta_file (scene_tag_classifiers_meta.json).
         :param first: The number of regions to process. Default: None, which implies all static regions.
         :param ref_samples: The frames of the region as a pct of region length to be considered for classification.
-                            Default: Three frames at (0.4, 0.5, 0.6) will be chosen.
+                            Default: Three frames at (0.5, 0.2, 0.8) will be chosen.
         :return: The updated regions (RegionFile object) with the scene_tag predictions.
 
         """
+        start_time = time.time()
+
         def _sequence_based_correction(prev_scene_tag, cur_pred_scene_tag):
             """
             The regions p2_z1 and p4_z2 look very similar (plain water), hence they are corrected based on sequence.
@@ -188,52 +192,87 @@ class RegionClassifier:
         if first:
             num_to_process = min(first, num_to_process)
 
+        def retrieve(r, sample_pct):
+            """
+            Retrieves an image via lazycache given a region and a float representing a point in that region.
+            """
+            frame = r.frame_at(sample_pct)
+            logging.info("Retrieving test frame %d" % frame)
+
+            width, height = model_config["input_shape"][:2]
+            retrieve_start_time = time.time()
+            ref_img = self.lazycache.get_frame(regions.mov, frame, format='png', width=width, height=height)
+            retrieve_end_time = time.time()
+            logging.debug("Time taken for retrieval: {}.".format(retrieve_end_time-retrieve_start_time))
+
+            ref_img = np.array(ref_img)
+
+            if ref_img.shape != tuple(model_config["input_shape"]):
+                raise RuntimeError("The retrieved frame shape doesn't conform with model's input_shape: %s"
+                                    % str(ref_img.shape))
+            if model_config["rescale"] is True:
+                rescaled_image = ref_img * (1.0 / 255)
+                return rescaled_image
+            else:
+                return ref_img
+
         prev_scene_tag = None
+        total_sample_count = 0
         for i in range(num_to_process):
+            region_start_time = time.time()
+            sample_count = 0
 
             r = regions.static_at(i)
 
             logging.info("Attempting to classify region from %d to %d" % (r.start_frame, r.end_frame))
 
             ref_images = []
-
-            for sample_pct in ref_samples:
-                frame = r.frame_at(sample_pct)
-                logging.info("Retrieving test frame %d" % frame)
-
-                width, height = model_config["input_shape"][:2]
-                ref_img = self.lazycache.get_frame(regions.mov, frame, format='png', width=width, height=height)
-                ref_img = np.array(ref_img)
-
-                if ref_img.shape != tuple(model_config["input_shape"]):
-                    raise RuntimeError("The retrieved frame shape doesn't conform with model's input_shape: %s"
-                                       % str(ref_img.shape))
-
-                if model_config["rescale"] is True:
-                    rescaled_image = ref_img * (1.0 / 255)
-                    ref_images.append(rescaled_image)
-                else:
-                    ref_images.append(ref_img)
-
             self.images[i] = ref_images
-            input_tensor = np.asarray(ref_images)
-            pred_probas = classifier.predict(input_tensor)
-            pred_classes = np.argmax(pred_probas, axis=1)
+            input_tensor = []
+            pred_probas = []
+            pred_classes = []
 
-            class_probas = []
-            for i, pred_class in enumerate(pred_classes):
-                class_probas.append(pred_probas[i][pred_class])
+            success = False
 
-            logging.info("Unique pred_classes: %s" % len(set(pred_classes)))
-            logging.info("pred_classes: %s, pred_probas: %s" % (str(pred_classes), str(class_probas)))
+            cnn_skip_thresh = model_config.get("skip_threshold", DEFAULT_CNN_SKIP_PROBABILITY_THRESH)
+            print(cnn_skip_thresh)
+            for sample_pct in ref_samples: # continues until either all samples have been evaluated or the threshold is met
+                sample_count += 1
+                analyze_img = retrieve(r, sample_pct)
+                self.images[i].append(analyze_img)
+                single_input_tensor = np.asarray([analyze_img])
+                single_pred_probas = classifier.predict(single_input_tensor)[0]
+                single_pred_classes = np.argmax(single_pred_probas)
+                best_prob = single_pred_probas[single_pred_classes]
 
-            majority_class_by_cnn = mode(pred_classes)[0][0]
-            majority_class_avg_proba_by_cnn = 0
-            for pred_class, class_proba in zip(pred_classes, class_probas):
-                if pred_class == majority_class_by_cnn:
-                    majority_class_avg_proba_by_cnn += class_proba
+                if best_prob>cnn_skip_thresh: # uses the info of the sample that met the threshold only
+                    majority_class_avg_proba_by_cnn = float(best_prob)
+                    majority_class_by_cnn = single_pred_classes
+                    success = True
+                    logging.info("Found good match with prob %s meeting threshold %s, skipping remainder of samples."
+                        % (best_prob,cnn_skip_thresh))
+                    break
+                
+                input_tensor.append(single_input_tensor)
+                pred_probas.append(single_pred_probas)
+                pred_classes.append(single_pred_classes)
+             
+            if not success: # uses the info of all samples
+                class_probas = []
+                for i, pred_class in enumerate(pred_classes):
+                    class_probas.append(pred_probas[i][pred_class])
 
-            majority_class_avg_proba_by_cnn = majority_class_avg_proba_by_cnn / len(ref_samples)
+                logging.info("Unique pred_classes: %s" % len(set(pred_classes)))
+                logging.info("pred_classes: %s, pred_probas: %s" % (str(pred_classes), str(class_probas)))
+
+                majority_class_by_cnn = mode(pred_classes)[0][0]
+                majority_class_avg_proba_by_cnn = 0
+                for pred_class, class_proba in zip(pred_classes, class_probas):
+                    if pred_class == majority_class_by_cnn:
+                        majority_class_avg_proba_by_cnn += class_proba
+
+                majority_class_avg_proba_by_cnn = majority_class_avg_proba_by_cnn / len(ref_samples)
+
 
             cur_pred_scene_tag_by_cnn = model_config["classes"][majority_class_by_cnn]
             cur_pred_scene_tag_sequence_corrected, is_corrected = _sequence_based_correction(prev_scene_tag,
@@ -267,8 +306,17 @@ class RegionClassifier:
             # This helps to evaluate the overall algorithmic performance.
             r.json['sceneTagMeta']["algoFinalLabel"] = majority_class_label
 
-        # TODO: Do we need to include any information in the depends section of the regions_file json?
+            total_sample_count += sample_count
+            region_end_time = time.time()
 
+            logging.debug("Samples taken for region: {}.".format(sample_count))
+            logging.debug("Time taken for region: {}.".format(region_end_time-region_start_time))
+
+        # TODO: Do we need to include any information in the depends section of the regions_file json?
+        end_time = time.time()
+        logging.info("Samples taken for file: {}.".format(total_sample_count))
+        logging.info("Regions processed for file: {}".format(num_to_process))
+        logging.info("Time taken for file: {}.".format(end_time-start_time))
         return regions
 
 
